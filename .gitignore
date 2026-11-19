@@ -1,0 +1,29 @@
+# Compiled class files & Maven target
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Spring Tool Suite (STS) / Eclipse
+.sts4/
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+
+# IntelliJ IDEA / VS Code
+.idea/
+*.iml
+.vscode/
+
+# OS & Temp files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.swp

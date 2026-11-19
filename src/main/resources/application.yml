@@ -1,0 +1,15 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: tacticalplay-rag
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tacticalplay}
+    username: ${POSTGRES_USER:tactical_user}
+    password: ${POSTGRES_PASSWORD:tactical_password}
+    driver-class-name: org.postgresql.Driver
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
