@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TacticalPlay RAG — Inteligencia Táctica &amp; Pizarra Dinámica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- Ambient Animated Background -->
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="glow-orb orb-3"></div>
+      <div class="tactical-grid"></div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- Top Header with 2 Dedicated View Tabs -->
+    <header class="topbar fade-slide-up" style="--delay: 0.05s">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="32" height="32" rx="9" stroke="url(#gradLogo)" stroke-width="2.2" />
+            <circle cx="18" cy="18" r="6" stroke="#c084fc" stroke-width="1.8" />
+            <path d="M18 2V34M2 18H34" stroke="rgba(192,132,252,0.35)" stroke-width="1.4" />
+            <circle cx="18" cy="18" r="2.2" fill="#a855f7" />
+            <defs>
+              <linearGradient id="gradLogo" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#c084fc" />
+                <stop offset="1" stop-color="#6d28d9" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="logo-pulse"></span>
+        </div>
+        <div>
+          <h1 class="brand-title">TacticalPlay <span class="accent-gradient">RAG</span></h1>
+          <p class="brand-subtitle">Entrenador IA Vectorial &amp; Pizarra Táctica</p>
+        </div>
+      </div>
+
+      <!-- Main Navigation Pills (3 Tabs) -->
+      <nav class="view-tabs-nav" role="tablist" aria-label="Vistas principales">
+        <button
+          type="button"
+          id="tab-btn-assistant"
+          class="view-tab-btn active"
+          data-tab="assistant"
+          role="tab"
+          aria-selected="true"
+        >
+          <span>🤖 Asistente Táctico IA</span>
+        </button>
+        <button
+          type="button"
+          id="tab-btn-board"
+          class="view-tab-btn"
+          data-tab="board"
+          role="tab"
+          aria-selected="false"
+        >
+          <span>🏟️ Pizarra &amp; Formaciones</span>
+        </button>
+        <button
+          type="button"
+          id="tab-btn-squad"
+          class="view-tab-btn"
+          data-tab="squad"
+          role="tab"
+          aria-selected="false"
+        >
+          <span>👥 Tu Propia Plantilla</span>
+        </button>
+      </nav>
+
+      <div class="header-meta">
+        <div class="active-modality-pill">
+          <span class="pill-label">Táctica activa:</span>
+          <strong id="header-modality-badge">Futsal · 1-3-1 (Rombo)</strong>
+        </div>
+
+        <button id="backend-status-btn" class="status-badge checking" title="Click para verificar conexión con Spring Boot">
+          <span class="status-dot"></span>
+          <span id="backend-status-text">Verificando API (8000)...</span>
+        </button>
+
+        <button id="shutdown-system-btn" type="button" class="shutdown-btn" title="Apagar Backend, Frontend y Docker limpiamente">
+          <span>⏻ Apagar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ========================================================================
+         TAB 1: 🤖 ASISTENTE TÁCTICO IA (Chat + Contexto Táctico Activo)
+         ======================================================================== -->
+    <main id="view-assistant" class="tab-view active-view">
+      <div class="assistant-layout">
+        <!-- Left Sidebar: Quick Modality & Active Tactic Context -->
+        <aside class="assistant-sidebar">
+          <!-- Quick Modality & Active Tactic Card -->
+          <article class="glass-card fade-slide-up" style="--delay: 0.1s">
+            <div class="card-header">
+              <div>
+                <span class="section-kicker">FORMATO &amp; CONTEXTO ACTIVO</span>
+                <h2 class="card-title">Modalidad en Consulta</h2>
+              </div>
+              <span class="badge-tag" id="players-count-tag">5 vs 5</span>
+            </div>
+
+            <div class="modality-grid" id="modality-selector" role="radiogroup" aria-label="Selector rápido de modalidad">
+              <button type="button" class="modality-btn active" data-modality="Futsal" data-players="5 vs 5">
+                <span class="mod-icon">⚡</span>
+                <span class="mod-name">Futsal</span>
+                <span class="mod-meta">40×20m · 5v5</span>
+              </button>
+              <button type="button" class="modality-btn" data-modality="Fútbol 7" data-players="7 vs 7">
+                <span class="mod-icon">🛡️</span>
+                <span class="mod-name">Fútbol 7</span>
+                <span class="mod-meta">Carrileros · 7v7</span>
+              </button>
+              <button type="button" class="modality-btn" data-modality="Fútbol 9" data-players="9 vs 9">
+                <span class="mod-icon">🎯</span>
+                <span class="mod-name">Fútbol 9</span>
+                <span class="mod-meta">Puente · 9v9</span>
+              </button>
+              <button type="button" class="modality-btn" data-modality="Fútbol 11" data-players="11 vs 11">
+                <span class="mod-icon">🏟️</span>
+                <span class="mod-name">Fútbol 11</span>
+                <span class="mod-meta">Campo completo · 11v11</span>
+              </button>
+            </div>
+
+            <div class="active-context-strip">
+              <div class="context-item">
+                <span class="ctx-label">Formación activa:</span>
+                <strong id="sidebar-formation-label">1-3-1 (Rombo)</strong>
+              </div>
+              <div class="context-item">
+                <span class="ctx-label">Estilo de juego:</span>
+                <strong id="sidebar-style-label">Posesión &amp; Juego de Posición</strong>
+              </div>
+              <div class="context-item">
+                <span class="ctx-label">Plantilla conectada:</span>
+                <strong id="sidebar-squad-label">PostgreSQL + Top 100 Activa</strong>
+              </div>
+              <button type="button" id="go-to-board-btn" class="ghost-mini-btn full-width-btn">
+                Ir a Pizarra &amp; Jugadas Preparadas 🏟️ →
+              </button>
+              <button type="button" id="go-to-squad-btn" class="ghost-mini-btn full-width-btn">
+                Gestionar Tu Propia Plantilla 👥 →
+              </button>
+              <button
+                type="button"
+                id="sync-wiki-btn"
+                class="ghost-mini-btn full-width-btn"
+                title="Sincronizar artículos tácticos reales desde Wikipedia API en pgvector"
+              >
+                🌐 Sincronizar Base Táctica Wikipedia
+              </button>
+            </div>
+          </article>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <section class="assistant-chat-main fade-slide-up" style="--delay: 0.14s">
+          <article class="glass-card chat-card">
+            <div class="chat-header">
+              <div class="assistant-identity">
+                <div class="assistant-avatar">
+                  <span>DT</span>
+                  <span class="avatar-ring"></span>
+                </div>
+                <div>
+                  <h2 class="card-title">Entrenador Táctico IA</h2>
+                  <p class="chat-subtitle">
+                    Lenguaje claro de cancha · Conectado a tu <code>Pizarra</code>, <code>Plantilla Propia</code> y <code>pgvector</code>
+                  </p>
+                </div>
+              </div>
+              <button type="button" id="clear-chat-btn" class="ghost-mini-btn" title="Limpiar conversación">
+                Limpiar chat
+              </button>
+            </div>
+
+            <!-- Quick Prompt Chips -->
+            <div class="quick-Chips-bar" id="quick-prompts">
+              <button type="button" class="prompt-chip" data-prompt="¿Cómo salimos jugando desde atrás si el rival nos presiona arriba?">
+                ⚡ Salida ante presión alta
+              </button>
+              <button type="button" class="prompt-chip" data-prompt="¿Qué movimientos y rotaciones hacemos en ataque para abrir espacios?">
+                🔄 Movimientos en ataque
+              </button>
+              <button type="button" class="prompt-chip" data-prompt="¿Cómo armamos el contragolpe rápido apenas recuperamos la pelota?">
+                🚀 Contragolpe tras robo
+              </button>
+              <button type="button" class="prompt-chip" data-prompt="¿Cómo nos repartimos las marcas y ayudas en el mediocampo?">
+                🛡️ Ayudas y marcas en el medio
+              </button>
+            </div>
+
+            <!-- Chat Messages Stream -->
+            <div id="chat-messages" class="chat-messages" role="log" aria-live="polite"></div>
+
+            <!-- Chat Input Form -->
+            <form id="chat-form" class="chat-input-bar">
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  id="chat-input"
+                  placeholder="Pregúntale al entrenador sobre tu formación, estilo, jugadas preparadas o plantilla..."
+                  autocomplete="off"
+                  required
+                />
+                <span class="input-modality-indicator" id="input-modality-tag">Futsal · 1-3-1</span>
+              </div>
+              <button type="submit" id="send-chat-btn" class="btn-primary shimmer-btn send-btn">
+                <span>Preguntar</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 5l7 7-7 7" />
+                </svg>
+              </button>
+            </form>
+          </article>
+        </section>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+         TAB 2: 🏟️ PIZARRA & FORMACIONES (Cancha amplia + Catálogo + Estilos)
+         ======================================================================== -->
+    <main id="view-board" class="tab-view hidden-view">
+      <div class="board-layout">
+        <!-- Left/Center: Controls + Large Interactive Tactical Pitch -->
+        <section class="board-main-section">
+          <article class="glass-card board-controls-card">
+            <div class="board-selectors-grid">
+              <!-- 1. Modality Selector -->
+              <div class="selector-group">
+                <label class="selector-label">1. Modalidad Deportiva</label>
+                <div class="board-modality-pills" id="board-modality-pills">
+                  <button type="button" class="board-mod-pill active" data-modality="Futsal">⚡ Futsal (5v5)</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 7">🛡️ Fútbol 7 (7v7)</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 9">🎯 Fútbol 9 (9v9)</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 11">🏟️ Fútbol 11 (11v11)</button>
+                </div>
+              </div>
+
+              <!-- 2. Formation Catalog Selector -->
+              <div class="selector-group">
+                <label for="formation-select" class="selector-label">2. Sistema / Formación Táctica</label>
+                <select id="formation-select" class="tactical-select"></select>
+              </div>
+
+              <!-- 3. Play Style Selector -->
+              <div class="selector-group">
+                <label for="style-select" class="selector-label">3. Estilo de Juego (Desplaza líneas)</label>
+                <select id="style-select" class="tactical-select">
+                  <option value="Posesión & Juego de Posición">🎯 Posesión &amp; Juego de Posición</option>
+                  <option value="Presión Alta (Gegenpressing)">🔥 Presión Alta (Gegenpressing)</option>
+                  <option value="Bloque Bajo & Contragolpe">🛡️ Bloque Bajo &amp; Contragolpe</option>
+                  <option value="Juego Directo & Vertical">⚡ Juego Directo &amp; Vertical</option>
+                  <option value="Rotación Dinámica">🔄 Rotación Dinámica</option>
+                </select>
+              </div>
+
+              <!-- 4. Set Piece / Prepared Play Sub-apartados (4A Categoría + 4B Jugada) -->
+              <div class="selector-group setpiece-dual-group">
+                <div class="sub-selector">
+                  <label for="setpiece-category-select" class="selector-label">4A. Fase / Tipo de Acción</label>
+                  <select id="setpiece-category-select" class="tactical-select">
+                    <option value="free">⚽ Juego Libre (Posicional)</option>
+                    <option value="attack">⚔️ Ataque / Balón Parado Ofensivo</option>
+                    <option value="defense">🛡️ Defensa / Organización Defensiva</option>
+                  </select>
+                </div>
+                <div class="sub-selector" id="setpiece-specific-wrap">
+                  <label for="setpiece-select" class="selector-label">4B. Jugada Específica</label>
+                  <select id="setpiece-select" class="tactical-select" disabled>
+                    <option value="0">Sin jugada seleccionada (Posicional)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Large Interactive Pitch Card -->
+          <article class="glass-card large-pitch-card">
+            <div class="card-header">
+              <div>
+                <span class="section-kicker">SIMULADOR POSICIONAL EN VIVO</span>
+                <h2 class="card-title" id="board-pitch-title">Pizarra Táctica · Futsal</h2>
+              </div>
+              <div class="pitch-header-badges">
+                <span class="badge-tag" id="board-style-badge">Posesión &amp; Juego de Posición</span>
+                <div class="formation-pill" id="formation-badge">1-3-1 (Rombo)</div>
+              </div>
+            </div>
+
+            <div class="tactical-pitch large-pitch" id="tactical-pitch">
+              <!-- Pitch markings SVG -->
+              <svg class="pitch-lines" viewBox="0 0 360 220" preserveAspectRatio="none">
+                <defs>
+                  <marker id="arrow-run" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#38bdf8" />
+                  </marker>
+                  <marker id="arrow-pass" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#fbbf24" />
+                  </marker>
+                  <marker id="arrow-shot" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" />
+                  </marker>
+                </defs>
+                <!-- Outer boundary -->
+                <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(168, 85, 247, 0.42)" stroke-width="1.8" />
+                <!-- Tactical thirds guide lines -->
+                <line x1="123" y1="10" x2="123" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
+                <line x1="236" y1="10" x2="236" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
+                <!-- Halfway line -->
+                <line x1="180" y1="10" x2="180" y2="210" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
+                <!-- Center circle -->
+                <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.5" />
+                <circle cx="180" cy="110" r="3" fill="#c084fc" />
+                <!-- Left Penalty Box -->
+                <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
+                <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
+                <!-- Right Penalty Box -->
+                <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
+                <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
+                <!-- Attack Direction Arrow -->
+                <path d="M150 202 L210 202 M204 198 L210 202 L204 206" stroke="rgba(192,132,252,0.45)" stroke-width="1.4" fill="none" />
+                <!-- Tactical passing lines container -->
+                <g id="synergy-links" stroke="rgba(192, 132, 252, 0.36)" stroke-width="1.5" stroke-dasharray="4 4"></g>
+                <!-- Set Piece / Prepared Play Overlay Layer -->
+                <g id="setpiece-overlay"></g>
+              </svg>
+
+              <!-- Dynamic Player Tokens Container -->
+              <div id="pitch-tokens" class="pitch-tokens"></div>
+
+              <!-- Animated Soccer Ball Token for Set Pieces -->
+              <div id="ball-token" class="ball-token hidden" aria-hidden="true">⚽</div>
+
+              <!-- Live Step-by-Step Banner Overlay on Pitch -->
+              <div id="setpiece-live-banner" class="setpiece-live-banner hidden">
+                <span class="live-step-badge" id="live-step-badge">Paso 1/3</span>
+                <span class="live-step-text" id="live-step-text">Preparando jugada...</span>
+              </div>
+            </div>
+
+            <div class="pitch-footer">
+              <span id="formation-full-text" class="formation-caption">
+                Dirección de ataque: Izquierda ➔ Derecha · Las fichas ajustan su altura y amplitud según el estilo elegido
+              </span>
+              <div class="pitch-footer-actions">
+                <div id="setpiece-playback-controls" class="setpiece-playback-controls hidden">
+                  <button type="button" id="play-setpiece-btn" class="play-action-btn" title="Reproducir secuencia paso a paso con pausa de lectura (2.5s)">
+                    ▶ Reproducir jugada (Pausada)
+                  </button>
+                  <button type="button" id="next-step-setpiece-btn" class="ghost-mini-btn" title="Avanzar manualmente al siguiente paso de la jugada">
+                    ⏭ Siguiente paso
+                  </button>
+                  <button type="button" id="reset-setpiece-btn" class="ghost-mini-btn" title="Volver a la posición inicial de la jugada">
+                    ↺ Posición inicial
+                  </button>
+                </div>
+                <button type="button" id="toggle-variant-btn" class="ghost-mini-btn" title="Siguiente formación del catálogo">
+                  Siguiente formación ↻
+                </button>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- Right Panel: Functions by Line (Defense, Midfield, Attack) + Send to Bot CTA -->
+        <aside class="board-details-aside">
+          <article class="glass-card line-functions-card">
+            <div class="card-header">
+              <div>
+                <span class="section-kicker">INSTRUCCIONES DE CANCHA POR LÍNEA</span>
+                <h2 class="card-title">Funciones &amp; Sinergias</h2>
+              </div>
+            </div>
+
+            <p id="tactic-overview-text" class="tactic-overview-text"></p>
+
+            <!-- Featured Reference Coach Card -->
+            <div class="reference-coach-card" id="reference-coach-card">
+              <div class="coach-card-header">
+                <span class="coach-kicker">🎓 DT REFERENTE / MODELO A SEGUIR</span>
+                <span class="coach-origin-badge" id="coach-origin-badge">Referente Directo</span>
+              </div>
+              <strong class="coach-name" id="coach-name-text">Pep Guardiola / Luis Enrique</strong>
+              <p class="coach-note" id="coach-note-text"></p>
+            </div>
+
+            <!-- Set Piece Step-by-Step Instructions Box (Visible when a Set Piece is selected) -->
+            <div class="setpiece-steps-box hidden" id="setpiece-steps-box">
+              <div class="setpiece-steps-header">
+                <span class="setpiece-kicker">📋 EJECUCIÓN DE JUGADA PREPARADA</span>
+                <div class="setpiece-legend">
+                  <span class="leg-item run">╌➔ Desmarque</span>
+                  <span class="leg-item pass">━➔ Pase</span>
+                  <span class="leg-item shot">━➔ Remate</span>
+                </div>
+              </div>
+              <strong id="setpiece-title-text" class="setpiece-title"></strong>
+              <ol id="setpiece-steps-list" class="setpiece-steps-list"></ol>
+            </div>
+
+            <div class="line-roles-list">
+              <div class="line-role-box defense">
+                <div class="line-role-header">
+                  <span class="line-dot gk-dot"></span>
+                  <strong>Salida &amp; Línea Defensiva</strong>
+                </div>
+                <p id="role-defense-text"></p>
+              </div>
+
+              <div class="line-role-box midfield">
+                <div class="line-role-header">
+                  <span class="line-dot mid-dot"></span>
+                  <strong>Mediocampo &amp; Elaboración</strong>
+                </div>
+                <p id="role-midfield-text"></p>
+              </div>
+
+              <div class="line-role-box attack">
+                <div class="line-role-header">
+                  <span class="line-dot att-dot"></span>
+                  <strong>Definición &amp; Presión Ofensiva</strong>
+                </div>
+                <p id="role-attack-text"></p>
+              </div>
+            </div>
+
+            <div class="style-effect-box">
+              <span class="style-effect-title">⚡ Efecto del estilo en cancha:</span>
+              <p id="style-effect-description"></p>
+            </div>
+
+            <div class="board-cta-actions">
+              <button type="button" id="analyze-with-bot-btn" class="btn-primary shimmer-btn analyze-cta-btn">
+                <span>Analizar esta táctica con el Bot →</span>
+              </button>
+              <button
+                type="button"
+                id="export-match-plan-board-btn"
+                class="btn-primary shimmer-btn print-plan-btn"
+                title="Generar ficha táctica imprimible / PDF con formación, titulares, funciones por línea y jugada preparada"
+              >
+                <span>📄 Exportar Plan de Partido (PDF / Imprimir)</span>
+              </button>
+            </div>
+          </article>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+         TAB 3: 👥 TU PROPIA PLANTILLA (Registro + Cancha Sinergias + Comparativa Top 100)
+         ======================================================================== -->
+    <main id="view-squad" class="tab-view hidden-view">
+      <div class="squad-layout">
+        <!-- Left Panel: Player Registration Form & Roster List -->
+        <aside class="squad-left-panel">
+          <article class="glass-card">
+            <div class="card-header">
+              <div>
+                <span class="section-kicker">REGISTRO EN POSTGRESQL</span>
+                <h2 class="card-title">Agregar Jugador</h2>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button
+                  type="button"
+                  id="load-demo-squad-btn"
+                  class="ghost-mini-btn"
+                  title="Cargar jugadores de demostración al instante"
+                >
+                  ⚡ Cargar Plantilla Demo
+                </button>
+                <button
+                  type="button"
+                  id="clear-squad-btn"
+                  class="ghost-mini-btn"
+                  title="Vaciar toda la plantilla personalizada en un clic"
+                >
+                  🗑️ Vaciar
+                </button>
+              </div>
+            </div>
+
+            <form id="add-player-form" class="player-form">
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label for="player-name-input">Nombre del Jugador</label>
+                  <input type="text" id="player-name-input" placeholder="Ej. Mateo Gómez" required />
+                </div>
+                <div class="form-field small-field">
+                  <label for="player-number-input">Dorsal</label>
+                  <input type="number" id="player-number-input" min="1" max="99" value="10" required />
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label for="player-pos-select">Posición Natural</label>
+                  <select id="player-pos-select" class="tactical-select">
+                    <optgroup label="Fútbol 11 / 9 / 7">
+                      <option value="POR">POR · Portero</option>
+                      <option value="DFC">DFC · Defensa Central</option>
+                      <option value="LD">LD · Lateral / Carrilero Der.</option>
+                      <option value="LI">LI · Lateral / Carrilero Izq.</option>
+                      <option value="MCD">MCD · Pivote Defensivo</option>
+                      <option value="MC">MC · Volante Mixto / Interior</option>
+                      <option value="MCO" selected>MCO · Enganche / Mediapunta</option>
+                      <option value="ED">ED · Extremo Derecho</option>
+                      <option value="EI">EI · Extremo Izquierdo</option>
+                      <option value="DC">DC · Delantero Centro</option>
+                    </optgroup>
+                    <optgroup label="Futsal (5v5)">
+                      <option value="CIE">CIE · Cierre</option>
+                      <option value="ALA">ALA · Ala</option>
+                      <option value="PIV">PIV · Pívot</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="player-foot-select">Pie Hábil</label>
+                  <select id="player-foot-select" class="tactical-select">
+                    <option value="Derecho">Derecho</option>
+                    <option value="Izquierdo">Izquierdo</option>
+                    <option value="Ambidiestro">Ambidiestro</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Attribute Sliders (1-99) -->
+              <div class="stats-sliders-grid">
+                <div class="slider-item">
+                  <div class="slider-header"><span>⚡ Ritmo</span><strong id="val-pace">84</strong></div>
+                  <input type="range" id="stat-pace" min="40" max="99" value="84" />
+                </div>
+                <div class="slider-item">
+                  <div class="slider-header"><span>🎯 Pase</span><strong id="val-passing">86</strong></div>
+                  <input type="range" id="stat-passing" min="40" max="99" value="86" />
+                </div>
+                <div class="slider-item">
+                  <div class="slider-header"><span>🪄 Regate</span><strong id="val-dribbling">85</strong></div>
+                  <input type="range" id="stat-dribbling" min="40" max="99" value="85" />
+                </div>
+                <div class="slider-item">
+                  <div class="slider-header"><span>🛡️ Defensa</span><strong id="val-defending">70</strong></div>
+                  <input type="range" id="stat-defending" min="40" max="99" value="70" />
+                </div>
+                <div class="slider-item">
+                  <div class="slider-header"><span>🚀 Tiro</span><strong id="val-shooting">82</strong></div>
+                  <input type="range" id="stat-shooting" min="40" max="99" value="82" />
+                </div>
+                <div class="slider-item">
+                  <div class="slider-header"><span>🧠 Visión</span><strong id="val-vision">86</strong></div>
+                  <input type="range" id="stat-vision" min="40" max="99" value="86" />
+                </div>
+              </div>
+
+              <button type="submit" id="save-player-btn" class="btn-primary shimmer-btn">
+                <span>+ Guardar en Tu Plantilla</span>
+              </button>
+            </form>
+
+            <!-- Registered Players Roster -->
+            <div class="squad-roster-section">
+              <div class="indexed-header">
+                <span>Jugadores en tu plantilla (Click para comparar)</span>
+                <span id="squad-count-badge" class="count-pill">0</span>
+              </div>
+              <ul id="squad-roster-list" class="squad-roster-list">
+                <li class="empty-docs-msg">Agrega jugadores o carga la Plantilla Demo.</li>
+              </ul>
+            </div>
+          </article>
+        </aside>
+
+        <!-- Center Panel: Squad Pitch & Automatic Lineup Synergy -->
+        <section class="squad-center-panel">
+          <article class="glass-card">
+            <div class="squad-top-controls">
+              <div class="squad-selectors-row">
+                <div class="selector-group">
+                  <label for="squad-modality-select" class="selector-label">Modalidad de tu Plantilla</label>
+                  <select id="squad-modality-select" class="tactical-select">
+                    <option value="Futsal">⚡ Futsal (5 vs 5)</option>
+                    <option value="Fútbol 7">🛡️ Fútbol 7 (7 vs 7)</option>
+                    <option value="Fútbol 9">🎯 Fútbol 9 (9 vs 9)</option>
+                    <option value="Fútbol 11" selected>🏟️ Fútbol 11 (11 vs 11)</option>
+                  </select>
+                </div>
+                <div class="selector-group">
+                  <label for="squad-formation-select" class="selector-label">Formación Predeterminada</label>
+                  <select id="squad-formation-select" class="tactical-select"></select>
+                </div>
+                <div class="selector-group">
+                  <label for="squad-style-select" class="selector-label">Estilo de Juego del Equipo</label>
+                  <select id="squad-style-select" class="tactical-select">
+                    <option value="Posesión & Juego de Posición" selected>🎯 Posesión &amp; Juego de Posición</option>
+                    <option value="Presión Alta (Gegenpressing)">🔥 Presión Alta (Gegenpressing)</option>
+                    <option value="Bloque Bajo & Contragolpe">🛡️ Bloque Bajo &amp; Contragolpe</option>
+                    <option value="Juego Directo & Vertical">⚡ Juego Directo &amp; Vertical</option>
+                    <option value="Rotación Dinámica">🔄 Rotación Dinámica</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="squad-actions-row">
+                <button
+                  type="button"
+                  id="generate-ideal-squad-btn"
+                  class="btn-primary shimmer-btn ideal-squad-btn"
+                  title="Evaluar combinaciones de titulares y suplentes por complementariedad, pie hábil y estilo de juego"
+                >
+                  <span>✨ Generar Plantilla Ideal según Estilo y Química Colectiva</span>
+                </button>
+                <div class="synergy-meter-box">
+                  <span class="selector-label">Sinergia Global</span>
+                  <div class="synergy-score-pill" id="squad-global-synergy">92%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ideal Chemistry Explanation Banner -->
+            <div id="ideal-squad-banner" class="ideal-squad-banner hidden">
+              <div class="ideal-banner-header">
+                <span class="ideal-banner-badge" id="ideal-banner-title">✨ XI Ideal por Química Colectiva</span>
+                <button type="button" id="close-ideal-banner-btn" class="roster-delete-btn" title="Ocultar explicación">✕</button>
+              </div>
+              <p id="ideal-banner-text" class="ideal-banner-text"></p>
+              <div id="ideal-banner-partners" class="ideal-partnerships-row"></div>
+            </div>
+
+            <div class="tactical-pitch large-pitch" id="squad-pitch">
+              <svg class="pitch-lines" viewBox="0 0 360 220" preserveAspectRatio="none">
+                <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(168, 85, 247, 0.42)" stroke-width="1.8" />
+                <line x1="123" y1="10" x2="123" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
+                <line x1="236" y1="10" x2="236" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
+                <line x1="180" y1="10" x2="180" y2="210" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
+                <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.5" />
+                <circle cx="180" cy="110" r="3" fill="#c084fc" />
+                <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
+                <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
+                <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
+                <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
+                <g id="squad-synergy-links" stroke="rgba(52, 211, 153, 0.42)" stroke-width="1.6" stroke-dasharray="4 4"></g>
+              </svg>
+              <div id="squad-pitch-tokens" class="pitch-tokens"></div>
+            </div>
+
+            <!-- Bench & Substitutes Drag-and-Drop Zone -->
+            <div class="bench-section" id="squad-bench-section">
+              <div class="bench-header">
+                <div class="bench-title-wrap">
+                  <span class="bench-title">🪑 Banca &amp; Suplentes (Arrastra hacia la cancha o intercambia titulares)</span>
+                  <span class="bench-legend">
+                    <span class="leg-dot natural"></span> Posición natural
+                    <span class="leg-dot adapted"></span> Improvisado / Fuera de puesto
+                  </span>
+                </div>
+                <div class="bench-actions">
+                  <span id="bench-count-badge" class="count-pill">0 en banca</span>
+                  <button type="button" id="reset-lineup-btn" class="ghost-mini-btn" title="Restaurar asignación automática por posición natural">
+                    ↺ Auto-ordenar
+                  </button>
+                </div>
+              </div>
+              <div id="squad-bench-list" class="squad-bench-list" aria-label="Banca de suplentes">
+                <span class="empty-docs-msg">Los jugadores suplentes o sin cupo titular aparecerán aquí para arrastrar.</span>
+              </div>
+            </div>
+
+            <div class="pitch-footer">
+              <span class="formation-caption">
+                Arrastra jugadores entre la <strong>Banca</strong> y la <strong>Cancha</strong> o exporta tu XI a la Pizarra Táctica
+              </span>
+              <div class="squad-footer-actions">
+                <button
+                  type="button"
+                  id="export-match-plan-squad-btn"
+                  class="btn-primary shimmer-btn print-plan-btn"
+                  title="Imprimir o guardar en PDF el Plan de Partido completo con tu alineación titular, banca e instrucciones"
+                >
+                  <span>📄 Exportar Plan de Partido</span>
+                </button>
+                <button
+                  type="button"
+                  id="export-squad-to-board-btn"
+                  class="btn-primary shimmer-btn export-board-btn"
+                  title="Enviar modalidad, formación, estilo y titulares con sus nombres/dorsales reales a la Pizarra Táctica para ejecutar Jugadas Preparadas"
+                >
+                  <span>📤 Exportar Plantilla Ideal a Pizarra</span>
+                </button>
+                <button type="button" id="ask-bot-about-squad-btn" class="btn-primary shimmer-btn" style="flex: 0 0 auto; padding: 8px 16px;">
+                  <span>Consultar mi plantilla con el Bot IA 🤖 →</span>
+                </button>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- Right Panel: Top 100 World / Historical Crack Comparison -->
+        <aside class="squad-right-panel">
+          <article class="glass-card crack-comparison-card">
+            <div class="card-header">
+              <div>
+                <span class="section-kicker">API TOP 100 MUNDIAL &amp; HISTÓRICO</span>
+                <h2 class="card-title">Espejo &amp; Sinergia Individual</h2>
+              </div>
+              <span class="badge-tag" id="comp-similarity-badge">94% Similitud</span>
+            </div>
+
+            <div id="crack-comparison-content" class="crack-comparison-content">
+              <div class="comp-player-header">
+                <div class="comp-avatar" id="comp-player-number">10</div>
+                <div>
+                  <h3 id="comp-player-name" class="comp-player-name">Selecciona un jugador</h3>
+                  <span id="comp-player-meta" class="comp-player-meta">Posición · Pie hábil · Media</span>
+                </div>
+              </div>
+
+              <!-- Homologous Top 100 Crack Box -->
+              <div class="homologous-crack-box">
+                <div class="coach-card-header">
+                  <span class="coach-kicker">🌟 ESTILO DE JUEGO SIMILAR A:</span>
+                  <span class="coach-origin-badge" id="comp-mirror-badge">Top 100</span>
+                </div>
+                <strong class="crack-name" id="comp-crack-name">Andrés Iniesta / Ricardinho</strong>
+                <span class="crack-style-tag" id="comp-crack-style">Conducción Pegada al Pie &amp; Visión</span>
+                <p class="crack-wiki-text" id="comp-crack-wiki"></p>
+              </div>
+
+              <div class="comp-detail-box">
+                <strong>🔍 ¿Por qué se parecen?</strong>
+                <p id="comp-why-text">Carga o selecciona un jugador para analizar su perfil técnico.</p>
+              </div>
+
+              <div class="comp-detail-box">
+                <strong>📈 Qué potenciar en entrenamientos:</strong>
+                <p id="comp-potentiate-text">—</p>
+              </div>
+
+              <div class="comp-detail-box">
+                <strong>🤝 Mejores socios dentro de tu plantilla:</strong>
+                <div id="comp-partners-chips" class="comp-partners-chips"></div>
+              </div>
+            </div>
+          </article>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+         PRINTABLE MATCH PLAN SHEET (Visible on @media print for PDF / Vestuario)
+         ======================================================================== -->
+    <section id="printable-match-plan" class="printable-match-plan" aria-hidden="true"></section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
