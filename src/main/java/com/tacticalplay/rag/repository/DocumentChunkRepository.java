@@ -3,12 +3,13 @@ package com.tacticalplay.rag.repository;
 import com.tacticalplay.rag.model.DocumentChunk;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,9 +17,13 @@ import java.util.stream.Collectors;
 @Repository
 public class DocumentChunkRepository {
 
-    private static final int EMBEDDING_DIM = 1536;
-    private static final String ZERO_VECTOR_LITERAL =
-            "[" + String.join(",", Collections.nCopies(EMBEDDING_DIM, "0.0")) + "]";
+    private static final String SEMANTIC_SEARCH_NATIVE_SQL = """
+            SELECT id, tenant_id, modality, source_name, page_number, chunk_text
+            FROM document_chunks
+            WHERE modality = :modality AND embedding IS NOT NULL
+            ORDER BY embedding <=> CAST(:queryEmbedding AS vector)
+            LIMIT :limit
+            """;
 
     private static final Set<String> STOP_WORDS = Set.of(
             "para", "como", "cual", "cuales", "cuando", "donde", "este", "esta",
@@ -37,31 +42,73 @@ public class DocumentChunkRepository {
     );
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     public DocumentChunkRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     }
 
     public int saveChunks(List<DocumentChunk> chunks) {
+        return saveChunks(chunks, "pdf-local");
+    }
+
+    public int saveChunks(List<DocumentChunk> chunks, String namespace) {
         if (chunks == null || chunks.isEmpty()) {
             return 0;
         }
 
+        String effectiveNamespace = (namespace != null && !namespace.isBlank()) ? namespace : "pdf-local";
         String sql = """
-                INSERT INTO document_chunks (tenant_id, modality, source_name, page_number, chunk_text, embedding)
-                VALUES (?, ?, ?, ?, ?, CAST(? AS vector))
+                INSERT INTO document_chunks (tenant_id, namespace, modality, source_name, page_number, chunk_text, embedding)
+                VALUES (?, ?, ?, ?, ?, ?, CAST(? AS vector))
                 """;
 
         jdbcTemplate.batchUpdate(sql, chunks, chunks.size(), (ps, chunk) -> {
             ps.setString(1, chunk.tenantId());
-            ps.setString(2, chunk.modality());
-            ps.setString(3, chunk.sourceName());
-            ps.setInt(4, chunk.pageNumber() != null ? chunk.pageNumber() : 1);
-            ps.setString(5, chunk.chunkText());
-            ps.setString(6, ZERO_VECTOR_LITERAL);
+            ps.setString(2, effectiveNamespace);
+            ps.setString(3, chunk.modality());
+            ps.setString(4, chunk.sourceName());
+            ps.setInt(5, chunk.pageNumber() != null ? chunk.pageNumber() : 1);
+            ps.setString(6, chunk.chunkText());
+            if (chunk.embeddingLiteral() != null && !chunk.embeddingLiteral().isBlank()) {
+                ps.setString(7, chunk.embeddingLiteral());
+            } else {
+                ps.setNull(7, Types.OTHER);
+            }
         });
 
         return chunks.size();
+    }
+
+    public int countByNamespace(String namespace) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM document_chunks WHERE namespace = ? OR tenant_id = ?",
+                Integer.class,
+                namespace,
+                namespace
+        );
+        return count != null ? count : 0;
+    }
+
+    public int deleteByNamespace(String namespace) {
+        return jdbcTemplate.update(
+                "DELETE FROM document_chunks WHERE namespace = ? OR tenant_id = ?",
+                namespace,
+                namespace
+        );
+    }
+
+    public List<DocumentChunk> findTopSimilarChunks(String modality, String queryEmbeddingLiteral, int limit) {
+        if (queryEmbeddingLiteral == null || queryEmbeddingLiteral.isBlank()) {
+            return List.of();
+        }
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("modality", modality)
+                .addValue("queryEmbedding", queryEmbeddingLiteral)
+                .addValue("limit", limit);
+
+        return namedJdbcTemplate.query(SEMANTIC_SEARCH_NATIVE_SQL, params, CHUNK_ROW_MAPPER);
     }
 
     public List<DocumentChunk> findContextualChunks(String modality, String userQuery, int limit) {
@@ -96,7 +143,6 @@ public class DocumentChunkRepository {
             return matchedChunks;
         }
 
-        // Fallback to most recent chunks for this modality if no exact keyword match
         String fallbackSql = """
                 SELECT id, tenant_id, modality, source_name, page_number, chunk_text
                 FROM document_chunks

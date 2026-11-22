@@ -6,6 +6,8 @@ import com.tacticalplay.rag.repository.DocumentChunkRepository;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +22,7 @@ import java.util.Set;
 @Service
 public class PdfIngestionService {
 
+    private static final Logger log = LoggerFactory.getLogger(PdfIngestionService.class);
     private static final int DEFAULT_CHUNK_SIZE = 800;
     private static final int DEFAULT_CHUNK_OVERLAP = 150;
     private static final Set<String> VALID_MODALITIES = Set.of(
@@ -27,9 +30,11 @@ public class PdfIngestionService {
     );
 
     private final DocumentChunkRepository chunkRepository;
+    private final EmbeddingService embeddingService;
 
-    public PdfIngestionService(DocumentChunkRepository chunkRepository) {
+    public PdfIngestionService(DocumentChunkRepository chunkRepository, EmbeddingService embeddingService) {
         this.chunkRepository = chunkRepository;
+        this.embeddingService = embeddingService;
     }
 
     public boolean isValidModality(String modality) {
@@ -48,6 +53,7 @@ public class PdfIngestionService {
 
             List<DocumentChunk> chunksToSave = new ArrayList<>();
             int totalPages;
+            int embeddedChunksCount = 0;
 
             try (PDDocument document = Loader.loadPDF(tempFile.toFile())) {
                 totalPages = document.getNumberOfPages();
@@ -60,18 +66,33 @@ public class PdfIngestionService {
 
                     List<String> pageChunks = splitTextIntoChunks(pageText, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP);
                     for (String chunkText : pageChunks) {
+                        String embeddingLiteral = null;
+                        if (embeddingService.isConfigured()) {
+                            try {
+                                embeddingLiteral = embeddingService.embedToPgVectorLiteral(chunkText);
+                                embeddedChunksCount++;
+                            } catch (Exception ex) {
+                                log.warn("No se pudo generar embedding para fragmento de {} (Pág. {}): {}",
+                                        originalFilename, page, ex.getMessage());
+                            }
+                        }
+
                         chunksToSave.add(DocumentChunk.forInsert(
                                 tenantId,
                                 modality,
                                 originalFilename,
                                 page,
-                                chunkText
+                                chunkText,
+                                embeddingLiteral
                         ));
                     }
                 }
             }
 
             int savedCount = chunkRepository.saveChunks(chunksToSave);
+            String statusMsg = embeddedChunksCount > 0
+                    ? String.format("PDF indexado con %d vectores semánticos (768 dims) en PostgreSQL y archivo temporal eliminado.", embeddedChunksCount)
+                    : "PDF guardado en PostgreSQL (sin embeddings porque GEMINI_API_KEY no está configurada) y archivo temporal eliminado.";
 
             return new PdfUploadResponse(
                     originalFilename,
@@ -79,7 +100,7 @@ public class PdfIngestionService {
                     modality,
                     totalPages,
                     savedCount,
-                    "PDF procesado e indexado correctamente en PostgreSQL y archivo temporal eliminado."
+                    statusMsg
             );
         } finally {
             try {

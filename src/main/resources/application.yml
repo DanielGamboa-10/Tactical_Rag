@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: tacticalplay-rag
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tacticalplay}
     username: ${POSTGRES_USER:tactical_user}
@@ -13,3 +15,11 @@ spring:
     multipart:
       max-file-size: 25MB
       max-request-size: 25MB
+
+ai:
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
+    chat-model: ${GEMINI_CHAT_MODEL:gemini-3.1-flash-lite}
+  embedding:
+    dimensions: 768

@@ -1,3 +1,9 @@
+# Environment secrets
+.env
+.env.*
+*.env
+!.env.example
+
 # Compiled class files & Maven target
 target/
 *.class
@@ -7,6 +13,12 @@ target/
 *.nar
 hs_err_pid*
 replay_pid*
+
+# Node & Frontend build artifacts
+node_modules/
+**/node_modules/
+dist/
+**/dist/
 
 # Spring Tool Suite (STS) / Eclipse
 .sts4/

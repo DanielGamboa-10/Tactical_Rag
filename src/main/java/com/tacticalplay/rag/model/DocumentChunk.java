@@ -6,8 +6,31 @@ public record DocumentChunk(
         String modality,
         String sourceName,
         Integer pageNumber,
-        String chunkText
+        String chunkText,
+        String embeddingLiteral
 ) {
+    public DocumentChunk(
+            Long id,
+            String tenantId,
+            String modality,
+            String sourceName,
+            Integer pageNumber,
+            String chunkText
+    ) {
+        this(id, tenantId, modality, sourceName, pageNumber, chunkText, null);
+    }
+
+    public static DocumentChunk forInsert(
+            String tenantId,
+            String modality,
+            String sourceName,
+            int pageNumber,
+            String chunkText,
+            String embeddingLiteral
+    ) {
+        return new DocumentChunk(null, tenantId, modality, sourceName, pageNumber, chunkText, embeddingLiteral);
+    }
+
     public static DocumentChunk forInsert(
             String tenantId,
             String modality,
@@ -15,7 +38,7 @@ public record DocumentChunk(
             int pageNumber,
             String chunkText
     ) {
-        return new DocumentChunk(null, tenantId, modality, sourceName, pageNumber, chunkText);
+        return new DocumentChunk(null, tenantId, modality, sourceName, pageNumber, chunkText, null);
     }
 
     public String formattedSource() {
