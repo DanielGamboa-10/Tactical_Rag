@@ -79,6 +79,9 @@ export const dom = {
   sidebarFormationLabel: document.getElementById('sidebar-formation-label'),
   sidebarStyleLabel: document.getElementById('sidebar-style-label'),
   sidebarSquadLabel: document.getElementById('sidebar-squad-label'),
+  sidebarSynergyValue: document.getElementById('sidebar-synergy-value'),
+  sidebarSetpieceValue: document.getElementById('sidebar-setpiece-value'),
+  sidebarCameraValue: document.getElementById('sidebar-camera-value'),
   goToBoardBtn: document.getElementById('go-to-board-btn'),
   goToSquadBtn: document.getElementById('go-to-squad-btn'),
   syncWikiBtn: document.getElementById('sync-wiki-btn'),
@@ -91,6 +94,7 @@ export const dom = {
   boardStyleBadge: document.getElementById('board-style-badge'),
   formationBadge: document.getElementById('formation-badge'),
   toggleExpandBoardBtn: document.getElementById('toggle-expand-board-btn'),
+  toggle2dViewBtn: document.getElementById('toggle-2d-view-btn'),
   toggleTvViewBtn: document.getElementById('toggle-tv-view-btn'),
   toggleStadium3dBtn: document.getElementById('toggle-stadium-3d-btn'),
   toggleHeatmapBtn: document.getElementById('toggle-heatmap-btn'),
@@ -291,11 +295,14 @@ export function switchTab(tabName) {
 
   dom.tabBtnAssistant.classList.toggle('active', isAssistant);
   dom.tabBtnAssistant.setAttribute('aria-selected', String(isAssistant));
+  dom.tabBtnAssistant.setAttribute('tabindex', isAssistant ? '0' : '-1');
   dom.tabBtnBoard.classList.toggle('active', isBoard);
   dom.tabBtnBoard.setAttribute('aria-selected', String(isBoard));
+  dom.tabBtnBoard.setAttribute('tabindex', isBoard ? '0' : '-1');
   if (dom.tabBtnSquad) {
     dom.tabBtnSquad.classList.toggle('active', isSquad);
     dom.tabBtnSquad.setAttribute('aria-selected', String(isSquad));
+    dom.tabBtnSquad.setAttribute('tabindex', isSquad ? '0' : '-1');
   }
 
   dom.viewAssistant.classList.toggle('active-view', isAssistant);
@@ -1436,6 +1443,22 @@ export function updateContextBadges() {
     dom.sidebarSquadLabel.textContent = count > 0
       ? `${count} jugadores en PostgreSQL`
       : 'PostgreSQL + Top 100 Activa';
+  }
+  if (dom.sidebarSynergyValue) {
+    dom.sidebarSynergyValue.textContent = synergyPct ? `${synergyPct}%` : 'Sin nómina';
+  }
+  if (dom.sidebarSetpieceValue) {
+    const activePlay = getActiveSetPiece();
+    dom.sidebarSetpieceValue.textContent = activePlay
+      ? activePlay.name.split('—')[0].trim()
+      : 'Juego libre';
+  }
+  if (dom.sidebarCameraValue) {
+    dom.sidebarCameraValue.textContent = state.isStadium3DView
+      ? 'Estadio 3D'
+      : state.isTv25DView
+        ? 'TV 2.5D'
+        : '2D Cenital';
   }
 }
 

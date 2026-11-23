@@ -20,6 +20,7 @@ import {
   playSetPieceAnimation,
   advanceNextSetPieceStep,
   resetSetPieceToStart,
+  activate2DView,
   toggleTv25DView,
   handleToggleStadium3D,
   toggleHeatmapView,
@@ -165,6 +166,11 @@ export function initPitchViewEvents() {
   // Export Tactical Pitch as High-Resolution PNG Image
   if (dom.exportPngBoardBtn) {
     dom.exportPngBoardBtn.addEventListener('click', () => exportPitchAsPng('board'));
+  }
+
+  // Selector de cámara segmentado (2D Cenital / TV 2.5D / Estadio 3D)
+  if (dom.toggle2dViewBtn) {
+    dom.toggle2dViewBtn.addEventListener('click', () => activate2DView());
   }
 
   // Toggle 2.5D TV Broadcast Perspective Camera

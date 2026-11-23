@@ -1031,6 +1031,28 @@ export function toggleStadium3DView(forceState = null, currentBoardCoords = []) 
     dom.toggleStadium3dBtn.classList.toggle('active', active);
     dom.toggleStadium3dBtn.setAttribute('aria-pressed', String(active));
   }
+  if (dom.toggle2dViewBtn) {
+    const is2d = !active && !state.isTv25DView;
+    dom.toggle2dViewBtn.classList.toggle('active', is2d);
+    dom.toggle2dViewBtn.setAttribute('aria-pressed', String(is2d));
+  }
+
+  // En Estadio 3D las capas 2D (Mapa de Calor y Trazado libre) no aplican sobre WebGL;
+  // usamos aria-disabled="true" para mantener foco por teclado con aviso claro.
+  [dom.toggleHeatmapBtn, dom.toggleDrawBtn].forEach((toolBtn) => {
+    if (!toolBtn) return;
+    toolBtn.classList.toggle('tool-disabled-3d', active);
+    if (active) {
+      toolBtn.setAttribute('aria-disabled', 'true');
+    } else {
+      toolBtn.removeAttribute('aria-disabled');
+    }
+  });
+  if (active && state.isDrawModeActive && dom.freehandDrawSvg) {
+    dom.freehandDrawSvg.classList.remove('drawing-enabled');
+  } else if (!active && state.isDrawModeActive && dom.freehandDrawSvg) {
+    dom.freehandDrawSvg.classList.add('drawing-enabled');
+  }
 
   if (dom.tacticalPitch) {
     dom.tacticalPitch.classList.toggle('stadium-3d-active', active);

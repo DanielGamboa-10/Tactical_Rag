@@ -428,6 +428,8 @@
           data-tab="assistant"
           role="tab"
           aria-selected="true"
+          aria-controls="view-assistant"
+          tabindex="0"
         >
           <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -442,6 +444,8 @@
           data-tab="board"
           role="tab"
           aria-selected="false"
+          aria-controls="view-board"
+          tabindex="-1"
         >
           <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -457,6 +461,8 @@
           data-tab="squad"
           role="tab"
           aria-selected="false"
+          aria-controls="view-squad"
+          tabindex="-1"
         >
           <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -505,10 +511,11 @@
       </div>
     </header>
 
+    <main id="app-main-content" class="app-main-content">
     <!-- ========================================================================
          TAB 1: ASISTENTE TÁCTICO RAG (Chat + Contexto Táctico Activo)
          ======================================================================== -->
-    <main id="view-assistant" class="tab-view active-view">
+    <section id="view-assistant" class="tab-view active-view" role="tabpanel" aria-labelledby="tab-btn-assistant">
       <div class="assistant-layout">
         <!-- Left Sidebar: Quick Modality & Active Tactic Context -->
         <aside class="assistant-sidebar">
@@ -586,6 +593,35 @@
               </button>
             </div>
           </article>
+
+          <article class="glass-card sidebar-card sidebar-summary-card" aria-label="Resumen táctico activo">
+            <div class="card-header compact">
+              <span class="section-kicker">TELEMETRÍA DE SESIÓN</span>
+            </div>
+            <div class="sidebar-active-metrics">
+              <div class="sidebar-metric-row">
+                <span class="sidebar-metric-label">Sinergia XI</span>
+                <strong class="sidebar-metric-value" id="sidebar-synergy-value">Sin nómina</strong>
+              </div>
+              <div class="sidebar-metric-row">
+                <span class="sidebar-metric-label">Fase pizarra</span>
+                <strong class="sidebar-metric-value" id="sidebar-setpiece-value">Juego libre</strong>
+              </div>
+              <div class="sidebar-metric-row">
+                <span class="sidebar-metric-label">Cámara</span>
+                <strong class="sidebar-metric-value" id="sidebar-camera-value">2D Cenital</strong>
+              </div>
+            </div>
+            <div class="sidebar-quick-scenarios">
+              <span class="sidebar-scenarios-label">Escenarios rápidos</span>
+              <div class="sidebar-scenarios-grid">
+                <button type="button" class="scenario-mini-btn" data-scenario-prompt="¿Cómo romper una defensa cerrada 2-2 en media cancha con mi sistema actual?">Romper bloque bajo</button>
+                <button type="button" class="scenario-mini-btn" data-scenario-prompt="Diseña la salida de presión alta 3+1 desde portero contra marca individual.">Salida de presión</button>
+                <button type="button" class="scenario-mini-btn" data-scenario-prompt="Plantea una jugada ensayada de córner con bloqueo indirecto y finalización en segundo palo.">Córner ensayado</button>
+                <button type="button" class="scenario-mini-btn" data-scenario-prompt="¿Qué ajustes defensivos recomiendas para proteger transiciones cuando perdemos el balón en zona 3?">Transición defensiva</button>
+              </div>
+            </div>
+          </article>
         </aside>
 
         <!-- Main Chat Area -->
@@ -610,7 +646,7 @@
             </div>
 
             <!-- Quick Prompt Chips -->
-            <div class="quick-Chips-bar" id="quick-prompts">
+            <div class="quick-chips-bar" id="quick-prompts">
               <button type="button" class="prompt-chip" data-prompt="¿Cómo salimos jugando desde atrás si el rival nos presiona arriba?">
                 Salida ante presión alta
               </button>
@@ -634,11 +670,12 @@
                 <input
                   type="text"
                   id="chat-input"
+                  aria-label="Consulta táctica para el asistente RAG"
                   placeholder="Consulta ajustes de sistema, superioridades, balón parado o variantes de plantilla..."
                   autocomplete="off"
                   required
                 />
-                <span class="input-modality-indicator" id="input-modality-tag">Futsal · 1-3-1</span>
+                <span class="input-modality-indicator" id="input-modality-tag" aria-live="polite">Futsal · 1-3-1</span>
               </div>
               <button type="submit" id="send-chat-btn" class="btn-primary shimmer-btn send-btn">
                 <span>Consultar</span>
@@ -650,12 +687,12 @@
           </article>
         </section>
       </div>
-    </main>
+    </section>
 
     <!-- ========================================================================
          TAB 2: PIZARRA TÁCTICA (Cancha interactiva + Sistemas + Modelos)
          ======================================================================== -->
-    <main id="view-board" class="tab-view hidden-view">
+    <section id="view-board" class="tab-view hidden-view" role="tabpanel" aria-labelledby="tab-btn-board">
       <div class="board-layout">
         <!-- Left/Center: Controls + Large Interactive Tactical Pitch -->
         <section class="board-main-section">
@@ -675,13 +712,13 @@
               <!-- 2. Formation Catalog Selector -->
               <div class="selector-group">
                 <label for="formation-select" class="selector-label">02 · Sistema Táctico</label>
-                <select id="formation-select" class="tactical-select"></select>
+                <select id="formation-select" name="formation" class="tactical-select"></select>
               </div>
 
               <!-- 3. Play Style Selector -->
               <div class="selector-group">
                 <label for="style-select" class="selector-label">03 · Modelo de Juego</label>
-                <select id="style-select" class="tactical-select">
+                <select id="style-select" name="playStyle" class="tactical-select">
                   <option value="Posesión & Juego de Posición">Posesión &amp; Juego de Posición</option>
                   <option value="Presión Alta (Gegenpressing)">Presión Alta (Gegenpressing)</option>
                   <option value="Bloque Bajo & Contragolpe">Bloque Bajo &amp; Contragolpe</option>
@@ -694,7 +731,7 @@
               <div class="selector-group setpiece-dual-group">
                 <div class="sub-selector">
                   <label for="setpiece-category-select" class="selector-label">04A · Fase Táctica</label>
-                  <select id="setpiece-category-select" class="tactical-select">
+                  <select id="setpiece-category-select" name="setpieceCategory" class="tactical-select">
                     <option value="free">Juego Libre (Posicional)</option>
                     <option value="attack">Balón Parado Ofensivo</option>
                     <option value="defense">Organización Defensiva</option>
@@ -702,7 +739,7 @@
                 </div>
                 <div class="sub-selector" id="setpiece-specific-wrap">
                   <label for="setpiece-select" class="selector-label">04B · Acción de Pizarra</label>
-                  <select id="setpiece-select" class="tactical-select" disabled>
+                  <select id="setpiece-select" name="setpiece" class="tactical-select" disabled>
                     <option value="0">Sin jugada seleccionada (Posicional)</option>
                   </select>
                 </div>
@@ -718,89 +755,99 @@
                 <h2 class="card-title" id="board-pitch-title">Pizarra Táctica · Futsal</h2>
               </div>
               <div class="pitch-header-badges">
-                <button
-                  type="button"
-                  id="toggle-expand-board-btn"
-                  class="tv-view-toggle-btn expand-board-btn"
-                  aria-pressed="false"
-                  title="Alternar modo presentación a ancho completo"
-                >
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="15 3 21 3 21 9" />
-                    <polyline points="9 21 3 21 3 15" />
-                    <line x1="21" y1="3" x2="14" y2="10" />
-                    <line x1="3" y1="21" x2="10" y2="14" />
-                  </svg>
-                  <span>Expandir</span>
-                </button>
-                <button
-                  type="button"
-                  id="toggle-tv-view-btn"
-                  class="tv-view-toggle-btn"
-                  aria-pressed="false"
-                  title="Alternar cámara con perspectiva táctica 2.5D"
-                >
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                    <polyline points="2 17 12 22 22 17" />
-                    <polyline points="2 12 12 17 22 12" />
-                  </svg>
-                  <span>Vista TV 2.5D</span>
-                </button>
-                <button
-                  type="button"
-                  id="toggle-stadium-3d-btn"
-                  class="tv-view-toggle-btn stadium-3d-btn"
-                  aria-pressed="false"
-                  title="Activar simulación WebGL en Estadio 3D"
-                >
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                    <line x1="12" y1="22.08" x2="12" y2="12" />
-                  </svg>
-                  <span>Estadio 3D</span>
-                </button>
-                <button
-                  type="button"
-                  id="toggle-heatmap-btn"
-                  class="tv-view-toggle-btn heatmap-toggle-btn"
-                  aria-pressed="false"
-                  title="Proyectar densidad térmica de ocupación espacial"
-                >
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                  </svg>
-                  <span>Mapa de Calor</span>
-                </button>
-                <button
-                  type="button"
-                  id="toggle-draw-btn"
-                  class="tv-view-toggle-btn draw-toggle-btn"
-                  aria-pressed="false"
-                  title="Trazar vectores y líneas de movimiento sobre el campo"
-                >
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 19l7-7 3 3-7 7-3-3z" />
-                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
-                    <path d="M2 2l7.586 7.586" />
-                  </svg>
-                  <span>Trazar Jugada</span>
-                </button>
-                <button
-                  type="button"
-                  id="clear-draw-btn"
-                  class="tv-view-toggle-btn clear-draw-btn hidden"
-                  title="Limpiar trazos manuales del campo"
-                >
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 6h18" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  </svg>
-                  <span>Limpiar</span>
-                </button>
-                <span class="badge-tag" id="board-style-badge">Posesión &amp; Juego de Posición</span>
-                <div class="formation-pill" id="formation-badge">1-3-1 (Rombo)</div>
+                <!-- Grupo 1: Modo de Cámara (2D / 2.5D / 3D) -->
+                <div class="pitch-camera-segmented" role="group" aria-label="Selector de cámara de cancha">
+                  <button
+                    type="button"
+                    id="toggle-2d-view-btn"
+                    class="camera-seg-btn active"
+                    aria-pressed="true"
+                    title="Vista cenital 2D reglamentaria"
+                  >
+                    <span>2D</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="toggle-tv-view-btn"
+                    class="camera-seg-btn"
+                    aria-pressed="false"
+                    title="Cámara táctica perspectiva TV 2.5D"
+                  >
+                    <span>TV 2.5D</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="toggle-stadium-3d-btn"
+                    class="camera-seg-btn stadium-3d-btn"
+                    aria-pressed="false"
+                    title="Simulación WebGL Estadio 3D"
+                  >
+                    <span>Estadio 3D</span>
+                  </button>
+                </div>
+
+                <!-- Grupo 2: Capas & Trazado sobre Pizarra -->
+                <div class="pitch-tools-group" role="group" aria-label="Capas y herramientas de dibujo">
+                  <button
+                    type="button"
+                    id="toggle-heatmap-btn"
+                    class="tv-view-toggle-btn heatmap-toggle-btn"
+                    aria-pressed="false"
+                    title="Proyectar densidad térmica de ocupación espacial (solo vista 2D / 2.5D)"
+                  >
+                    <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                    <span>Calor</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="toggle-draw-btn"
+                    class="tv-view-toggle-btn draw-toggle-btn"
+                    aria-pressed="false"
+                    title="Trazar vectores y líneas de movimiento sobre el campo (solo vista 2D / 2.5D)"
+                  >
+                    <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                      <path d="M2 2l7.586 7.586" />
+                    </svg>
+                    <span>Trazar</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="clear-draw-btn"
+                    class="tv-view-toggle-btn clear-draw-btn hidden"
+                    title="Limpiar trazos manuales del campo"
+                  >
+                    <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    <span>Limpiar</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="toggle-expand-board-btn"
+                    class="tv-view-toggle-btn expand-board-btn"
+                    aria-pressed="false"
+                    title="Alternar modo presentación a ancho completo"
+                  >
+                    <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="15 3 21 3 21 9" />
+                      <polyline points="9 21 3 21 3 15" />
+                      <line x1="21" y1="3" x2="14" y2="10" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                    <span>Expandir</span>
+                  </button>
+                </div>
+
+                <!-- Grupo 3: Estado Táctico -->
+                <div class="pitch-status-badges">
+                  <span class="badge-tag" id="board-style-badge">Posesión &amp; Juego de Posición</span>
+                  <div class="formation-pill" id="formation-badge">1-3-1 (Rombo)</div>
+                </div>
               </div>
             </div>
 
@@ -1039,12 +1086,12 @@
           </article>
         </aside>
       </div>
-    </main>
+    </section>
 
     <!-- ========================================================================
          TAB 3: GESTIÓN DE PLANTILLA (Registro + Sinergia Posicional + Top 100)
          ======================================================================== -->
-    <main id="view-squad" class="tab-view hidden-view">
+    <section id="view-squad" class="tab-view hidden-view" role="tabpanel" aria-labelledby="tab-btn-squad">
       <div class="squad-layout">
         <!-- Left Panel: Player Registration Form & Roster List -->
         <aside class="squad-left-panel">
@@ -1098,7 +1145,7 @@
               <div class="form-row-2">
                 <div class="form-field">
                   <label for="player-pos-select">Posición Natural</label>
-                  <select id="player-pos-select" class="tactical-select">
+                  <select id="player-pos-select" name="playerPosition" class="tactical-select">
                     <optgroup label="Fútbol 11 / 9 / 7">
                       <option value="POR">POR · Portero</option>
                       <option value="DFC">DFC · Defensa Central</option>
@@ -1120,7 +1167,7 @@
                 </div>
                 <div class="form-field">
                   <label for="player-foot-select">Perfil Hábil</label>
-                  <select id="player-foot-select" class="tactical-select">
+                  <select id="player-foot-select" name="playerFoot" class="tactical-select">
                     <option value="Derecho">Derecho</option>
                     <option value="Izquierdo">Izquierdo</option>
                     <option value="Ambidiestro">Ambidiestro</option>
@@ -1187,7 +1234,7 @@
               <div class="squad-selectors-row">
                 <div class="selector-group">
                   <label for="squad-modality-select" class="selector-label">Modalidad de Plantilla</label>
-                  <select id="squad-modality-select" class="tactical-select">
+                  <select id="squad-modality-select" name="squadModality" class="tactical-select">
                     <option value="Futsal">Futsal (5 vs 5)</option>
                     <option value="Fútbol 7">Fútbol 7 (7 vs 7)</option>
                     <option value="Fútbol 9">Fútbol 9 (9 vs 9)</option>
@@ -1196,11 +1243,11 @@
                 </div>
                 <div class="selector-group">
                   <label for="squad-formation-select" class="selector-label">Sistema Base</label>
-                  <select id="squad-formation-select" class="tactical-select"></select>
+                  <select id="squad-formation-select" name="squadFormation" class="tactical-select"></select>
                 </div>
                 <div class="selector-group">
                   <label for="squad-style-select" class="selector-label">Modelo de Juego del Equipo</label>
-                  <select id="squad-style-select" class="tactical-select">
+                  <select id="squad-style-select" name="squadStyle" class="tactical-select">
                     <option value="Posesión & Juego de Posición" selected>Posesión &amp; Juego de Posición</option>
                     <option value="Presión Alta (Gegenpressing)">Presión Alta (Gegenpressing)</option>
                     <option value="Bloque Bajo & Contragolpe">Bloque Bajo &amp; Contragolpe</option>
@@ -1472,6 +1519,7 @@
           </article>
         </aside>
       </div>
+    </section>
     </main>
 
     <!-- ========================================================================

@@ -150,6 +150,38 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
   });
 }
 
+export function syncCameraSegmentedButtons() {
+  const is3d = Boolean(state.isStadium3DView);
+  const is25d = Boolean(state.isTv25DView) && !is3d;
+  const is2d = !is3d && !is25d;
+
+  if (dom.toggle2dViewBtn) {
+    dom.toggle2dViewBtn.classList.toggle('active', is2d);
+    dom.toggle2dViewBtn.setAttribute('aria-pressed', String(is2d));
+  }
+  if (dom.toggleTvViewBtn) {
+    dom.toggleTvViewBtn.classList.toggle('active', is25d);
+    dom.toggleTvViewBtn.setAttribute('aria-pressed', String(is25d));
+  }
+  if (dom.toggleStadium3dBtn) {
+    dom.toggleStadium3dBtn.classList.toggle('active', is3d);
+    dom.toggleStadium3dBtn.setAttribute('aria-pressed', String(is3d));
+  }
+  if (dom.sidebarCameraValue) {
+    dom.sidebarCameraValue.textContent = is3d ? 'Estadio 3D' : is25d ? 'TV 2.5D' : '2D Cenital';
+  }
+}
+
+export function activate2DView() {
+  if (state.isStadium3DView) {
+    toggleStadium3DView(false, currentBoardCoords);
+  }
+  if (state.isTv25DView) {
+    toggleTv25DView(false);
+  }
+  syncCameraSegmentedButtons();
+}
+
 export function toggleTv25DView(forceState = null) {
   if (state.isStadium3DView && forceState !== false) {
     toggleStadium3DView(false, currentBoardCoords);
@@ -157,10 +189,7 @@ export function toggleTv25DView(forceState = null) {
   state.isTv25DView = typeof forceState === 'boolean' ? forceState : !state.isTv25DView;
   const active = state.isTv25DView;
 
-  if (dom.toggleTvViewBtn) {
-    dom.toggleTvViewBtn.classList.toggle('active', active);
-    dom.toggleTvViewBtn.setAttribute('aria-pressed', String(active));
-  }
+  syncCameraSegmentedButtons();
 
   if (dom.tacticalPitch) {
     dom.tacticalPitch.classList.toggle('tv-25d-active', active);
@@ -204,6 +233,7 @@ export function handleToggleStadium3D(forceState = null) {
     toggleTv25DView(false);
   }
   toggleStadium3DView(forceState, currentBoardCoords);
+  syncCameraSegmentedButtons();
 }
 
 export function toggleExpandBoard(forceState = null) {
@@ -1062,6 +1092,14 @@ export function renderTacticalHeatmap(adjustedCoords = [], links = [], styleMod 
 }
 
 export function toggleHeatmapView(forceState = null) {
+  if (state.isStadium3DView && forceState !== false) {
+    showToast(
+      'Mapa de Calor solo en 2D / 2.5D',
+      'Cambia a vista 2D o TV 2.5D para proyectar la densidad térmica espacial.',
+      'info'
+    );
+    return;
+  }
   state.isHeatmapActive =
     typeof forceState === 'boolean' ? forceState : !state.isHeatmapActive;
   const active = state.isHeatmapActive;
@@ -1107,6 +1145,14 @@ function buildSmoothFreehandPathD(pts) {
 }
 
 export function toggleFreehandDrawMode(forceState = null) {
+  if (state.isStadium3DView && forceState !== false) {
+    showToast(
+      'Trazado manual no disponible en 3D',
+      'Vuelve a vista 2D o TV 2.5D para dibujar rutas tácticas sobre la pizarra.',
+      'info'
+    );
+    return;
+  }
   state.isDrawModeActive =
     typeof forceState === 'boolean' ? forceState : !state.isDrawModeActive;
   const active = state.isDrawModeActive;

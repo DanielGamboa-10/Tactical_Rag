@@ -595,7 +595,7 @@ body {
 }
 
 .board-layout.board-expanded .tactical-pitch.large-pitch {
-  height: 520px;
+  max-block-size: 740px;
 }
 
 .board-main-section {
@@ -686,7 +686,7 @@ body {
   min-width: 0;
   padding: 9px 12px;
   border-radius: 8px;
-  background: #111827;
+  background-color: #111827;
   border: 1px solid rgba(148, 163, 184, 0.16);
   color: #f1f5f9;
   font-family: 'Inter', sans-serif;
@@ -695,7 +695,67 @@ body {
   line-height: 1.35;
   cursor: pointer;
   text-overflow: ellipsis;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 160ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  appearance: base-select;
+  align-items: center;
+  gap: 8px;
+}
+
+.tactical-select::picker-icon {
+  color: #7c8ba1;
+  margin-inline-start: auto;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tactical-select:open::picker-icon {
+  transform: rotate(180deg);
+  color: #38bdf8;
+}
+
+.tactical-select::picker(select) {
+  appearance: base-select;
+  background-color: #0c111d;
+  color: #f1f5f9;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 10px;
+  padding: 6px;
+  margin-block: 4px;
+  box-shadow: 0 18px 36px rgba(2, 6, 23, 0.72);
+  max-block-size: 280px;
+}
+
+.tactical-select option {
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 0.81rem;
+}
+
+.tactical-select option:hover,
+.tactical-select option:focus-visible {
+  background-color: #17253e;
+  color: #fff;
+}
+
+.tactical-select option:checked {
+  background-color: rgba(2, 132, 199, 0.24);
+  color: #7dd3fc;
+  font-weight: 600;
+}
+
+.tactical-select option::checkmark {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+@supports not (appearance: base-select) {
+  .tactical-select {
+    appearance: none;
+    padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
 }
 
 .tactical-select:hover {
@@ -715,17 +775,63 @@ body {
   flex-wrap: wrap;
 }
 
+.pitch-camera-segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: #070a12;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.camera-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #94a3b8;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.camera-seg-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.camera-seg-btn.active {
+  background: linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%);
+  border-color: rgba(125, 211, 252, 0.4);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.pitch-tools-group,
+.pitch-status-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .tv-view-toggle-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 11px;
   border-radius: 8px;
   background: #111827;
   border: 1px solid rgba(148, 163, 184, 0.16);
   color: #cbd5e1;
   font-family: 'Inter', sans-serif;
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -742,6 +848,13 @@ body {
   border-color: rgba(125, 211, 252, 0.45);
   color: #fff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.tv-view-toggle-btn.tool-disabled-3d,
+.tv-view-toggle-btn[aria-disabled='true'] {
+  opacity: 0.42;
+  cursor: not-allowed;
+  border-style: dashed;
 }
 
 .formation-pill {
@@ -774,7 +887,10 @@ body {
 .tactical-pitch {
   position: relative;
   width: 100%;
-  height: 240px;
+  inline-size: 100%;
+  aspect-ratio: 360 / 220;
+  block-size: auto;
+  min-block-size: 250px;
   border-radius: var(--radius-md);
   background:
     radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.14), rgba(6, 22, 18, 0.94));
@@ -802,7 +918,8 @@ body {
 
 .tactical-pitch.surface-grass .pitch-regulatory-lines rect,
 .tactical-pitch.surface-grass .pitch-regulatory-lines line,
-.tactical-pitch.surface-grass .pitch-regulatory-lines circle {
+.tactical-pitch.surface-grass .pitch-regulatory-lines circle,
+.tactical-pitch.surface-grass .pitch-regulatory-lines path {
   stroke: rgba(167, 243, 208, 0.46);
 }
 
@@ -830,7 +947,10 @@ body {
 }
 
 .tactical-pitch.large-pitch {
-  height: 430px;
+  aspect-ratio: 360 / 220;
+  inline-size: 100%;
+  block-size: auto;
+  max-block-size: 620px;
 }
 
 .pitch-lines {
@@ -1568,8 +1688,8 @@ body {
 .chat-card {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 135px);
-  min-height: 640px;
+  height: calc(100dvh - 135px);
+  min-height: 540px;
 }
 
 .chat-header {
@@ -1623,13 +1743,133 @@ body {
   font-size: 0.71rem;
 }
 
+/* Tab 1 Sidebar Telemetry & Quick Scenarios Card */
+.card-header.compact {
+  margin-bottom: 10px;
+}
+
+.sidebar-active-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.sidebar-metric-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 9px;
+  border-radius: 8px;
+  background: #101728;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  min-width: 0;
+}
+
+.sidebar-metric-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7c8ba1;
+}
+
+.sidebar-metric-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-scenarios-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7c8ba1;
+}
+
+.sidebar-scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.scenario-mini-btn {
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: #111827;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  color: #cbd5e1;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.scenario-mini-btn:hover {
+  border-color: #0ea5e9;
+  background: #162038;
+  color: #f8fafc;
+}
+
 /* Quick Prompt Chips */
-.quick-Chips-bar {
+.quick-chips-bar {
   display: flex;
   gap: 8px;
-  padding: 12px 0;
+  padding: 12px 4px;
   overflow-x: auto;
   border-bottom: 1px solid rgba(148, 163, 184, 0.11);
+  scrollbar-width: thin;
+  mask-image: linear-gradient(to right, black 94%, transparent 100%);
+}
+
+.chat-inline-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.79rem;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: #0b1220;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #7dd3fc;
+}
+
+.chat-blockquote {
+  margin: 4px 0;
+  padding: 7px 12px;
+  border-left: 3px solid #38bdf8;
+  background: rgba(14, 165, 233, 0.08);
+  border-radius: 0 7px 7px 0;
+  color: #e2e8f0;
+  font-size: 0.84rem;
+}
+
+.copy-msg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: #0b1220;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.copy-msg-btn:hover {
+  border-color: #38bdf8;
+  background: #132038;
+  color: #fff;
 }
 
 .prompt-chip {
@@ -1881,25 +2121,35 @@ body {
 .input-wrapper {
   position: relative;
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-}
-
-.input-wrapper input {
-  width: 100%;
-  padding: 12px 140px 12px 14px;
+  gap: 8px;
+  padding: 4px 8px 4px 12px;
   border-radius: 8px;
   background: #111827;
   border: 1px solid rgba(148, 163, 184, 0.16);
+  transition: border-color 160ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-wrapper:focus-within {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+}
+
+.input-wrapper input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 8px 4px;
+  border: none;
+  background: transparent;
   color: var(--text-primary);
   font-size: 0.86rem;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .input-wrapper input:focus {
   outline: none;
-  border-color: #0284c7;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
 }
 
 .input-modality-indicator {
@@ -1967,7 +2217,7 @@ body {
    ========================================================================== */
 .squad-layout {
   display: grid;
-  grid-template-columns: 395px 1fr 395px;
+  grid-template-columns: 345px minmax(460px, 1fr) 360px;
   gap: 20px;
   align-items: start;
 }
@@ -1976,6 +2226,11 @@ body {
 .squad-center-panel,
 .squad-right-panel {
   min-width: 0;
+}
+
+.squad-center-panel {
+  container-type: inline-size;
+  container-name: squad-center;
 }
 
 .player-form {
@@ -3439,16 +3694,89 @@ body {
   color: #e0f2fe;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1220px) {
+/* Container Query: Tab 3 Center Panel adapta controles si se comprime */
+@container squad-center (max-width: 560px) {
+  .squad-selectors-row {
+    grid-template-columns: 1fr;
+  }
+
+  .squad-actions-row {
+    flex-wrap: wrap;
+  }
+}
+
+/* Multi-level Responsive Breakpoints */
+@media (max-width: 1360px) {
+  .topbar {
+    padding: 10px 18px;
+  }
+
+  .squad-layout {
+    grid-template-columns: 320px 1fr;
+  }
+
+  .squad-right-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1024px) {
   .assistant-layout,
   .board-layout,
-  .board-selectors-grid,
   .squad-layout {
     grid-template-columns: 1fr;
   }
 
+  .board-selectors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .chat-card {
-    height: 650px;
+    height: clamp(480px, 72dvh, 640px);
+    min-height: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    padding: 0 12px;
+  }
+
+  .topbar {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .view-tabs-nav {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .view-tab-btn {
+    white-space: nowrap;
+    padding: 6px 11px;
+    font-size: 0.78rem;
+  }
+
+  .board-selectors-grid,
+  .setpiece-dual-group,
+  .sidebar-scenarios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pitch-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .pitch-footer-actions,
+  .squad-footer-actions {
+    flex-wrap: wrap;
+  }
+
+  .tactical-pitch {
+    min-block-size: 220px;
   }
 }

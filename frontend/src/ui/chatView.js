@@ -200,6 +200,7 @@ function formatMarkdownToHtml(rawText) {
 
   const formatInline = (text) => {
     let safe = escapeHtml(text);
+    safe = safe.replace(/`([^`]+)`/g, '<code class="chat-inline-code">$1</code>');
     safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     safe = safe.replace(/__(.+?)__/g, '<strong>$1</strong>');
     safe = safe.replace(/(^|[\s(])\*(?!\s)([^*]+?)\*(?=[\s).,;:!?]|$)/g, '$1<em>$2</em>');
@@ -212,6 +213,13 @@ function formatMarkdownToHtml(rawText) {
 
     if (!line) {
       closeLists();
+      continue;
+    }
+
+    const blockquoteMatch = line.match(/^&gt;\s?(.*)$/) || line.match(/^>\s?(.*)$/);
+    if (blockquoteMatch) {
+      closeLists();
+      htmlParts.push(`<blockquote class="chat-blockquote">${formatInline(blockquoteMatch[1])}</blockquote>`);
       continue;
     }
 
@@ -305,6 +313,17 @@ export function appendAssistantMessage(data) {
         ${sourcesHtml}
         <button
           type="button"
+          class="copy-msg-btn"
+          title="Copiar análisis táctico al portapapeles"
+        >
+          <svg class="ui-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          <span>Copiar</span>
+        </button>
+        <button
+          type="button"
           class="play-on-board-btn"
           title="Aplicar y animar este sistema en la Pizarra Táctica"
         >
@@ -316,6 +335,22 @@ export function appendAssistantMessage(data) {
       </div>
     </div>
   `;
+
+  const copyMsgBtn = row.querySelector('.copy-msg-btn');
+  if (copyMsgBtn) {
+    copyMsgBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(mainAnalysis);
+        const lbl = copyMsgBtn.querySelector('span');
+        if (lbl) lbl.textContent = 'Copiado';
+        setTimeout(() => {
+          if (lbl) lbl.textContent = 'Copiar';
+        }, 1600);
+      } catch (_) {
+        showToast('Portapapeles no disponible', 'Copia el texto manualmente desde el mensaje.', 'info');
+      }
+    });
+  }
 
   const playOnBoardBtn = row.querySelector('.play-on-board-btn');
   if (playOnBoardBtn) {
@@ -447,12 +482,39 @@ export async function sendChatMessage(messageText) {
 }
 
 export function initChatViewEvents() {
-  // Top navigation tabs
+  // Top navigation tabs + Roving Tabindex (ArrowLeft / ArrowRight / Home / End)
+  const tabBtns = [dom.tabBtnAssistant, dom.tabBtnBoard, dom.tabBtnSquad].filter(Boolean);
   dom.tabBtnAssistant.addEventListener('click', () => switchTab('assistant'));
   dom.tabBtnBoard.addEventListener('click', () => switchTab('board'));
   if (dom.tabBtnSquad) {
     dom.tabBtnSquad.addEventListener('click', () => switchTab('squad'));
   }
+  tabBtns.forEach((tabBtn, idx) => {
+    tabBtn.addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+      e.preventDefault();
+      let nextIdx = idx;
+      if (e.key === 'ArrowRight') nextIdx = (idx + 1) % tabBtns.length;
+      if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + tabBtns.length) % tabBtns.length;
+      if (e.key === 'Home') nextIdx = 0;
+      if (e.key === 'End') nextIdx = tabBtns.length - 1;
+      const targetBtn = tabBtns[nextIdx];
+      if (targetBtn?.dataset?.tab) {
+        switchTab(targetBtn.dataset.tab);
+        targetBtn.focus();
+      }
+    });
+  });
+
+  // Sidebar Quick Scenarios (Tab 1)
+  document.querySelectorAll('.scenario-mini-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.scenarioPrompt) {
+        sendChatMessage(btn.dataset.scenarioPrompt);
+      }
+    });
+  });
+
   dom.goToBoardBtn.addEventListener('click', () => switchTab('board'));
   if (dom.goToSquadBtn) {
     dom.goToSquadBtn.addEventListener('click', () => switchTab('squad'));
