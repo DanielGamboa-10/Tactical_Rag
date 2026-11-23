@@ -25,6 +25,8 @@ import {
   handleToggleStadium3D,
   toggleHeatmapView,
   toggleFreehandDrawMode,
+  setFreehandColor,
+  undoLastFreehandStroke,
   clearFreehandDrawings,
   initFreehandDrawingEvents,
   toggleExpandBoard,
@@ -188,14 +190,37 @@ export function initPitchViewEvents() {
     dom.toggleHeatmapBtn.addEventListener('click', () => toggleHeatmapView());
   }
 
-  // Toggle Freehand Tactical Drawing Pencil & Clear Button
+  // Toggle Freehand Tactical Drawing Pencil, Palette & Undo (Ctrl+Z)
   initFreehandDrawingEvents();
   if (dom.toggleDrawBtn) {
     dom.toggleDrawBtn.addEventListener('click', () => toggleFreehandDrawMode());
   }
+  if (dom.freehandToolbar) {
+    dom.freehandToolbar.addEventListener('click', (e) => {
+      const colorBtn = e.target.closest('.freehand-color-btn');
+      if (colorBtn && colorBtn.dataset.drawColor) {
+        setFreehandColor(colorBtn.dataset.drawColor);
+      }
+    });
+  }
+  if (dom.undoDrawBtn) {
+    dom.undoDrawBtn.addEventListener('click', () => undoLastFreehandStroke());
+  }
   if (dom.clearDrawBtn) {
     dom.clearDrawBtn.addEventListener('click', () => clearFreehandDrawings());
   }
+  document.addEventListener('keydown', (e) => {
+    if (
+      state.activeTab === 'board' &&
+      (e.ctrlKey || e.metaKey) &&
+      e.key.toLowerCase() === 'z' &&
+      !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)
+    ) {
+      if (undoLastFreehandStroke()) {
+        e.preventDefault();
+      }
+    }
+  });
 
   // Toggle Full-Width Presentation / Broadcast Mode
   if (dom.toggleExpandBoardBtn) {

@@ -851,6 +851,32 @@
               </div>
             </div>
 
+            <!-- Palette & Undo Toolbar (Visible when Trazar Libre is active) -->
+            <div id="freehand-toolbar" class="freehand-toolbar hidden" role="toolbar" aria-label="Color y deshacer en trazado libre">
+              <span class="freehand-toolbar-label">Tinta táctica:</span>
+              <div class="freehand-color-group" role="group" aria-label="Color de flecha">
+                <button type="button" class="freehand-color-btn active" data-draw-color="cyan" aria-pressed="true">
+                  <span class="draw-swatch cyan" aria-hidden="true"></span>
+                  <span>Cian</span>
+                </button>
+                <button type="button" class="freehand-color-btn" data-draw-color="amber" aria-pressed="false">
+                  <span class="draw-swatch amber" aria-hidden="true"></span>
+                  <span>Ámbar</span>
+                </button>
+                <button type="button" class="freehand-color-btn" data-draw-color="red" aria-pressed="false">
+                  <span class="draw-swatch red" aria-hidden="true"></span>
+                  <span>Rojo</span>
+                </button>
+              </div>
+              <button type="button" id="undo-draw-btn" class="ghost-mini-btn freehand-undo-btn" title="Deshacer último trazo (Ctrl+Z)" disabled>
+                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 14 4 9l5-5" />
+                  <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
+                </svg>
+                <span>Deshacer (Ctrl+Z)</span>
+              </button>
+            </div>
+
             <div class="tactical-pitch large-pitch" id="tactical-pitch">
               <!-- Pitch markings SVG -->
               <svg class="pitch-lines" viewBox="0 0 360 220" preserveAspectRatio="none">
@@ -870,7 +896,7 @@
                 <rect class="pitch-surface-vignette" x="10" y="10" width="340" height="200" rx="8" fill="url(#pitch-vignette-grad)" />
                 <!-- Dynamic Tactical Heatmap Layer -->
                 <g id="heatmap-overlay-layer" class="heatmap-overlay-layer hidden" filter="url(#heatmap-blur-filter)"></g>
-                <g class="pitch-regulatory-lines">
+                <g class="pitch-regulatory-lines" id="board-pitch-lines">
                   <!-- Outer boundary -->
                   <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.8" />
                   <!-- Tactical thirds guide lines -->
@@ -881,12 +907,8 @@
                   <!-- Center circle -->
                   <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(56, 189, 248, 0.38)" stroke-width="1.5" />
                   <circle cx="180" cy="110" r="3" fill="#38bdf8" />
-                  <!-- Left Penalty Box -->
-                  <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
-                  <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
-                  <!-- Right Penalty Box -->
-                  <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
-                  <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
+                  <!-- Dynamic sport-specific penalty areas rendered by pitchEngine.js -->
+                  <g data-sport-lines></g>
                   <!-- Attack Direction Arrow -->
                   <path d="M150 202 L210 202 M204 198 L210 202 L204 206" stroke="rgba(56, 189, 248, 0.48)" stroke-width="1.4" fill="none" />
                 </g>
@@ -917,6 +939,9 @@
                   </marker>
                   <marker id="arrow-freehand-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
                     <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#fbbf24" />
+                  </marker>
+                  <marker id="arrow-freehand-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#f43f5e" />
                   </marker>
                 </defs>
                 <g id="freehand-paths-group"></g>
@@ -1179,27 +1204,27 @@
               <div class="stats-sliders-grid">
                 <div class="slider-item">
                   <div class="slider-header"><span>RIT · Ritmo</span><strong id="val-pace">84</strong></div>
-                  <input type="range" id="stat-pace" min="40" max="99" value="84" />
+                  <input type="range" id="stat-pace" min="40" max="99" value="84" aria-label="Ritmo" />
                 </div>
                 <div class="slider-item">
                   <div class="slider-header"><span>PAS · Pase</span><strong id="val-passing">86</strong></div>
-                  <input type="range" id="stat-passing" min="40" max="99" value="86" />
+                  <input type="range" id="stat-passing" min="40" max="99" value="86" aria-label="Pase" />
                 </div>
                 <div class="slider-item">
                   <div class="slider-header"><span>REG · Regate</span><strong id="val-dribbling">85</strong></div>
-                  <input type="range" id="stat-dribbling" min="40" max="99" value="85" />
+                  <input type="range" id="stat-dribbling" min="40" max="99" value="85" aria-label="Regate" />
                 </div>
                 <div class="slider-item">
                   <div class="slider-header"><span>DEF · Defensa</span><strong id="val-defending">70</strong></div>
-                  <input type="range" id="stat-defending" min="40" max="99" value="70" />
+                  <input type="range" id="stat-defending" min="40" max="99" value="70" aria-label="Defensa" />
                 </div>
                 <div class="slider-item">
                   <div class="slider-header"><span>TIR · Tiro</span><strong id="val-shooting">82</strong></div>
-                  <input type="range" id="stat-shooting" min="40" max="99" value="82" />
+                  <input type="range" id="stat-shooting" min="40" max="99" value="82" aria-label="Tiro" />
                 </div>
                 <div class="slider-item">
                   <div class="slider-header"><span>VIS · Visión</span><strong id="val-vision">86</strong></div>
-                  <input type="range" id="stat-vision" min="40" max="99" value="86" />
+                  <input type="range" id="stat-vision" min="40" max="99" value="86" aria-label="Visión" />
                 </div>
               </div>
 
@@ -1271,7 +1296,10 @@
                 </button>
                 <div class="synergy-meter-box">
                   <span class="selector-label">Sinergia Global</span>
-                  <div class="synergy-score-pill" id="squad-global-synergy">92%</div>
+                  <div class="synergy-pill-wrap">
+                    <div class="synergy-score-pill" id="squad-global-synergy">92%</div>
+                    <span class="synergy-tier-badge synergy-high" id="squad-synergy-tier" aria-live="polite">Óptima</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1280,7 +1308,12 @@
             <div id="ideal-squad-banner" class="ideal-squad-banner hidden">
               <div class="ideal-banner-header">
                 <span class="ideal-banner-badge" id="ideal-banner-title">XI Óptimo por Sinergia Colectiva</span>
-                <button type="button" id="close-ideal-banner-btn" class="roster-delete-btn" title="Cerrar informe">✕</button>
+                <button type="button" id="close-ideal-banner-btn" class="roster-delete-btn" title="Cerrar informe" aria-label="Cerrar informe">
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
               </div>
               <p id="ideal-banner-text" class="ideal-banner-text"></p>
               <div id="ideal-banner-partners" class="ideal-partnerships-row"></div>
@@ -1321,17 +1354,14 @@
               <svg class="pitch-lines" viewBox="0 0 360 220" preserveAspectRatio="none">
                 <rect class="pitch-surface-turf" x="10" y="10" width="340" height="200" rx="8" />
                 <rect class="pitch-surface-vignette" x="10" y="10" width="340" height="200" rx="8" fill="url(#pitch-vignette-grad)" />
-                <g class="pitch-regulatory-lines">
+                <g class="pitch-regulatory-lines" id="squad-pitch-lines">
                   <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.8" />
                   <line x1="123" y1="10" x2="123" y2="210" stroke="rgba(56, 189, 248, 0.16)" stroke-width="1" stroke-dasharray="3 4" />
                   <line x1="236" y1="10" x2="236" y2="210" stroke="rgba(56, 189, 248, 0.16)" stroke-width="1" stroke-dasharray="3 4" />
                   <line x1="180" y1="10" x2="180" y2="210" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
                   <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(56, 189, 248, 0.38)" stroke-width="1.5" />
                   <circle cx="180" cy="110" r="3" fill="#38bdf8" />
-                  <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
-                  <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
-                  <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
-                  <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
+                  <g data-sport-lines></g>
                 </g>
                 <g id="squad-hover-influence-layer"></g>
                 <g id="squad-synergy-links" stroke="rgba(52, 211, 153, 0.42)" stroke-width="1.6" stroke-dasharray="4 4"></g>
@@ -1339,11 +1369,11 @@
               <div id="squad-pitch-tokens" class="pitch-tokens"></div>
             </div>
 
-            <!-- Bench & Substitutes Drag-and-Drop Zone -->
+            <!-- Bench & Substitutes Drag-and-Drop & Click-to-Swap Zone -->
             <div class="bench-section" id="squad-bench-section">
               <div class="bench-header">
                 <div class="bench-title-wrap">
-                  <span class="bench-title">Banca &amp; Suplentes (Arrastrar al campo para permutar titulares)</span>
+                  <span class="bench-title" id="bench-swap-hint">Banca &amp; Suplentes (Clic para armar cambio o arrastra al campo)</span>
                   <span class="bench-legend">
                     <span class="leg-dot natural"></span> Posición natural
                     <span class="leg-dot adapted"></span> Adaptado / Fuera de puesto
@@ -1474,30 +1504,30 @@
                     <span id="radar-legend-crack">Referente Top 100</span>
                   </span>
                 </div>
-                <svg id="player-radar-svg" class="player-radar-svg" viewBox="0 0 240 204" aria-label="Gráfico de radar comparativo de 6 atributos">
-                  <!-- Concentric Hexagonal Grid Rings -->
-                  <polygon class="radar-grid-ring" points="120,34 178.9,68 178.9,136 120,170 61.1,136 61.1,68" />
-                  <polygon class="radar-grid-ring" points="120,56.7 159.3,79.3 159.3,124.7 120,147.3 80.7,124.7 80.7,79.3" />
-                  <polygon class="radar-grid-ring inner" points="120,79.3 139.6,90.7 139.6,113.3 120,124.7 100.4,113.3 100.4,90.7" />
-                  <!-- 6 Axis Spokes from Center (120, 102) -->
-                  <line class="radar-axis-line" x1="120" y1="102" x2="120" y2="34" />
-                  <line class="radar-axis-line" x1="120" y1="102" x2="178.9" y2="68" />
-                  <line class="radar-axis-line" x1="120" y1="102" x2="178.9" y2="136" />
-                  <line class="radar-axis-line" x1="120" y1="102" x2="120" y2="170" />
-                  <line class="radar-axis-line" x1="120" y1="102" x2="61.1" y2="136" />
-                  <line class="radar-axis-line" x1="120" y1="102" x2="61.1" y2="68" />
-                  <!-- Polygon 2: Top 100 Reference Crack (Violet / Amber Translucent) -->
-                  <polygon id="radar-poly-crack" class="radar-poly-crack" points="120,102 120,102 120,102 120,102 120,102 120,102" />
+                <svg id="player-radar-svg" class="player-radar-svg" viewBox="0 0 280 216" aria-label="Gráfico de radar comparativo de 6 atributos">
+                  <!-- Concentric Hexagonal Grid Rings (Center 140, 108 · R 68) -->
+                  <polygon class="radar-grid-ring" points="140,40 198.9,74 198.9,142 140,176 81.1,142 81.1,74" />
+                  <polygon class="radar-grid-ring" points="140,62.7 179.3,85.3 179.3,130.7 140,153.3 100.7,130.7 100.7,85.3" />
+                  <polygon class="radar-grid-ring inner" points="140,85.3 159.6,96.7 159.6,119.3 140,130.7 120.4,119.3 120.4,96.7" />
+                  <!-- 6 Axis Spokes from Center (140, 108) -->
+                  <line class="radar-axis-line" x1="140" y1="108" x2="140" y2="40" />
+                  <line class="radar-axis-line" x1="140" y1="108" x2="198.9" y2="74" />
+                  <line class="radar-axis-line" x1="140" y1="108" x2="198.9" y2="142" />
+                  <line class="radar-axis-line" x1="140" y1="108" x2="140" y2="176" />
+                  <line class="radar-axis-line" x1="140" y1="108" x2="81.1" y2="142" />
+                  <line class="radar-axis-line" x1="140" y1="108" x2="81.1" y2="74" />
+                  <!-- Polygon 2: Top 100 Reference Crack (Amber Translucent) -->
+                  <polygon id="radar-poly-crack" class="radar-poly-crack" points="140,108 140,108 140,108 140,108 140,108 140,108" />
                   <!-- Polygon 1: User's Custom Player (Cyan / Neon) -->
-                  <polygon id="radar-poly-user" class="radar-poly-user" points="120,102 120,102 120,102 120,102 120,102 120,102" />
+                  <polygon id="radar-poly-user" class="radar-poly-user" points="140,108 140,108 140,108 140,108 140,108 140,108" />
                   <!-- Dynamic Vertex Dots & Axis Labels -->
                   <g id="radar-vertices-layer"></g>
-                  <text class="radar-axis-label" x="120" y="22" text-anchor="middle" id="radar-lbl-pace">RIT</text>
-                  <text class="radar-axis-label" x="192" y="66" text-anchor="start" id="radar-lbl-passing">PAS</text>
-                  <text class="radar-axis-label" x="192" y="144" text-anchor="start" id="radar-lbl-dribbling">REG</text>
-                  <text class="radar-axis-label" x="120" y="190" text-anchor="middle" id="radar-lbl-defending">DEF</text>
-                  <text class="radar-axis-label" x="48" y="144" text-anchor="end" id="radar-lbl-shooting">TIR</text>
-                  <text class="radar-axis-label" x="48" y="66" text-anchor="end" id="radar-lbl-vision">VIS</text>
+                  <text class="radar-axis-label" x="140" y="24" text-anchor="middle" id="radar-lbl-pace">RIT</text>
+                  <text class="radar-axis-label" x="208" y="70" text-anchor="start" id="radar-lbl-passing">PAS</text>
+                  <text class="radar-axis-label" x="208" y="150" text-anchor="start" id="radar-lbl-dribbling">REG</text>
+                  <text class="radar-axis-label" x="140" y="198" text-anchor="middle" id="radar-lbl-defending">DEF</text>
+                  <text class="radar-axis-label" x="72" y="150" text-anchor="end" id="radar-lbl-shooting">TIR</text>
+                  <text class="radar-axis-label" x="72" y="70" text-anchor="end" id="radar-lbl-vision">VIS</text>
                 </svg>
               </div>
 
@@ -1521,6 +1551,31 @@
       </div>
     </section>
     </main>
+
+    <!-- Native Top-Layer Modal for System Shutdown Confirmation -->
+    <dialog id="shutdown-confirm-dialog" class="tactical-dialog" aria-labelledby="shutdown-dialog-title">
+      <div class="tactical-dialog-card">
+        <div class="tactical-dialog-header">
+          <div class="tactical-dialog-icon" aria-hidden="true">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+              <line x1="12" y1="2" x2="12" y2="12" />
+            </svg>
+          </div>
+          <div>
+            <span class="section-kicker">CONTROL DEL SISTEMA</span>
+            <h2 id="shutdown-dialog-title" class="card-title">¿Detener TacticalPlay RAG?</h2>
+          </div>
+        </div>
+        <p class="tactical-dialog-body">
+          Esta acción detendrá ordenadamente los servicios locales de <strong>Spring Boot (API 8000)</strong>, el servidor frontend de <strong>Vite</strong> y el contenedor <strong>PostgreSQL + pgvector</strong>.
+        </p>
+        <form method="dialog" class="tactical-dialog-actions">
+          <button type="submit" value="cancel" class="btn-secondary" autofocus>Cancelar</button>
+          <button type="submit" value="confirm" class="btn-danger-solid">Apagar sistema</button>
+        </form>
+      </div>
+    </dialog>
 
     <!-- ========================================================================
          PRINTABLE MATCH PLAN SHEET (Visible on @media print for PDF / Vestuario)

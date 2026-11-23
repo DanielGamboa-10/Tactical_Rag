@@ -938,6 +938,13 @@ body {
   filter: drop-shadow(0 0 4px rgba(125, 211, 252, 0.65));
 }
 
+.tactical-pitch.surface-futsal .pitch-regulatory-lines rect,
+.tactical-pitch.surface-futsal .pitch-regulatory-lines line,
+.tactical-pitch.surface-futsal .pitch-regulatory-lines circle,
+.tactical-pitch.surface-futsal .pitch-regulatory-lines path {
+  stroke: rgba(56, 189, 248, 0.55);
+}
+
 .tactical-pitch.tv-25d-active {
   overflow: visible;
   box-shadow:
@@ -2329,8 +2336,72 @@ body {
 
 .slider-item input[type='range'] {
   width: 100%;
-  accent-color: #38bdf8;
+  appearance: none;
+  background: transparent;
   cursor: pointer;
+  --slider-pct: calc((var(--control-value, 84) - var(--attr-min, 40)) / (var(--attr-max, 99) - var(--attr-min, 40)) * 100%);
+}
+
+@supports (opacity: progress(1, 0, 100)) {
+  .slider-item input[type='range'] {
+    --slider-pct: calc(progress(var(--control-value, 84), var(--attr-min, 40), var(--attr-max, 99)) * 100%);
+  }
+}
+
+.slider-item input[type='range']::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    #38bdf8 0%,
+    #0284c7 var(--slider-pct),
+    #1e293b var(--slider-pct),
+    #1e293b 100%
+  );
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.slider-item input[type='range']::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.slider-item input[type='range']::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+}
+
+.slider-item input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  margin-top: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  border: 2px solid #0284c7;
+  box-shadow: 0 2px 6px rgba(2, 6, 23, 0.65);
+  transition: transform 0.14s ease, border-color 0.14s ease;
+}
+
+.slider-item input[type='range']::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  border: 2px solid #0284c7;
+  box-shadow: 0 2px 6px rgba(2, 6, 23, 0.65);
+  transition: transform 0.14s ease, border-color 0.14s ease;
+}
+
+.slider-item input[type='range']:hover::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+.slider-item input[type='range']:hover::-moz-range-thumb {
+  transform: scale(1.12);
 }
 
 .squad-roster-section {
@@ -3450,6 +3521,86 @@ body {
   filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.85));
 }
 
+.freehand-stroke.red {
+  stroke: #f43f5e;
+  filter: drop-shadow(0 0 5px rgba(244, 63, 94, 0.85));
+}
+
+.freehand-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border-radius: 9px;
+  background: #0a101e;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.freehand-toolbar.hidden {
+  display: none;
+}
+
+.freehand-toolbar-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.freehand-color-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.freehand-color-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: #111827;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.freehand-color-btn.active {
+  border-color: #38bdf8;
+  background: rgba(2, 132, 199, 0.2);
+  color: #fff;
+}
+
+.draw-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.draw-swatch.cyan {
+  background: #38bdf8;
+}
+
+.draw-swatch.amber {
+  background: #fbbf24;
+}
+
+.draw-swatch.red {
+  background: #f43f5e;
+}
+
+.freehand-undo-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* Collective Tactical Balance Strip (ATAQUE / CREACIÓN / DEFENSA) */
 .collective-balance-strip {
   display: grid;
@@ -3694,6 +3845,111 @@ body {
   color: #e0f2fe;
 }
 
+/* Native <dialog> Top-Layer Modal + Transitions (modern-web-guidance: dialog & animate-to-from-top-layer) */
+dialog.tactical-dialog {
+  margin: auto;
+  padding: 0;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 14px;
+  background: #0c111d;
+  color: var(--text-primary);
+  max-width: min(440px, calc(100vw - 32px));
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s ease, overlay 0.22s, display 0.22s;
+  transition-behavior: allow-discrete;
+}
+
+dialog.tactical-dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.tactical-dialog[open] {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog.tactical-dialog[open] {
+    opacity: 0;
+  }
+}
+
+dialog.tactical-dialog::backdrop {
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(5px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transition: opacity 0.22s ease, overlay 0.22s, display 0.22s;
+  transition-behavior: allow-discrete;
+}
+
+dialog.tactical-dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog.tactical-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.tactical-dialog-card {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tactical-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tactical-dialog-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(244, 63, 94, 0.14);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: #fb7185;
+  flex-shrink: 0;
+}
+
+.tactical-dialog-body {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+}
+
+.tactical-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.btn-danger-solid {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  border: 1px solid rgba(251, 113, 133, 0.45);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 150ms ease, transform 150ms ease;
+}
+
+.btn-danger-solid:hover {
+  filter: brightness(1.08);
+}
+
 /* Container Query: Tab 3 Center Panel adapta controles si se comprime */
 @container squad-center (max-width: 560px) {
   .squad-selectors-row {
@@ -3778,5 +4034,155 @@ body {
 
   .tactical-pitch {
     min-block-size: 220px;
+  }
+}
+
+/* ==========================================================================
+   9. Synergy Tiers, Click-to-Swap Highlights & Accessibility / Motion / Forced Colors
+   ========================================================================== */
+.synergy-pill-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.synergy-score-pill.synergy-high {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(52, 211, 153, 0.45);
+  color: #34d399;
+}
+
+.synergy-score-pill.synergy-mid {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(251, 191, 36, 0.48);
+  color: #fbbf24;
+}
+
+.synergy-score-pill.synergy-low {
+  background: rgba(244, 63, 94, 0.14);
+  border-color: rgba(251, 113, 133, 0.5);
+  color: #fb7185;
+}
+
+.synergy-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.71rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid currentColor;
+}
+
+.synergy-tier-badge::before {
+  font-size: 0.65rem;
+}
+
+.synergy-tier-badge.synergy-high {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.synergy-tier-badge.synergy-high::before {
+  content: '●';
+}
+
+.synergy-tier-badge.synergy-mid {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.synergy-tier-badge.synergy-mid::before {
+  content: '▲';
+}
+
+.synergy-tier-badge.synergy-low {
+  color: #fb7185;
+  background: rgba(244, 63, 94, 0.1);
+}
+
+.synergy-tier-badge.synergy-low::before {
+  content: '▼';
+}
+
+.bench-title.swap-armed {
+  color: #38bdf8;
+  cursor: pointer;
+}
+
+.bench-player-chip.armed-swap-bench {
+  border-color: #38bdf8;
+  background: rgba(2, 132, 199, 0.22);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.35);
+}
+
+.player-token.squad-token.swap-target-candidate {
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.55);
+  cursor: pointer;
+}
+
+/* Global Keyboard Focus Indicator */
+:where(button, a, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+/* Touch Target Hitboxes on Coarse Pointer Devices */
+@media (pointer: coarse) {
+  .tv-view-toggle-btn,
+  .camera-seg-btn,
+  .ghost-mini-btn,
+  .scenario-mini-btn,
+  .freehand-color-btn,
+  .copy-msg-btn,
+  .prompt-chip {
+    min-block-size: 38px;
+  }
+
+  .player-token {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* Reduced Motion Respect (targeted per-rule — no global animation-duration reset) */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-btn::after,
+  .logo-pulse,
+  .avatar-ring,
+  .typing-dot {
+    animation: none !important;
+  }
+
+  .glass-card,
+  .tv-view-toggle-btn,
+  .view-tab-btn,
+  .prompt-chip,
+  .scenario-mini-btn,
+  dialog.tactical-dialog,
+  dialog.tactical-dialog::backdrop {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* Windows High-Contrast / Forced Colors System Alignment */
+@media (forced-colors: active) {
+  .view-tab-btn.active,
+  .camera-seg-btn.active,
+  .tv-view-toggle-btn.active,
+  .board-mod-pill.active,
+  .modality-btn.active,
+  .freehand-color-btn.active {
+    outline: 2px solid Highlight;
+    forced-color-adjust: none;
+  }
+
+  .synergy-score-pill,
+  .synergy-tier-badge,
+  .formation-pill,
+  .glass-card {
+    border: 1px solid CanvasText;
   }
 }

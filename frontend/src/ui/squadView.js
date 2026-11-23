@@ -309,11 +309,47 @@ export function renderSquadRosterList() {
     .join('');
 }
 
+function syncSynergyBadgeVisuals(scorePct) {
+  const score = Number(scorePct) || 0;
+  let tierClass = 'synergy-low';
+  let tierText = 'Baja';
+  if (score >= 85) {
+    tierClass = 'synergy-high';
+    tierText = 'Óptima';
+  } else if (score >= 70) {
+    tierClass = 'synergy-mid';
+    tierText = 'Media';
+  }
+
+  [dom.squadGlobalSynergy, dom.squadSynergyTier].forEach((el) => {
+    if (!el) return;
+    el.classList.remove('synergy-high', 'synergy-mid', 'synergy-low');
+    el.classList.add(tierClass);
+  });
+
+  if (dom.squadSynergyTier) {
+    dom.squadSynergyTier.textContent = tierText;
+  }
+}
+
 export function renderSquadBench() {
   if (!dom.squadBenchList) return;
   const substitutes = state.squadOptimization?.substitutes || [];
   if (dom.benchCountBadge) {
     dom.benchCountBadge.textContent = `${substitutes.length} en banca`;
+  }
+
+  if (dom.benchSwapHint) {
+    if (state.pendingSwapBenchPlayerId) {
+      const armedSub = substitutes.find((s) => s.playerId === state.pendingSwapBenchPlayerId);
+      dom.benchSwapHint.textContent = armedSub
+        ? `Cambio armado: ${armedSub.name.split(' ')[0]} (#${armedSub.jerseyNumber}) — Haz clic en un titular de cancha para permutar (clic aquí para cancelar)`
+        : 'Banca & Suplentes (Clic para armar cambio o arrastra al campo)';
+      dom.benchSwapHint.classList.toggle('swap-armed', Boolean(armedSub));
+    } else {
+      dom.benchSwapHint.textContent = 'Banca & Suplentes (Clic para armar cambio o arrastra al campo)';
+      dom.benchSwapHint.classList.remove('swap-armed');
+    }
   }
 
   if (substitutes.length === 0) {
@@ -325,12 +361,16 @@ export function renderSquadBench() {
   dom.squadBenchList.innerHTML = substitutes
     .map((sub) => {
       const isSelected = sub.playerId === state.selectedSquadPlayerId;
+      const isArmedForSwap = sub.playerId === state.pendingSwapBenchPlayerId;
       return `
         <div
-          class="bench-player-chip ${isSelected ? 'selected-bench' : ''}"
+          class="bench-player-chip ${isSelected ? 'selected-bench' : ''} ${isArmedForSwap ? 'armed-swap-bench' : ''}"
           draggable="true"
+          tabindex="0"
+          role="button"
+          aria-pressed="${isArmedForSwap}"
           data-player-id="${sub.playerId}"
-          title="Arrastra a cualquier posición de la cancha"
+          aria-label="${escapeHtml(sub.name)}, dorsal ${sub.jerseyNumber}, posición ${escapeHtml(sub.naturalPosition || sub.position)}. Pulsa Enter o haz clic para permutar por un titular"
         >
           <span class="bench-chip-num">${sub.jerseyNumber}</span>
           <div class="bench-chip-info">
@@ -370,43 +410,63 @@ function recalculateLineupSynergy() {
   opt.globalSynergy = Math.max(55, Math.min(99, avgSynergy));
   if (dom.squadGlobalSynergy) {
     animateNumericCounter(dom.squadGlobalSynergy, opt.globalSynergy, '%');
+    syncSynergyBadgeVisuals(opt.globalSynergy);
   }
   updateContextBadges();
+}
+
+export function swapBenchPlayerWithPitchSlot(benchPlayerId, targetSlotIdx) {
+  if (!state.squadOptimization) return false;
+  const opt = state.squadOptimization;
+  const lineup = opt.lineup || [];
+  const substitutes = opt.substitutes || [];
+  const targetSlot = lineup[targetSlotIdx];
+  const subIdx = substitutes.findIndex((s) => s.playerId === Number(benchPlayerId));
+  if (!targetSlot || subIdx === -1) return false;
+
+  const incomingSub = substitutes.splice(subIdx, 1)[0];
+  if (targetSlot.assigned && targetSlot.playerId) {
+    substitutes.push({
+      playerId: targetSlot.playerId,
+      name: targetSlot.name,
+      jerseyNumber: targetSlot.jerseyNumber,
+      naturalPosition: targetSlot.naturalPosition,
+      preferredFoot: targetSlot.preferredFoot || 'Derecho',
+      overall: targetSlot.overall || 82
+    });
+  }
+
+  targetSlot.assigned = true;
+  targetSlot.playerId = incomingSub.playerId;
+  targetSlot.name = incomingSub.name;
+  targetSlot.jerseyNumber = incomingSub.jerseyNumber;
+  targetSlot.naturalPosition = incomingSub.naturalPosition || incomingSub.position;
+  targetSlot.preferredFoot = incomingSub.preferredFoot;
+  targetSlot.overall = incomingSub.overall;
+  targetSlot.outOfPosition = !isStrictNaturalPositionMatch(targetSlot.naturalPosition, targetSlot.slotRole);
+
+  state.selectedSquadPlayerId = incomingSub.playerId;
+  state.pendingSwapBenchPlayerId = null;
+
+  recalculateLineupSynergy();
+  renderSquadRosterList();
+  renderSquadPitch();
+  renderSquadBench();
+  renderSelectedPlayerComparison();
+  return true;
 }
 
 function handlePitchSlotDrop(targetSlotIdx) {
   if (!activeDragPayload || !state.squadOptimization) return;
   const opt = state.squadOptimization;
   const lineup = opt.lineup || [];
-  const substitutes = opt.substitutes || [];
   const targetSlot = lineup[targetSlotIdx];
   if (!targetSlot) return;
 
   if (activeDragPayload.source === 'bench') {
-    const subIdx = substitutes.findIndex((s) => s.playerId === activeDragPayload.playerId);
-    if (subIdx === -1) return;
-    const incomingSub = substitutes.splice(subIdx, 1)[0];
-
-    if (targetSlot.assigned && targetSlot.playerId) {
-      substitutes.push({
-        playerId: targetSlot.playerId,
-        name: targetSlot.name,
-        jerseyNumber: targetSlot.jerseyNumber,
-        naturalPosition: targetSlot.naturalPosition,
-        preferredFoot: targetSlot.preferredFoot || 'Derecho',
-        overall: targetSlot.overall || 82
-      });
-    }
-
-    targetSlot.assigned = true;
-    targetSlot.playerId = incomingSub.playerId;
-    targetSlot.name = incomingSub.name;
-    targetSlot.jerseyNumber = incomingSub.jerseyNumber;
-    targetSlot.naturalPosition = incomingSub.naturalPosition || incomingSub.position;
-    targetSlot.preferredFoot = incomingSub.preferredFoot;
-    targetSlot.overall = incomingSub.overall;
-    targetSlot.outOfPosition = !isStrictNaturalPositionMatch(targetSlot.naturalPosition, targetSlot.slotRole);
-    state.selectedSquadPlayerId = incomingSub.playerId;
+    swapBenchPlayerWithPitchSlot(activeDragPayload.playerId, targetSlotIdx);
+    activeDragPayload = null;
+    return;
   } else if (activeDragPayload.source === 'pitch') {
     const sourceSlotIdx = activeDragPayload.slotIndex;
     if (sourceSlotIdx === targetSlotIdx) return;
@@ -493,8 +553,8 @@ function handleSendStarterToBench() {
   renderSelectedPlayerComparison();
 }
 
-const RADAR_CENTER_X = 120;
-const RADAR_CENTER_Y = 102;
+const RADAR_CENTER_X = 140;
+const RADAR_CENTER_Y = 108;
 const RADAR_MAX_R = 68;
 const RADAR_ANGLES_DEG = [-90, -30, 30, 90, 150, 210];
 
@@ -786,18 +846,27 @@ async function handleClearSquad() {
 
 export function initSquadViewEvents() {
   const sliderPairs = [
-    [dom.statPace, dom.valPace],
-    [dom.statPassing, dom.valPassing],
-    [dom.statDribbling, dom.valDribbling],
-    [dom.statDefending, dom.valDefending],
-    [dom.statShooting, dom.valShooting],
-    [dom.statVision, dom.valVision]
+    [dom.statPace, dom.valPace, 'Ritmo'],
+    [dom.statPassing, dom.valPassing, 'Pase'],
+    [dom.statDribbling, dom.valDribbling, 'Regate'],
+    [dom.statDefending, dom.valDefending, 'Defensa'],
+    [dom.statShooting, dom.valShooting, 'Tiro'],
+    [dom.statVision, dom.valVision, 'Visión']
   ];
-  sliderPairs.forEach(([inputEl, labelEl]) => {
+  const syncSliderVisualVars = (inputEl, labelEl, statName) => {
+    const min = inputEl.min || '40';
+    const max = inputEl.max || '99';
+    const val = inputEl.value;
+    labelEl.textContent = val;
+    inputEl.style.setProperty('--attr-min', min);
+    inputEl.style.setProperty('--attr-max', max);
+    inputEl.style.setProperty('--control-value', val);
+    inputEl.setAttribute('aria-valuetext', `${statName}: ${val} de ${max}`);
+  };
+  sliderPairs.forEach(([inputEl, labelEl, statName]) => {
     if (inputEl && labelEl) {
-      inputEl.addEventListener('input', () => {
-        labelEl.textContent = inputEl.value;
-      });
+      syncSliderVisualVars(inputEl, labelEl, statName);
+      inputEl.addEventListener('input', () => syncSliderVisualVars(inputEl, labelEl, statName));
     }
   });
 
@@ -904,16 +973,51 @@ export function initSquadViewEvents() {
     });
   }
 
-  // Click & Drag-and-Drop on Squad Pitch Tokens
+  // Click, Keyboard (Enter/Space) & Drag-and-Drop on Squad Pitch Tokens
   if (dom.squadPitchTokens) {
-    dom.squadPitchTokens.addEventListener('click', (e) => {
-      const token = e.target.closest('.player-token');
-      if (token && token.dataset.playerId) {
+    const activatePitchToken = (token) => {
+      if (!token) return;
+      const targetSlotIdx = Number(token.dataset.slotIndex);
+      if (state.pendingSwapBenchPlayerId && !Number.isNaN(targetSlotIdx)) {
+        const swapped = swapBenchPlayerWithPitchSlot(state.pendingSwapBenchPlayerId, targetSlotIdx);
+        if (swapped) {
+          showToast(
+            'Cambio Aplicado en XI',
+            'Se intercambió el jugador de banca por el titular seleccionado.',
+            'success'
+          );
+        }
+        return;
+      }
+
+      if (token.dataset.playerId) {
         state.selectedSquadPlayerId = Number(token.dataset.playerId);
         renderSquadRosterList();
         renderSquadPitch();
         renderSquadBench();
         renderSelectedPlayerComparison();
+      }
+    };
+
+    dom.squadPitchTokens.addEventListener('click', (e) => {
+      activatePitchToken(e.target.closest('.player-token'));
+    });
+
+    dom.squadPitchTokens.addEventListener('keydown', (e) => {
+      const token = e.target.closest('.player-token');
+      if (!token) return;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        activatePitchToken(token);
+      } else if (e.key === ' ') {
+        e.preventDefault();
+      }
+    });
+
+    dom.squadPitchTokens.addEventListener('keyup', (e) => {
+      const token = e.target.closest('.player-token');
+      if (token && e.key === ' ') {
+        activatePitchToken(token);
       }
     });
 
@@ -966,16 +1070,49 @@ export function initSquadViewEvents() {
     });
   }
 
-  // Click & Drag-and-Drop on Bench Substitutes
+  // Click, Keyboard (Enter/Space) & Drag-and-Drop on Bench Substitutes
   if (dom.squadBenchSection && dom.squadBenchList) {
-    dom.squadBenchList.addEventListener('click', (e) => {
-      const chip = e.target.closest('.bench-player-chip');
-      if (!chip) return;
-      state.selectedSquadPlayerId = Number(chip.dataset.playerId);
+    const toggleBenchChipSwap = (chip) => {
+      if (!chip || !chip.dataset.playerId) return;
+      const clickedId = Number(chip.dataset.playerId);
+      state.selectedSquadPlayerId = clickedId;
+      state.pendingSwapBenchPlayerId =
+        state.pendingSwapBenchPlayerId === clickedId ? null : clickedId;
       renderSquadRosterList();
       renderSquadPitch();
       renderSquadBench();
       renderSelectedPlayerComparison();
+    };
+
+    if (dom.benchSwapHint) {
+      dom.benchSwapHint.addEventListener('click', () => {
+        if (!state.pendingSwapBenchPlayerId) return;
+        state.pendingSwapBenchPlayerId = null;
+        renderSquadPitch();
+        renderSquadBench();
+      });
+    }
+
+    dom.squadBenchList.addEventListener('click', (e) => {
+      toggleBenchChipSwap(e.target.closest('.bench-player-chip'));
+    });
+
+    dom.squadBenchList.addEventListener('keydown', (e) => {
+      const chip = e.target.closest('.bench-player-chip');
+      if (!chip) return;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        toggleBenchChipSwap(chip);
+      } else if (e.key === ' ') {
+        e.preventDefault();
+      }
+    });
+
+    dom.squadBenchList.addEventListener('keyup', (e) => {
+      const chip = e.target.closest('.bench-player-chip');
+      if (chip && e.key === ' ') {
+        toggleBenchChipSwap(chip);
+      }
     });
 
     dom.squadBenchList.addEventListener('dragstart', (e) => {

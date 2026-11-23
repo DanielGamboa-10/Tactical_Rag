@@ -526,29 +526,46 @@ export function initChatViewEvents() {
     dom.syncWikiBtn.addEventListener('click', syncWikipediaKnowledge);
   }
 
-  // Clean System Shutdown
+  // Clean System Shutdown (Native <dialog>.showModal)
+  const shutdownDialog = document.getElementById('shutdown-confirm-dialog');
+  const executeSystemShutdown = async () => {
+    if (!dom.shutdownSystemBtn) return;
+    dom.shutdownSystemBtn.disabled = true;
+    dom.backendStatusBtn.className = 'status-badge offline';
+    dom.backendStatusText.textContent = 'Apagando sistema...';
+
+    try {
+      await api.shutdownSystem();
+    } catch (ignored) {}
+
+    dom.backendStatusBtn.className = 'status-badge offline';
+    dom.backendStatusText.textContent = 'Sistema apagado';
+    showToast(
+      'Sistema apagado',
+      'Spring Boot, Vite y PostgreSQL (Docker) se han detenido limpiamente.',
+      'info'
+    );
+  };
+
+  if (shutdownDialog) {
+    shutdownDialog.addEventListener('close', () => {
+      const result = shutdownDialog.returnValue;
+      shutdownDialog.returnValue = '';
+      if (result === 'confirm') {
+        executeSystemShutdown();
+      }
+    });
+  }
+
   if (dom.shutdownSystemBtn) {
-    dom.shutdownSystemBtn.addEventListener('click', async () => {
-      const confirmed = window.confirm(
-        '¿Deseas apagar completamente TacticalPlay RAG (Spring Boot, Vite y contenedor Docker)?'
-      );
-      if (!confirmed) return;
-
-      dom.shutdownSystemBtn.disabled = true;
-      dom.backendStatusBtn.className = 'status-badge offline';
-      dom.backendStatusText.textContent = 'Apagando sistema...';
-
-      try {
-        await api.shutdownSystem();
-      } catch (ignored) {}
-
-      dom.backendStatusBtn.className = 'status-badge offline';
-      dom.backendStatusText.textContent = 'Sistema apagado';
-      showToast(
-        'Sistema apagado',
-        'Spring Boot, Vite y PostgreSQL (Docker) se han detenido limpiamente.',
-        'info'
-      );
+    dom.shutdownSystemBtn.addEventListener('click', () => {
+      if (shutdownDialog && typeof shutdownDialog.showModal === 'function') {
+        if (!shutdownDialog.open) {
+          shutdownDialog.showModal();
+        }
+      } else {
+        executeSystemShutdown();
+      }
     });
   }
 

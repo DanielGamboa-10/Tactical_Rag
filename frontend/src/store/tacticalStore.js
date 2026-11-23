@@ -19,6 +19,7 @@ export const state = {
   isStadium3DView: false,
   isHeatmapActive: false,
   isDrawModeActive: false,
+  drawColor: 'cyan',
   isBoardExpanded: false,
   playbackTimers: [],
   motionBlurTimers: [],
@@ -33,6 +34,7 @@ export const state = {
   top100Catalog: [],
   squadOptimization: null,
   selectedSquadPlayerId: null,
+  pendingSwapBenchPlayerId: null,
   exportedBoardLineup: null
 };
 
@@ -101,8 +103,12 @@ export const dom = {
   heatmapOverlayLayer: document.getElementById('heatmap-overlay-layer'),
   toggleDrawBtn: document.getElementById('toggle-draw-btn'),
   clearDrawBtn: document.getElementById('clear-draw-btn'),
+  freehandToolbar: document.getElementById('freehand-toolbar'),
+  undoDrawBtn: document.getElementById('undo-draw-btn'),
   freehandDrawSvg: document.getElementById('freehand-draw-svg'),
   freehandPathsGroup: document.getElementById('freehand-paths-group'),
+  squadSynergyTier: document.getElementById('squad-synergy-tier'),
+  benchSwapHint: document.getElementById('bench-swap-hint'),
   stadium3dContainer: document.getElementById('stadium-3d-container'),
   boardLayout: document.querySelector('.board-layout'),
   tacticalPitch: document.getElementById('tactical-pitch'),
@@ -1459,6 +1465,18 @@ export function updateContextBadges() {
       : state.isTv25DView
         ? 'TV 2.5D'
         : '2D Cenital';
+  }
+  if (synergyPct && (dom.squadGlobalSynergy || dom.squadSynergyTier)) {
+    const tierClass = synergyPct >= 85 ? 'synergy-high' : synergyPct >= 70 ? 'synergy-mid' : 'synergy-low';
+    const tierText = synergyPct >= 85 ? 'Óptima' : synergyPct >= 70 ? 'Media' : 'Baja';
+    [dom.squadGlobalSynergy, dom.squadSynergyTier].forEach((el) => {
+      if (!el) return;
+      el.classList.remove('synergy-high', 'synergy-mid', 'synergy-low');
+      el.classList.add(tierClass);
+    });
+    if (dom.squadSynergyTier) {
+      dom.squadSynergyTier.textContent = tierText;
+    }
   }
 }
 

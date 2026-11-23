@@ -175,7 +175,13 @@ function drawBlueFlameOnCanvas(ctx, flame, timeSec, masterAlpha) {
   ctx.restore();
 }
 
+let escapeIntroHandler = null;
+
 function stopAndCleanupIntroCanvas(canvas) {
+  if (escapeIntroHandler) {
+    window.removeEventListener('keydown', escapeIntroHandler);
+    escapeIntroHandler = null;
+  }
   if (introRafId) {
     cancelAnimationFrame(introRafId);
     introRafId = null;
@@ -219,6 +225,14 @@ export function playBlueRoseIntroCinematic() {
   stopAndCleanupIntroCanvas(canvas);
   isIntroRunning = true;
 
+  escapeIntroHandler = (e) => {
+    if (e.key === 'Escape' && isIntroRunning) {
+      e.preventDefault();
+      finishIntroAndRevealApp();
+    }
+  };
+  window.addEventListener('keydown', escapeIntroHandler);
+
   // Mostrar overlay y resetear estados iniciales por capas
   overlay.classList.remove('hidden');
   overlay.style.display = 'flex';
@@ -235,6 +249,26 @@ export function playBlueRoseIntroCinematic() {
   gsap.set(domeReflection, { opacity: 0 });
   gsap.set(quoteEl, { opacity: 0, y: 14 });
   gsap.set(flashLayer, { opacity: 0 });
+
+  // Respetar preferencia del SO prefers-reduced-motion mostrando emblema estático breve
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    [stemPath, domePath].forEach((pathEl) => {
+      if (!pathEl) return;
+      pathEl.style.strokeDasharray = 'none';
+      pathEl.style.strokeDashoffset = '0';
+      pathEl.style.opacity = '1';
+    });
+    gsap.set(bgPattern, { opacity: 0.28, scale: 1 });
+    gsap.set([roseLayerCore, roseLayerMid, roseLayerOuter, leafLeft, leafRight], {
+      opacity: 1,
+      scale: 1
+    });
+    gsap.set(domeBase, { opacity: 1, scaleX: 1 });
+    gsap.set(domeReflection, { opacity: 0.45 });
+    gsap.set(quoteEl, { opacity: 1, y: 0 });
+    introTimeline = gsap.delayedCall(1.6, () => finishIntroAndRevealApp());
+    return;
+  }
 
   // Preparar trazos SVG con holgura extra (+18px) para que al llegar a offset 0 la cúpula selle 100% cerrada
   [stemPath, domePath].forEach((pathEl) => {

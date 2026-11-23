@@ -110,12 +110,32 @@ function createPitchCanvasTexture(isFutsal) {
   ctx.arc(720, 440, 11, 0, Math.PI * 2);
   ctx.fill();
 
-  // Áreas grandes y chicas (Izquierda y Derecha)
-  ctx.strokeRect(40, 220, 192, 440);
-  ctx.strokeRect(40, 328, 72, 224);
-
-  ctx.strokeRect(1208, 220, 192, 440);
-  ctx.strokeRect(1328, 328, 72, 224);
+  // Áreas reglamentarias (Arcos de 6m y marcas para Futsal vs Rectángulos y medialuna para Campo)
+  if (isFutsal) {
+    ctx.beginPath();
+    ctx.ellipse(40, 440, 176, 216, 0, -Math.PI / 2, Math.PI / 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(1400, 440, 176, 216, 0, Math.PI / 2, (Math.PI * 3) / 2);
+    ctx.stroke();
+    [184, 288, 1152, 1256].forEach((dotX) => {
+      ctx.fillStyle = '#bae6fd';
+      ctx.beginPath();
+      ctx.arc(dotX, 440, 9, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  } else {
+    ctx.strokeRect(40, 208, 200, 464);
+    ctx.strokeRect(40, 328, 72, 224);
+    ctx.strokeRect(1200, 208, 200, 464);
+    ctx.strokeRect(1328, 328, 72, 224);
+    ctx.beginPath();
+    ctx.arc(172, 440, 96, -0.78, 0.78);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(1268, 440, 96, Math.PI - 0.78, Math.PI + 0.78);
+    ctx.stroke();
+  }
 
   // Líneas guía de tercios tácticos punteadas
   ctx.save();

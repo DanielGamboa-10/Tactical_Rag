@@ -21,11 +21,43 @@ import {
   updateContextBadges,
   isStrictNaturalPositionMatch
 } from '../store/tacticalStore.js';
-import {
-  syncStadium3DScene,
-  animateBall3DParabolic,
-  toggleStadium3DView
-} from './stadium3DEngine.js';
+let stadium3DModule = null;
+let stadium3DModulePromise = null;
+
+function loadStadium3DModule() {
+  if (stadium3DModule) return Promise.resolve(stadium3DModule);
+  if (!stadium3DModulePromise) {
+    stadium3DModulePromise = import('./stadium3DEngine.js').then((mod) => {
+      stadium3DModule = mod;
+      return mod;
+    });
+  }
+  return stadium3DModulePromise;
+}
+
+function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
+  if (stadium3DModule) {
+    stadium3DModule.syncStadium3DScene(adjustedCoords, activeSetPiece);
+  }
+}
+
+function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, isShot = false) {
+  if (stadium3DModule) {
+    stadium3DModule.animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass, isShot);
+  }
+}
+
+function toggleStadium3DView(forceState = null, coords = []) {
+  if (!stadium3DModule && forceState === false) return;
+  loadStadium3DModule()
+    .then((mod) => {
+      mod.toggleStadium3DView(forceState, coords);
+      syncCameraSegmentedButtons();
+    })
+    .catch((err) => {
+      console.warn('Error cargando módulo Estadio 3D:', err);
+    });
+}
 
 let currentBoardCoords = [];
 let currentSquadCoords = [];
@@ -681,11 +713,56 @@ export function resetSetPieceToStart() {
   executeSetPieceStep(1);
 }
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function renderRegulatoryPitchLines(pitchEl, isFutsal) {
+  if (!pitchEl) return;
+  const sportGroup = pitchEl.querySelector('[data-sport-lines]');
+  if (!sportGroup) return;
+
+  sportGroup.innerHTML = '';
+
+  const mk = (tag, attrs) => {
+    const el = document.createElementNS(SVG_NS, tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, String(v)));
+    return el;
+  };
+
+  if (isFutsal) {
+    // Arcos semicirculares reglamentarios de 6m en ambas metas + marcas de 6m y 10m
+    sportGroup.appendChild(mk('path', { d: 'M 10 56 A 44 54 0 0 1 10 164', fill: 'none', 'stroke-width': '1.5' }));
+    sportGroup.appendChild(mk('path', { d: 'M 350 56 A 44 54 0 0 0 350 164', fill: 'none', 'stroke-width': '1.5' }));
+    // Punto de penalti (6m) y doble penalti (10m)
+    sportGroup.appendChild(mk('circle', { cx: '46', cy: '110', r: '1.8', fill: '#38bdf8' }));
+    sportGroup.appendChild(mk('circle', { cx: '72', cy: '110', r: '1.8', fill: 'rgba(125, 211, 252, 0.85)' }));
+    sportGroup.appendChild(mk('circle', { cx: '314', cy: '110', r: '1.8', fill: '#38bdf8' }));
+    sportGroup.appendChild(mk('circle', { cx: '288', cy: '110', r: '1.8', fill: 'rgba(125, 211, 252, 0.85)' }));
+  } else {
+    // Fútbol 7 / 9 / 11: Área grande rectangular, área de meta, punto de penalti y medialuna (18 yd)
+    sportGroup.appendChild(mk('rect', { x: '10', y: '52', width: '50', height: '116', fill: 'none', 'stroke-width': '1.5' }));
+    sportGroup.appendChild(mk('rect', { x: '10', y: '82', width: '18', height: '56', fill: 'none', 'stroke-width': '1.2' }));
+    sportGroup.appendChild(mk('circle', { cx: '43', cy: '110', r: '1.9', fill: '#a7f3d0' }));
+    sportGroup.appendChild(mk('path', { d: 'M 60 93 A 24 24 0 0 1 60 127', fill: 'none', 'stroke-width': '1.3' }));
+
+    sportGroup.appendChild(mk('rect', { x: '300', y: '52', width: '50', height: '116', fill: 'none', 'stroke-width': '1.5' }));
+    sportGroup.appendChild(mk('rect', { x: '332', y: '82', width: '18', height: '56', fill: 'none', 'stroke-width': '1.2' }));
+    sportGroup.appendChild(mk('circle', { cx: '317', cy: '110', r: '1.9', fill: '#a7f3d0' }));
+    sportGroup.appendChild(mk('path', { d: 'M 300 93 A 24 24 0 0 0 300 127', fill: 'none', 'stroke-width': '1.3' }));
+  }
+
+  // Arcos de esquina (4 córners)
+  sportGroup.appendChild(mk('path', { d: 'M 10 18 A 8 8 0 0 0 18 10', fill: 'none', 'stroke-width': '1.2' }));
+  sportGroup.appendChild(mk('path', { d: 'M 342 10 A 8 8 0 0 0 350 18', fill: 'none', 'stroke-width': '1.2' }));
+  sportGroup.appendChild(mk('path', { d: 'M 10 202 A 8 8 0 0 1 18 210', fill: 'none', 'stroke-width': '1.2' }));
+  sportGroup.appendChild(mk('path', { d: 'M 342 210 A 8 8 0 0 1 350 202', fill: 'none', 'stroke-width': '1.2' }));
+}
+
 export function applyPitchSurfaceTheme(pitchEl, modality) {
   if (!pitchEl) return;
   const isFutsal = String(modality || '').toLowerCase().includes('futsal');
   pitchEl.classList.toggle('surface-futsal', isFutsal);
   pitchEl.classList.toggle('surface-grass', !isFutsal);
+  renderRegulatoryPitchLines(pitchEl, isFutsal);
 }
 
 export function renderTacticalPitch(animateMotionBlur = false) {
@@ -965,6 +1042,7 @@ export function renderSquadPitch() {
       ? `${assignedSlot.name.split(' ')[0]} (${assignedSlot.naturalPosition}${isOutOfPos ? ' · Adapt.' : ''})`
       : `Vacante · ${slotPlayer.role}`;
     const isSelected = playerId && playerId === state.selectedSquadPlayerId;
+    const isSwapArmedTarget = Boolean(state.pendingSwapBenchPlayerId);
 
     tokenEl.className = [
       'player-token',
@@ -972,25 +1050,36 @@ export function renderSquadPitch() {
       slotPlayer.gk ? 'gk' : '',
       isSelected ? 'selected-token' : '',
       !isAssigned ? 'vacant-slot' : '',
-      isOutOfPos ? 'out-of-position' : ''
+      isOutOfPos ? 'out-of-position' : '',
+      isSwapArmedTarget ? 'swap-target-candidate' : ''
     ]
       .filter(Boolean)
       .join(' ');
 
     tokenEl.textContent = String(displayNum);
     tokenEl.setAttribute('data-role', shortName);
+    tokenEl.setAttribute('role', 'button');
+    tokenEl.setAttribute('tabindex', '0');
     tokenEl.dataset.slotIndex = String(idx);
     tokenEl.dataset.vision = String(visionStat);
     tokenEl.draggable = isAssigned;
 
     if (playerId) {
       tokenEl.dataset.playerId = String(playerId);
+      tokenEl.setAttribute(
+        'aria-label',
+        `${assignedSlot.name}, dorsal ${assignedSlot.jerseyNumber}, puesto ${slotPlayer.role}${isSwapArmedTarget ? '. Haz clic o pulsa Enter para permutar' : ''}`
+      );
       tokenEl.title = isOutOfPos
-        ? `${assignedSlot.name} (${assignedSlot.naturalPosition} jugando en puesto de ${slotPlayer.role}) — Arrastra para cambiar`
-        : `${assignedSlot.name} (${assignedSlot.naturalPosition} · Visión ${visionStat}) — Arrastra para intercambiar o enviar a la banca`;
+        ? `${assignedSlot.name} (${assignedSlot.naturalPosition} jugando en puesto de ${slotPlayer.role}) — Arrastra o usa Clic-para-Permutar`
+        : `${assignedSlot.name} (${assignedSlot.naturalPosition} · Visión ${visionStat}) — Arrastra o usa Clic-para-Permutar`;
     } else {
       delete tokenEl.dataset.playerId;
-      tokenEl.title = `Puesto vacante (${slotPlayer.role}) — Arrastra un jugador desde la banca aquí`;
+      tokenEl.setAttribute(
+        'aria-label',
+        `Puesto vacante ${slotPlayer.role}${isSwapArmedTarget ? '. Pulsa Enter o haz clic para asignar suplente' : ''}`
+      );
+      tokenEl.title = `Puesto vacante (${slotPlayer.role}) — Selecciona o arrastra un jugador desde la banca aquí`;
     }
 
     const tx = Math.round(slotPlayer.x * scaleX);
@@ -1144,6 +1233,41 @@ function buildSmoothFreehandPathD(pts) {
   return d;
 }
 
+export function setFreehandColor(color = 'cyan') {
+  const validColors = new Set(['cyan', 'amber', 'red']);
+  state.drawColor = validColors.has(color) ? color : 'cyan';
+  if (dom.freehandToolbar) {
+    dom.freehandToolbar.querySelectorAll('.freehand-color-btn').forEach((btn) => {
+      const isMatch = btn.dataset.drawColor === state.drawColor;
+      btn.classList.toggle('active', isMatch);
+      btn.setAttribute('aria-pressed', String(isMatch));
+    });
+  }
+}
+
+export function syncDrawToolbarButtons() {
+  const strokeCount = dom.freehandPathsGroup ? dom.freehandPathsGroup.children.length : 0;
+  const hasStrokes = strokeCount > 0;
+  if (dom.clearDrawBtn) {
+    dom.clearDrawBtn.classList.toggle('hidden', !state.isDrawModeActive && !hasStrokes);
+  }
+  if (dom.undoDrawBtn) {
+    dom.undoDrawBtn.disabled = !hasStrokes;
+  }
+  if (dom.freehandToolbar) {
+    dom.freehandToolbar.classList.toggle('hidden', !state.isDrawModeActive);
+  }
+}
+
+export function undoLastFreehandStroke() {
+  if (!dom.freehandPathsGroup) return false;
+  const last = dom.freehandPathsGroup.lastElementChild;
+  if (!last) return false;
+  last.remove();
+  syncDrawToolbarButtons();
+  return true;
+}
+
 export function toggleFreehandDrawMode(forceState = null) {
   if (state.isStadium3DView && forceState !== false) {
     showToast(
@@ -1164,19 +1288,14 @@ export function toggleFreehandDrawMode(forceState = null) {
   if (dom.freehandDrawSvg) {
     dom.freehandDrawSvg.classList.toggle('drawing-enabled', active);
   }
-  if (dom.clearDrawBtn) {
-    const hasStrokes = Boolean(dom.freehandPathsGroup && dom.freehandPathsGroup.children.length > 0);
-    dom.clearDrawBtn.classList.toggle('hidden', !active && !hasStrokes);
-  }
+  syncDrawToolbarButtons();
 }
 
 export function clearFreehandDrawings() {
   if (dom.freehandPathsGroup) {
     dom.freehandPathsGroup.innerHTML = '';
   }
-  if (dom.clearDrawBtn && !state.isDrawModeActive) {
-    dom.clearDrawBtn.classList.add('hidden');
-  }
+  syncDrawToolbarButtons();
 }
 
 export function initFreehandDrawingEvents() {
@@ -1193,16 +1312,19 @@ export function initFreehandDrawingEvents() {
     const startPt = clientToSvgCoords(svgEl, e.clientX, e.clientY);
     activeStrokePoints = [startPt];
 
-    const isAmber = e.shiftKey || strokeColorIndex % 2 === 1;
-    strokeColorIndex++;
+    // Shift + arrastrar alterna rápido a Ámbar manteniendo color seleccionado para uso normal
+    const activeColor = e.shiftKey ? 'amber' : (state.drawColor || 'cyan');
+    const markerId =
+      activeColor === 'amber'
+        ? 'url(#arrow-freehand-amber)'
+        : activeColor === 'red'
+          ? 'url(#arrow-freehand-red)'
+          : 'url(#arrow-freehand-cyan)';
 
     activeStrokePathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    activeStrokePathEl.setAttribute('class', `freehand-stroke ${isAmber ? 'amber' : 'cyan'}`);
+    activeStrokePathEl.setAttribute('class', `freehand-stroke ${activeColor}`);
     activeStrokePathEl.setAttribute('d', `M ${startPt.x} ${startPt.y}`);
-    activeStrokePathEl.setAttribute(
-      'marker-end',
-      isAmber ? 'url(#arrow-freehand-amber)' : 'url(#arrow-freehand-cyan)'
-    );
+    activeStrokePathEl.setAttribute('marker-end', markerId);
     groupEl.appendChild(activeStrokePathEl);
   });
 
@@ -1221,9 +1343,7 @@ export function initFreehandDrawingEvents() {
     if (e?.pointerId !== undefined && svgEl.hasPointerCapture(e.pointerId)) {
       svgEl.releasePointerCapture(e.pointerId);
     }
-    if (dom.clearDrawBtn && groupEl.children.length > 0) {
-      dom.clearDrawBtn.classList.remove('hidden');
-    }
+    syncDrawToolbarButtons();
     activeStrokePathEl = null;
     activeStrokePoints = [];
   };
@@ -1403,11 +1523,32 @@ export function exportPitchAsPng(sourceTab = 'board') {
   ctx.arc(mapX(180), mapY(110), (32 / 360) * pitchW, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Áreas izquierda y derecha
-  ctx.strokeRect(mapX(10), mapY(55), (48 / 360) * pitchW, (110 / 220) * pitchH);
-  ctx.strokeRect(mapX(10), mapY(82), (18 / 360) * pitchW, (56 / 220) * pitchH);
-  ctx.strokeRect(mapX(302), mapY(55), (48 / 360) * pitchW, (110 / 220) * pitchH);
-  ctx.strokeRect(mapX(332), mapY(82), (18 / 360) * pitchW, (56 / 220) * pitchH);
+  // Áreas reglamentarias diferenciadas por modalidad (Futsal vs Fútbol 7/9/11)
+  if (isFutsal) {
+    ctx.beginPath();
+    ctx.ellipse(mapX(10), mapY(110), (44 / 360) * pitchW, (54 / 220) * pitchH, 0, -Math.PI / 2, Math.PI / 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(mapX(350), mapY(110), (44 / 360) * pitchW, (54 / 220) * pitchH, 0, Math.PI / 2, (Math.PI * 3) / 2);
+    ctx.stroke();
+    [46, 72, 288, 314].forEach((pxDot) => {
+      ctx.beginPath();
+      ctx.arc(mapX(pxDot), mapY(110), 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fill();
+    });
+  } else {
+    ctx.strokeRect(mapX(10), mapY(52), (50 / 360) * pitchW, (116 / 220) * pitchH);
+    ctx.strokeRect(mapX(10), mapY(82), (18 / 360) * pitchW, (56 / 220) * pitchH);
+    ctx.strokeRect(mapX(300), mapY(52), (50 / 360) * pitchW, (116 / 220) * pitchH);
+    ctx.strokeRect(mapX(332), mapY(82), (18 / 360) * pitchW, (56 / 220) * pitchH);
+    ctx.beginPath();
+    ctx.arc(mapX(43), mapY(110), (24 / 360) * pitchW, -0.78, 0.78);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(mapX(317), mapY(110), (24 / 360) * pitchW, Math.PI - 0.78, Math.PI + 0.78);
+    ctx.stroke();
+  }
 
   // 6. Líneas de sinergia
   ctx.save();
@@ -1425,16 +1566,37 @@ export function exportPitchAsPng(sourceTab = 'board') {
   });
   ctx.restore();
 
+  // 6B. Rutas de Balón Parado activas (si hay una jugada seleccionada)
+  const activeSetPieceForPng = !isFromSquad ? getActiveSetPiece() : null;
+  if (activeSetPieceForPng && Array.isArray(activeSetPieceForPng.movements)) {
+    activeSetPieceForPng.movements.forEach((mv) => {
+      const targetPlayer = coordsToDraw[mv.playerIndex];
+      const startX = mv.fromX ?? targetPlayer?.x;
+      const startY = mv.fromY ?? targetPlayer?.y;
+      if (startX === undefined || mv.toX === undefined) return;
+      ctx.save();
+      ctx.strokeStyle = mv.type === 'pass' ? '#fbbf24' : mv.type === 'shot' ? '#f43f5e' : '#38bdf8';
+      ctx.lineWidth = 3.2;
+      if (mv.type === 'pass') ctx.setLineDash([10, 7]);
+      ctx.beginPath();
+      ctx.moveTo(mapX(startX), mapY(startY));
+      ctx.lineTo(mapX(mv.toX), mapY(mv.toY));
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
   // 7. Trazos manuales dibujados con el lápiz táctico
   if (!isFromSquad && dom.freehandPathsGroup && dom.freehandPathsGroup.children.length > 0) {
     Array.from(dom.freehandPathsGroup.children).forEach((pathEl) => {
       const dAttr = pathEl.getAttribute('d');
       if (!dAttr) return;
       const isAmber = pathEl.classList.contains('amber');
+      const isRed = pathEl.classList.contains('red');
       ctx.save();
       ctx.translate(pitchX, pitchY);
       ctx.scale(pitchW / 360, pitchH / 220);
-      ctx.strokeStyle = isAmber ? '#fbbf24' : '#38bdf8';
+      ctx.strokeStyle = isRed ? '#f43f5e' : isAmber ? '#fbbf24' : '#38bdf8';
       ctx.lineWidth = 2.6;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
