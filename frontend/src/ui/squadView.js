@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Tab 3 UI View: 👥 Tu Propia Plantilla (Drag & Drop, Química & Top 100)
+   Tab 3 UI View: Gestión de Plantilla (Drag & Drop, Química & Top 100)
    ========================================================================== */
 
 import gsap from 'gsap';

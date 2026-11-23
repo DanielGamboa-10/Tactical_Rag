@@ -372,7 +372,7 @@ function createPlayerLabelSprite(dorsal, roleText, isGk) {
 
   // Dorsal destacado + nombre/rol con tipografía HD nítida
   ctx.fillStyle = '#ffffff';
-  ctx.font = '800 46px "Space Grotesk", "Inter", system-ui, sans-serif';
+  ctx.font = '800 46px "Plus Jakarta Sans", "Inter", system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   const cleanLabel = `#${dorsal} · ${roleText}`;

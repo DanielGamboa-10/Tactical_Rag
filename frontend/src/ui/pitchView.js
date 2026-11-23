@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Tab 2 UI View: 🏟️ Pizarra & Formaciones (Selectores, Jugadas & Exportación)
+   Tab 2 UI View: Pizarra Táctica (Selectores, Jugadas & Exportación)
    ========================================================================== */
 
 import gsap from 'gsap';

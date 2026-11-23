@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0284c7" />
     <title>TacticalPlay RAG — Inteligencia Táctica &amp; Pizarra Dinámica</title>
     <link rel="manifest" href="/manifest.json" />
@@ -303,9 +304,54 @@
 
       <div id="intro-flash-layer" class="intro-flash-layer" aria-hidden="true"></div>
       <button type="button" id="skip-intro-rose-btn" class="skip-intro-rose-btn">
-        Saltar intro ➔
+        <span>Saltar intro</span>
+        <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 5l7 7-7 7" />
+        </svg>
       </button>
     </div>
+
+    <!-- Shared SVG Paint Definitions (always mounted outside hidden tabs) -->
+    <svg class="svg-shared-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="vision-aura-grad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#00d2ff" stop-opacity="0.36" />
+          <stop offset="55%" stop-color="#2563eb" stop-opacity="0.18" />
+          <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0" />
+        </radialGradient>
+        <!-- Broadcast Grass Mowing Stripes Pattern (Fútbol 7 / 9 / 11) -->
+        <pattern id="grass-stripes-pattern" width="42.5" height="220" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="21.25" height="220" fill="rgba(16, 185, 129, 0.085)" />
+          <rect x="21.25" y="0" width="21.25" height="220" fill="rgba(6, 78, 59, 0.14)" />
+        </pattern>
+        <!-- Synthetic Futsal Parquet / Court Pattern (Futsal 5v5) -->
+        <pattern id="futsal-court-pattern" width="28" height="14" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="28" height="14" fill="rgba(15, 41, 82, 0.22)" />
+          <path d="M 0 7 L 28 7 M 14 0 L 14 7 M 0 0 L 0 14" stroke="rgba(56, 189, 248, 0.1)" stroke-width="0.6" />
+        </pattern>
+        <!-- Radial Perimeter Vignette -->
+        <radialGradient id="pitch-vignette-grad" cx="50%" cy="50%" r="65%">
+          <stop offset="0%" stop-color="#05050d" stop-opacity="0" />
+          <stop offset="72%" stop-color="#05050d" stop-opacity="0.18" />
+          <stop offset="100%" stop-color="#030308" stop-opacity="0.62" />
+        </radialGradient>
+        <!-- Tactical Heatmap Blur Filter & Thermal Gradients -->
+        <filter id="heatmap-blur-filter" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="13" />
+        </filter>
+        <radialGradient id="heat-grad-core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.82" />
+          <stop offset="42%" stop-color="#f59e0b" stop-opacity="0.58" />
+          <stop offset="78%" stop-color="#10b981" stop-opacity="0.26" />
+          <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="heat-grad-bridge" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.52" />
+          <stop offset="55%" stop-color="#10b981" stop-opacity="0.24" />
+          <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+    </svg>
     <!-- Ambient Animated Background -->
     <div class="ambient-bg" aria-hidden="true">
       <div class="glow-orb orb-1"></div>
@@ -771,42 +817,6 @@
                   <marker id="arrow-shot" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
                     <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" />
                   </marker>
-                  <radialGradient id="vision-aura-grad" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#00d2ff" stop-opacity="0.36" />
-                    <stop offset="55%" stop-color="#2563eb" stop-opacity="0.18" />
-                    <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0" />
-                  </radialGradient>
-                  <!-- Broadcast Grass Mowing Stripes Pattern (Fútbol 7 / 9 / 11) -->
-                  <pattern id="grass-stripes-pattern" width="42.5" height="220" patternUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="21.25" height="220" fill="rgba(16, 185, 129, 0.085)" />
-                    <rect x="21.25" y="0" width="21.25" height="220" fill="rgba(6, 78, 59, 0.14)" />
-                  </pattern>
-                  <!-- Synthetic Futsal Parquet / Court Pattern (Futsal 5v5) -->
-                  <pattern id="futsal-court-pattern" width="28" height="14" patternUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="28" height="14" fill="rgba(15, 41, 82, 0.22)" />
-                    <path d="M 0 7 L 28 7 M 14 0 L 14 7 M 0 0 L 0 14" stroke="rgba(56, 189, 248, 0.1)" stroke-width="0.6" />
-                  </pattern>
-                  <!-- Radial Perimeter Vignette -->
-                  <radialGradient id="pitch-vignette-grad" cx="50%" cy="50%" r="65%">
-                    <stop offset="0%" stop-color="#05050d" stop-opacity="0" />
-                    <stop offset="72%" stop-color="#05050d" stop-opacity="0.18" />
-                    <stop offset="100%" stop-color="#030308" stop-opacity="0.62" />
-                  </radialGradient>
-                  <!-- Tactical Heatmap Blur Filter & Thermal Gradients -->
-                  <filter id="heatmap-blur-filter" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur stdDeviation="13" />
-                  </filter>
-                  <radialGradient id="heat-grad-core" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#ef4444" stop-opacity="0.82" />
-                    <stop offset="42%" stop-color="#f59e0b" stop-opacity="0.58" />
-                    <stop offset="78%" stop-color="#10b981" stop-opacity="0.26" />
-                    <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
-                  </radialGradient>
-                  <radialGradient id="heat-grad-bridge" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.52" />
-                    <stop offset="55%" stop-color="#10b981" stop-opacity="0.24" />
-                    <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
-                  </radialGradient>
                 </defs>
                 <!-- Surface Turf / Parquet Texture + Vignette -->
                 <rect class="pitch-surface-turf" x="10" y="10" width="340" height="200" rx="8" />
@@ -845,7 +855,12 @@
               <div id="pitch-tokens" class="pitch-tokens"></div>
 
               <!-- Animated Soccer Ball Token for Set Pieces -->
-              <div id="ball-token" class="ball-token hidden" aria-hidden="true">⚽</div>
+              <div id="ball-token" class="ball-token hidden" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" fill="#ffffff" stroke="#0f172a" stroke-width="1.6" />
+                  <polygon points="12,7 16.5,10.2 14.8,15.5 9.2,15.5 7.5,10.2" fill="#0f172a" />
+                </svg>
+              </div>
 
               <!-- Freehand Tactical Drawing SVG Layer (Pointer Events enabled when Pencil active) -->
               <svg id="freehand-draw-svg" class="freehand-draw-svg" viewBox="0 0 360 220" preserveAspectRatio="none">
@@ -872,7 +887,7 @@
 
             <div class="pitch-footer">
               <span id="formation-full-text" class="formation-caption">
-                Dirección de ataque: Izquierda ➔ Derecha · Las fichas ajustan su altura y amplitud según el estilo elegido
+                Sentido de ataque: Izquierda a Derecha · Altura y amplitud dinámicas según el modelo de juego
               </span>
               <div class="pitch-footer-actions">
                 <div id="setpiece-playback-controls" class="setpiece-playback-controls hidden">
@@ -944,9 +959,9 @@
               <div class="setpiece-steps-header">
                 <span class="setpiece-kicker">SECUENCIA DE BALÓN PARADO</span>
                 <div class="setpiece-legend">
-                  <span class="leg-item run">╌➔ Desmarque</span>
-                  <span class="leg-item pass">━➔ Pase</span>
-                  <span class="leg-item shot">━➔ Finalización</span>
+                  <span class="leg-item run"><span class="leg-swatch"></span>Desmarque</span>
+                  <span class="leg-item pass"><span class="leg-swatch"></span>Pase</span>
+                  <span class="leg-item shot"><span class="leg-swatch"></span>Finalización</span>
                 </div>
               </div>
               <strong id="setpiece-title-text" class="setpiece-title"></strong>
@@ -995,7 +1010,7 @@
                 <button
                   type="button"
                   id="export-match-plan-board-btn"
-                  class="btn-primary shimmer-btn print-plan-btn"
+                  class="btn-secondary print-plan-btn"
                   title="Generar informe táctico imprimible / PDF con sistema, funciones de línea y balón parado"
                 >
                   <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1009,7 +1024,7 @@
                 <button
                   type="button"
                   id="export-png-board-btn"
-                  class="btn-primary shimmer-btn export-png-btn"
+                  class="btn-secondary export-png-btn"
                   title="Descargar captura PNG de alta resolución de la pizarra activa"
                 >
                   <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1311,7 +1326,7 @@
                 <button
                   type="button"
                   id="export-match-plan-squad-btn"
-                  class="btn-primary shimmer-btn print-plan-btn"
+                  class="btn-secondary print-plan-btn"
                   title="Imprimir o guardar en PDF el Plan de Partido completo"
                 >
                   <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1323,7 +1338,7 @@
                 <button
                   type="button"
                   id="export-png-squad-btn"
-                  class="btn-primary shimmer-btn export-png-btn"
+                  class="btn-secondary export-png-btn"
                   title="Guardar captura PNG del XI titular actual"
                 >
                   <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1336,7 +1351,7 @@
                 <button
                   type="button"
                   id="export-squad-to-board-btn"
-                  class="btn-primary shimmer-btn export-board-btn"
+                  class="btn-secondary export-board-btn"
                   title="Enviar titulares con dorsales y nombres reales a la Pizarra Táctica"
                 >
                   <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

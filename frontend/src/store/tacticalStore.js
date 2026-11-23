@@ -210,19 +210,6 @@ export const dom = {
   compWhyText: document.getElementById('comp-why-text'),
   compPotentiateText: document.getElementById('comp-potentiate-text'),
   compPartnersChips: document.getElementById('comp-partners-chips'),
-  // PDF & Chat
-  pdfUploadForm: document.getElementById('pdf-upload-form'),
-  dropZone: document.getElementById('drop-zone'),
-  pdfFileInput: document.getElementById('pdf-file-input'),
-  dropTitle: document.getElementById('drop-title'),
-  uploadModalityLabel: document.getElementById('upload-modality-label'),
-  uploadProgressBox: document.getElementById('upload-progress-box'),
-  uploadFilename: document.getElementById('upload-filename'),
-  uploadStatusPct: document.getElementById('upload-status-pct'),
-  tenantInput: document.getElementById('tenant-input'),
-  uploadSubmitBtn: document.getElementById('upload-submit-btn'),
-  indexedCountBadge: document.getElementById('indexed-count-badge'),
-  indexedDocsList: document.getElementById('indexed-docs-list'),
   quickPrompts: document.getElementById('quick-prompts'),
   chatMessages: document.getElementById('chat-messages'),
   chatForm: document.getElementById('chat-form'),
@@ -939,7 +926,7 @@ export const FUTSAL_ATTACK_PLAYS = [
   {
     name: 'Tiro de Esquina (Arrastre al Primer Palo)',
     steps: [
-      'El Ala (idx 2) se ubica en la esquina derecha junto al balón (⚽).',
+      'El Ala (idx 2) se ubica en la esquina derecha junto al balón.',
       'El Pívot (idx 4) pica al primer palo arrastrando al cierre rival.',
       'El Ala opuesta (idx 3) entra al punto penal, recibe el pase raso y fusila al arco.'
     ],
@@ -1108,7 +1095,7 @@ export const FIELD_ATTACK_PLAYS = [
   {
     name: 'Tiro de Esquina (Arrastre al Primer Palo)',
     steps: [
-      'El cobrador se ubica en el banderín de córner derecho junto al balón (⚽).',
+      'El cobrador se ubica en el banderín de córner derecho junto al balón.',
       'El Delantero (9) ataca el primer palo arrastrando a la defensa.',
       'El segundo atacante entra de frente al punto penal, cabecea el centro y anota.'
     ],
@@ -1425,7 +1412,7 @@ export function updateContextBadges() {
   const setup = getActiveFormationSetup();
   const shortStyle = state.playStyle.split('(')[0].split('&')[0].trim();
   const synergyPct = state.squadOptimization?.globalSynergy;
-  const synergyClause = synergyPct ? ` · ⚡ ${synergyPct}%` : '';
+  const synergyClause = synergyPct ? ` · Sinergia ${synergyPct}%` : '';
   const nextHudText = `${state.modality} · ${setup.code} · ${shortStyle}${synergyClause}`;
 
   if (dom.headerModalityBadge) {
@@ -1444,9 +1431,6 @@ export function updateContextBadges() {
   dom.inputModalityTag.textContent = `${state.modality} · ${setup.code.split(' ')[0]}`;
   dom.sidebarFormationLabel.textContent = setup.code;
   dom.sidebarStyleLabel.textContent = state.playStyle;
-  if (dom.uploadModalityLabel) {
-    dom.uploadModalityLabel.textContent = state.modality;
-  }
   if (dom.sidebarSquadLabel) {
     const count = state.squadPlayers.length;
     dom.sidebarSquadLabel.textContent = count > 0

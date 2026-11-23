@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Tab 1 UI View: 🤖 Asistente Táctico IA & Header System Controls
+   Tab 1 UI View: Asistente Táctico RAG & Header System Controls
    ========================================================================== */
 
 import gsap from 'gsap';

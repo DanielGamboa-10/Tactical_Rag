@@ -218,8 +218,20 @@ export function toggleExpandBoard(forceState = null) {
     dom.toggleExpandBoardBtn.classList.toggle('active', expanded);
     dom.toggleExpandBoardBtn.setAttribute('aria-pressed', String(expanded));
     dom.toggleExpandBoardBtn.innerHTML = expanded
-      ? '<span>🗗 Contraer</span>'
-      : '<span>⛶ Expandir</span>';
+      ? `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+           <polyline points="4 14 10 14 10 20" />
+           <polyline points="20 10 14 10 14 4" />
+           <line x1="14" y1="10" x2="21" y2="3" />
+           <line x1="3" y1="21" x2="10" y2="14" />
+         </svg>
+         <span>Contraer</span>`
+      : `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+           <polyline points="15 3 21 3 21 9" />
+           <polyline points="9 21 3 21 3 15" />
+           <line x1="21" y1="3" x2="14" y2="10" />
+           <line x1="3" y1="21" x2="10" y2="14" />
+         </svg>
+         <span>Expandir</span>`;
   }
 
   requestAnimationFrame(() => {
@@ -438,7 +450,7 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
 
   if (dom.setpieceStepsBox) {
     dom.setpieceStepsBox.classList.remove('hidden');
-    const catBadge = state.setPieceCategory === 'attack' ? '⚔️ Ataque: ' : '🛡️ Defensa: ';
+    const catBadge = state.setPieceCategory === 'attack' ? 'Ofensivo · ' : 'Defensivo · ';
     dom.setpieceTitleText.textContent = catBadge + setPiece.name;
     const activeSetup = getActiveFormationSetup();
     dom.setpieceStepsList.innerHTML = setPiece.steps
@@ -920,7 +932,7 @@ export function renderSquadPitch() {
 
     const displayNum = isAssigned ? assignedSlot.jerseyNumber : '+';
     const shortName = isAssigned
-      ? `${assignedSlot.name.split(' ')[0]} (${assignedSlot.naturalPosition}${isOutOfPos ? ' ⚠' : ''})`
+      ? `${assignedSlot.name.split(' ')[0]} (${assignedSlot.naturalPosition}${isOutOfPos ? ' · Adapt.' : ''})`
       : `Vacante · ${slotPlayer.role}`;
     const isSelected = playerId && playerId === state.selectedSquadPlayerId;
 
@@ -1272,7 +1284,7 @@ export function exportPitchAsPng(sourceTab = 'board') {
   ctx.strokeRect(40, 24, 1360, 76);
 
   ctx.fillStyle = '#f1f5f9';
-  ctx.font = 'bold 26px "Space Grotesk", "Inter", sans-serif';
+  ctx.font = 'bold 26px "Plus Jakarta Sans", "Inter", sans-serif';
   ctx.fillText(`TacticalPlay RAG · ${activeModality} · Sistema ${activeSetup.code}`, 64, 58);
 
   ctx.fillStyle = '#38bdf8';
@@ -1414,7 +1426,7 @@ export function exportPitchAsPng(sourceTab = 'board') {
 
     // Dorsal
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 19px "Space Grotesk", "Inter", sans-serif';
+    ctx.font = 'bold 19px "JetBrains Mono", "Inter", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(dorsal, px, py);
@@ -1435,7 +1447,7 @@ export function exportPitchAsPng(sourceTab = 'board') {
   link.remove();
 
   showToast(
-    '📸 Imagen Guardada',
+    'Imagen Guardada',
     'Se descargó la captura táctica en alta resolución (tacticalplay-pizarra.png).',
     'success'
   );
