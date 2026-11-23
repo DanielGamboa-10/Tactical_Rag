@@ -308,6 +308,9 @@ export function appendAssistantMessage(data) {
           class="play-on-board-btn"
           title="Aplicar y animar este sistema en la Pizarra Táctica"
         >
+          <svg class="ui-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
           <span>Simular en Pizarra</span>
         </button>
       </div>
@@ -395,8 +398,8 @@ function reproduceAssistantTacticOnBoard(targetModality, suggestedFormationCode,
   }
 
   showToast(
-    '▶ Reproduciendo en Pizarra Táctica',
-    `${state.modality} · ${getActiveFormationSetup().code} (${state.playStyle}) animado con GSAP.`,
+    'Simulación Activa en Pizarra Táctica',
+    `${state.modality} · ${getActiveFormationSetup().code} (${state.playStyle}) sincronizado con GSAP.`,
     'success'
   );
 }

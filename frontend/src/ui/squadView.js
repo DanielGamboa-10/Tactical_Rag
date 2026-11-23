@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Tab 3 UI View: 👥 Tu Propia Plantilla (Drag & Drop, Química & Top 100)
    ========================================================================== */
 
@@ -181,7 +181,7 @@ async function handleGenerateIdealSquad() {
     await refreshSquadAndOptimize(true);
     const synergyPct = state.squadOptimization?.globalSynergy || 95;
     showToast(
-      `✨ Plantilla Ideal Generada (${synergyPct}% Sinergia)`,
+      `XI Óptimo Calculado (${synergyPct}% Sinergia)`,
       `Titulares y banca optimizados por química colectiva, pie hábil y complementariedad para '${activeStyle}'.`,
       'success'
     );
@@ -265,8 +265,8 @@ function handleExportSquadToBoard() {
 
   const startersCount = lineup.filter((s) => s.assigned && s.playerId).length;
   showToast(
-    '📤 Plantilla Exportada a la Pizarra',
-    `${startersCount} titulares (${state.modality} · ${setup.code} · ${state.playStyle}) listos en cancha para ejecutar Jugadas Preparadas.`,
+    'XI Exportado a Pizarra Táctica',
+    `${startersCount} titulares (${state.modality} · ${setup.code} · ${state.playStyle}) listos en cancha para ejecutar acciones tácticas.`,
     'success'
   );
 }
@@ -280,7 +280,7 @@ export function renderSquadRosterList() {
 
   if (compatiblePlayers.length === 0) {
     dom.squadRosterList.innerHTML =
-      `<li class="empty-docs-msg">No hay jugadores registrados para <strong>${escapeHtml(state.squadModality)}</strong>. Registra uno arriba o pulsa "⚡ Cargar Plantilla Demo".</li>`;
+      `<li class="empty-docs-msg">No hay jugadores registrados para <strong>${escapeHtml(state.squadModality)}</strong>. Registra uno arriba o pulsa "Cargar Demo".</li>`;
     return;
   }
 
@@ -297,7 +297,12 @@ export function renderSquadRosterList() {
               <span class="doc-item-meta">${escapeHtml(p.position)} · Pie ${escapeHtml(p.preferredFoot)} · Media ${avg}</span>
             </div>
           </div>
-          <button type="button" class="roster-delete-btn" data-delete-id="${p.id}" title="Eliminar jugador">✕</button>
+          <button type="button" class="roster-delete-btn" data-delete-id="${p.id}" title="Eliminar jugador" aria-label="Eliminar jugador">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </li>
       `;
     })
@@ -636,7 +641,7 @@ export function renderSelectedPlayerComparison() {
     dom.compCrackName.textContent = defaultCrackName;
     dom.compCrackStyle.textContent = defaultCrackStyle;
     dom.compCrackWiki.textContent = defaultCrackWiki;
-    dom.compWhyText.textContent = 'Agrega jugadores a la izquierda o pulsa "⚡ Cargar Plantilla Demo" para calcular la similitud frente al Top 100.';
+    dom.compWhyText.textContent = 'Agrega jugadores a la izquierda o pulsa "Cargar Demo" para calcular la similitud frente al Top 100.';
     dom.compPotentiateText.textContent = 'Selecciona un jugador de tu plantilla para recibir recomendaciones personalizadas de entrenamiento.';
     dom.compPartnersChips.innerHTML = '';
     updateCrackInitialsBadge(defaultCrackName);
@@ -747,7 +752,14 @@ async function handleLoadDemoSquad() {
     showToast('Error', err.message, 'error');
   } finally {
     dom.loadDemoSquadBtn.disabled = false;
-    dom.loadDemoSquadBtn.textContent = 'Cargar Demo';
+    dom.loadDemoSquadBtn.innerHTML = `
+      <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      <span>Cargar Demo</span>
+    `;
   }
 }
 
@@ -764,7 +776,7 @@ async function handleClearSquad() {
     }
     await refreshSquadAndOptimize(false);
     renderTacticalPitch();
-    showToast('🗑️ Plantilla Vaciada', 'Se eliminaron todos los jugadores personalizados de la plantilla.', 'info');
+    showToast('Plantilla Vaciada', 'Se eliminaron todos los jugadores personalizados de la plantilla.', 'info');
   } catch (err) {
     showToast('Error al vaciar plantilla', err.message, 'error');
   } finally {
