@@ -230,6 +230,7 @@ export function initPitchViewEvents() {
   // Inclinación 3D interactiva al cursor + brillo especular holográfico para la carta del DT Referente
   if (dom.referenceCoachCard) {
     dom.referenceCoachCard.addEventListener('mousemove', (e) => {
+      if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
       const rect = dom.referenceCoachCard.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
       const relX = (e.clientX - rect.left) / rect.width;

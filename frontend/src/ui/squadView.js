@@ -621,34 +621,42 @@ function renderPlayerRadarChart(userPlayer, crackRef, comp) {
   const userPts = computeRadarPoints(userStats);
   const crackPts = computeRadarPoints(crackStats);
 
+  const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const userPointsStr = userPts.map((pt) => `${pt.x},${pt.y}`).join(' ');
   const crackPointsStr = crackPts.map((pt) => `${pt.x},${pt.y}`).join(' ');
 
-  // Animar expansión radial desde el centro hacia los 6 vértices con GSAP
-  gsap.fromTo(
-    dom.radarPolyCrack,
-    { attr: { points: centerPointsStr }, opacity: 0.15 },
-    {
-      attr: { points: crackPointsStr },
-      opacity: 1,
-      duration: 0.72,
-      ease: 'back.out(1.4)',
-      overwrite: 'auto'
-    }
-  );
+  if (prefersReducedMotion) {
+    dom.radarPolyCrack.setAttribute('points', crackPointsStr);
+    dom.radarPolyCrack.style.opacity = '1';
+    dom.radarPolyUser.setAttribute('points', userPointsStr);
+    dom.radarPolyUser.style.opacity = '1';
+  } else {
+    // Animar expansión radial desde el centro hacia los 6 vértices con GSAP
+    gsap.fromTo(
+      dom.radarPolyCrack,
+      { attr: { points: centerPointsStr }, opacity: 0.15 },
+      {
+        attr: { points: crackPointsStr },
+        opacity: 1,
+        duration: 0.72,
+        ease: 'back.out(1.4)',
+        overwrite: 'auto'
+      }
+    );
 
-  gsap.fromTo(
-    dom.radarPolyUser,
-    { attr: { points: centerPointsStr }, opacity: 0.2 },
-    {
-      attr: { points: userPointsStr },
-      opacity: 1,
-      duration: 0.82,
-      delay: 0.06,
-      ease: 'elastic.out(1, 0.72)',
-      overwrite: 'auto'
-    }
-  );
+    gsap.fromTo(
+      dom.radarPolyUser,
+      { attr: { points: centerPointsStr }, opacity: 0.2 },
+      {
+        attr: { points: userPointsStr },
+        opacity: 1,
+        duration: 0.82,
+        delay: 0.06,
+        ease: 'elastic.out(1, 0.72)',
+        overwrite: 'auto'
+      }
+    );
+  }
 
   if (dom.radarVerticesLayer) {
     dom.radarVerticesLayer.innerHTML = userPts
@@ -664,18 +672,20 @@ function renderPlayerRadarChart(userPlayer, crackRef, comp) {
       )
       .join('');
 
-    gsap.fromTo(
-      dom.radarVerticesLayer.querySelectorAll('circle'),
-      { scale: 0, opacity: 0, transformOrigin: '50% 50%' },
-      {
-        scale: 1,
-        opacity: 1,
-        duration: 0.45,
-        delay: 0.22,
-        stagger: 0.03,
-        ease: 'back.out(2)'
-      }
-    );
+    if (!prefersReducedMotion) {
+      gsap.fromTo(
+        dom.radarVerticesLayer.querySelectorAll('circle'),
+        { scale: 0, opacity: 0, transformOrigin: '50% 50%' },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.45,
+          delay: 0.22,
+          stagger: 0.03,
+          ease: 'back.out(2)'
+        }
+      );
+    }
   }
 }
 
@@ -721,8 +731,12 @@ export function renderSelectedPlayerComparison() {
 
   state.selectedSquadPlayerId = comp.playerId;
 
-  // Animación Walkout 3D con GSAP al cambiar de jugador seleccionado
-  if (dom.holographicPlayerCard && comp.playerId !== lastWalkoutPlayerId) {
+  // Animación Walkout 3D con GSAP al cambiar de jugador seleccionado (respetando reduced motion)
+  if (
+    dom.holographicPlayerCard &&
+    comp.playerId !== lastWalkoutPlayerId &&
+    !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  ) {
     lastWalkoutPlayerId = comp.playerId;
     gsap.fromTo(
       dom.holographicPlayerCard,
