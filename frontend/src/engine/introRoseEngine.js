@@ -270,12 +270,11 @@ export function playBlueRoseIntroCinematic() {
     return;
   }
 
-  // Preparar trazos SVG con holgura extra (+18px) para que al llegar a offset 0 la cúpula selle 100% cerrada
+  // Preparar trazos SVG usando pathLength="100" (+2u para cerrar 100% sin forzar getTotalLength reflow)
   [stemPath, domePath].forEach((pathEl) => {
     if (!pathEl) return;
-    const len = (pathEl.getTotalLength ? Math.ceil(pathEl.getTotalLength()) : 820) + 18;
-    pathEl.style.strokeDasharray = `${len}`;
-    pathEl.style.strokeDashoffset = `${len}`;
+    pathEl.style.strokeDasharray = '102';
+    pathEl.style.strokeDashoffset = '102';
     pathEl.style.opacity = '1';
   });
 

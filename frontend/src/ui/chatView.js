@@ -101,18 +101,21 @@ function scrollToBottom() {
   });
 }
 
-export function appendWelcomeMessage() {
+export function appendWelcomeMessage({ animate = true } = {}) {
   dom.chatMessages.innerHTML = '';
   const activeSetup = getActiveFormationSetup();
-  appendAssistantMessage({
-    reply:
-      'Bienvenido al módulo de análisis de **TacticalPlay RAG**.\n\n' +
-      '* Consulta ajustes posicionales, superioridades por zona o variantes tácticas adaptadas a los perfiles registrados en **Gestión de Plantilla**.\n' +
-      '* En **Pizarra Táctica** dispones de 30 sistemas estructurados, el **Modelo Táctico de Referencia** y secuencias de **Balón Parado** sincronizadas en 2D, 2.5D y Estadio 3D.',
-    modality: state.modality,
-    suggestedFormation: activeSetup.code,
-    sources: ['Motor Vectorial pgvector + Wikipedia API']
-  });
+  appendAssistantMessage(
+    {
+      reply:
+        'Bienvenido al módulo de análisis de **TacticalPlay RAG**.\n\n' +
+        '* Consulta ajustes posicionales, superioridades por zona o variantes tácticas adaptadas a los perfiles registrados en **Gestión de Plantilla**.\n' +
+        '* En **Pizarra Táctica** dispones de 30 sistemas estructurados, el **Modelo Táctico de Referencia** y secuencias de **Balón Parado** sincronizadas en 2D, 2.5D y Estadio 3D.',
+      modality: state.modality,
+      suggestedFormation: activeSetup.code,
+      sources: ['Motor Vectorial pgvector + Wikipedia API']
+    },
+    { animate }
+  );
 }
 
 function appendUserMessage(text, modality, formation, playStyle) {
@@ -127,18 +130,6 @@ function appendUserMessage(text, modality, formation, playStyle) {
     <div class="message-bubble">${escapeHtml(text)}</div>
   `;
   dom.chatMessages.appendChild(row);
-
-  const progressiveEls = row.querySelectorAll(
-    '.chat-heading, .chat-paragraph, .chat-list li, .rag-context-block, .message-footer-tags'
-  );
-  if (progressiveEls.length > 0) {
-    gsap.fromTo(
-      progressiveEls,
-      { opacity: 0, y: 8 },
-      { opacity: 1, y: 0, duration: 0.34, stagger: 0.07, ease: 'power2.out' }
-    );
-  }
-
   scrollToBottom();
 }
 
@@ -159,18 +150,6 @@ function showTypingIndicator() {
     </div>
   `;
   dom.chatMessages.appendChild(row);
-
-  const progressiveEls = row.querySelectorAll(
-    '.chat-heading, .chat-paragraph, .chat-list li, .rag-context-block, .message-footer-tags'
-  );
-  if (progressiveEls.length > 0) {
-    gsap.fromTo(
-      progressiveEls,
-      { opacity: 0, y: 8 },
-      { opacity: 1, y: 0, duration: 0.34, stagger: 0.07, ease: 'power2.out' }
-    );
-  }
-
   scrollToBottom();
 }
 
@@ -266,7 +245,7 @@ function formatMarkdownToHtml(rawText) {
   return htmlParts.join('');
 }
 
-export function appendAssistantMessage(data) {
+export function appendAssistantMessage(data, { animate = true } = {}) {
   const rawReply = data.reply || '';
   const formation = data.suggestedFormation || data.suggested_formation || getActiveFormationSetup().code;
   const sources = Array.isArray(data.sources) ? data.sources : [];
@@ -361,10 +340,11 @@ export function appendAssistantMessage(data) {
 
   dom.chatMessages.appendChild(row);
 
+  const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const progressiveEls = row.querySelectorAll(
     '.chat-heading, .chat-paragraph, .chat-list li, .rag-context-block, .message-footer-tags'
   );
-  if (progressiveEls.length > 0) {
+  if (animate && !prefersReducedMotion && progressiveEls.length > 0) {
     gsap.fromTo(
       progressiveEls,
       { opacity: 0, y: 8 },
@@ -372,7 +352,9 @@ export function appendAssistantMessage(data) {
     );
   }
 
-  scrollToBottom();
+  if (animate) {
+    scrollToBottom();
+  }
 }
 
 function reproduceAssistantTacticOnBoard(targetModality, suggestedFormationCode, replyText = '') {

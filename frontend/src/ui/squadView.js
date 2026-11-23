@@ -172,9 +172,12 @@ async function handleGenerateIdealSquad() {
 
   if (dom.squadPitch) {
     dom.squadPitch.classList.remove('shimmer-sweep-active');
-    void dom.squadPitch.offsetWidth;
-    dom.squadPitch.classList.add('shimmer-sweep-active');
-    setTimeout(() => dom.squadPitch?.classList.remove('shimmer-sweep-active'), 1100);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        dom.squadPitch?.classList.add('shimmer-sweep-active');
+        setTimeout(() => dom.squadPitch?.classList.remove('shimmer-sweep-active'), 1100);
+      });
+    });
   }
 
   try {

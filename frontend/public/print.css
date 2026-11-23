@@ -1,0 +1,170 @@
+/* ==========================================================================
+   TacticalPlay RAG — Print Match Plan Stylesheet (media="print" only)
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .intro-rose-overlay,
+  .ambient-bg,
+  .topbar,
+  .tab-view,
+  .toast-container,
+  dialog {
+    display: none !important;
+  }
+
+  .printable-match-plan {
+    display: block !important;
+    width: 100% !important;
+    color: #111827 !important;
+    background: #ffffff !important;
+  }
+
+  .print-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 3px solid #1e40af;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+
+  .print-brand-title {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .print-brand-subtitle {
+    font-size: 9.5pt;
+    color: #475569;
+    margin-top: 3px;
+  }
+
+  .print-meta-box {
+    text-align: right;
+    font-size: 9pt;
+    color: #334155;
+  }
+
+  .print-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .print-summary-item {
+    border: 1px solid #cbd5e1;
+    border-left: 4px solid #1d4ed8;
+    border-radius: 6px;
+    padding: 7px 10px;
+    background: #f8fafc;
+  }
+
+  .print-summary-label {
+    display: block;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+
+  .print-summary-value {
+    font-size: 10pt;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .print-section-title {
+    font-size: 11pt;
+    font-weight: 800;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1.5px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin: 12px 0 8px 0;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.8pt;
+    margin-bottom: 10px;
+  }
+
+  .print-table th {
+    background: #e2e8f0;
+    color: #0f172a;
+    text-align: left;
+    padding: 6px 8px;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
+  }
+
+  .print-table td {
+    padding: 5px 8px;
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
+  }
+
+  .print-table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  .print-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .print-card-box {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 9px 11px;
+    background: #ffffff;
+    font-size: 8.8pt;
+    line-height: 1.45;
+  }
+
+  .print-card-box h4 {
+    margin: 0 0 5px 0;
+    font-size: 9.5pt;
+    color: #1e40af;
+  }
+
+  .print-card-box p,
+  .print-card-box ol {
+    margin: 4px 0;
+    color: #1f2937;
+  }
+
+  .print-card-box ol {
+    padding-left: 18px;
+  }
+
+  .print-footer-note {
+    margin-top: 14px;
+    padding-top: 8px;
+    border-top: 1px solid #d1d5db;
+    font-size: 8pt;
+    color: #6b7280;
+    display: flex;
+    justify-content: space-between;
+  }
+}
