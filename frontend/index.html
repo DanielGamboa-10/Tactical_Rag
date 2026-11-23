@@ -129,45 +129,71 @@
       .ui-icon { flex-shrink: 0; vertical-align: middle; }
       .topbar {
         position: relative;
-        max-width: 1440px; margin: 16px auto 0; padding: 12px 22px;
+        max-width: 1440px; margin: 16px auto 0; padding: 14px 24px;
         display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-        background: var(--bg-surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(56, 189, 248, 0.16); border-radius: 12px;
-        box-shadow: inset 0 1px 0 rgba(125, 211, 252, 0.12), 0 14px 32px -16px rgba(2, 6, 23, 0.8);
+        background-color: var(--bg-surface);
+        background-image:
+          linear-gradient(90deg, transparent 8%, rgba(0, 240, 255, 0.72) 50%, transparent 92%),
+          linear-gradient(180deg, rgba(14, 165, 233, 0.08), transparent 45%);
+        background-size: 100% 2px, 100% 100%;
+        background-position: 0 0, 0 0;
+        background-repeat: no-repeat;
+        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(56, 189, 248, 0.24); border-radius: 12px;
+        box-shadow: inset 0 1px 0 rgba(0, 240, 255, 0.16), 0 18px 40px -16px rgba(2, 6, 23, 0.9);
       }
       .brand { display: flex; align-items: center; gap: 14px; }
-      .brand-logo { position: relative; width: 42px; height: 42px; display: grid; place-items: center; }
-      .brand-logo svg { width: 38px; height: 38px; }
+      .brand-logo {
+        position: relative; width: 44px; height: 44px; display: grid; place-items: center;
+        border-radius: 10px; background: radial-gradient(circle, rgba(14, 165, 233, 0.22), #030712);
+        border: 1px solid rgba(0, 240, 255, 0.36); box-shadow: 0 0 18px rgba(0, 240, 255, 0.18);
+      }
+      .brand-logo svg { width: 34px; height: 34px; }
       .brand-title { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size-adjust: from-font; font-size: 1.24rem; font-weight: 700; letter-spacing: -0.03em; }
-      .accent-gradient { background: linear-gradient(135deg, #e0f2fe 0%, #38bdf8 50%, #1d4ed8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .accent-gradient { background: linear-gradient(135deg, #e0f2fe 0%, #00f0ff 55%, #1d4ed8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .brand-subtitle { font-size: 0.75rem; color: var(--text-kicker); letter-spacing: 0.01em; }
-      .view-tabs-nav { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 9px; background: #050811; border: 1px solid rgba(56, 189, 248, 0.18); }
+      .view-tabs-nav { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 9px; background: #030712; border: 1px solid rgba(56, 189, 248, 0.24); }
       .view-tab-btn {
         position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 7px 15px;
         border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--text-secondary);
         font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size-adjust: from-font; font-size: 0.83rem; font-weight: 600; cursor: pointer;
       }
-      .view-tab-btn.active { background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%); color: #fff; border-color: rgba(125, 211, 252, 0.4); border-block-end: 2px solid #38bdf8; }
+      .view-tab-btn.active { background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%); color: #fff; border-color: rgba(125, 211, 252, 0.45); border-block-end: 2px solid #00f0ff; }
       .header-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
       .active-modality-pill, .status-badge, .shutdown-btn {
-        padding: 6px 12px; border-radius: 8px; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.18);
+        padding: 6px 12px; border-radius: 8px; background: #030712; border: 1px solid rgba(56, 189, 248, 0.24);
         font-size: 0.75rem; display: inline-flex; align-items: center; gap: 6px; color: var(--text-primary);
       }
-      .active-modality-pill strong { font-family: 'JetBrains Mono', monospace; font-size-adjust: from-font; font-variant-numeric: tabular-nums; font-size: 0.76rem; }
+      .active-modality-pill strong { font-family: 'JetBrains Mono', monospace; font-size-adjust: from-font; font-variant-numeric: tabular-nums; font-size: 0.76rem; color: #00f0ff; }
       .pill-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7c8ba1; }
-      .replay-rose-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.2); color: #38bdf8; }
+      .replay-rose-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: #030712; border: 1px solid rgba(56, 189, 248, 0.28); color: #38bdf8; }
       .tab-view { max-width: 1440px; margin: 18px auto 28px; padding: 0 16px; }
       .assistant-layout { display: grid; grid-template-columns: 410px 1fr; gap: 20px; align-items: start; }
       .assistant-sidebar { display: flex; flex-direction: column; gap: 20px; }
       .glass-card {
-        position: relative; background: var(--bg-surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(56, 189, 248, 0.16); border-radius: 12px; padding: 20px 22px;
-        box-shadow: inset 0 1px 0 rgba(125, 211, 252, 0.12), 0 16px 36px -18px rgba(2, 6, 23, 0.78);
+        position: relative; background-color: var(--bg-surface);
+        background-image:
+          linear-gradient(to right, rgba(0, 240, 255, 0.65), rgba(0, 240, 255, 0.65)),
+          linear-gradient(to bottom, rgba(0, 240, 255, 0.65), rgba(0, 240, 255, 0.65)),
+          linear-gradient(to left, rgba(0, 240, 255, 0.65), rgba(0, 240, 255, 0.65)),
+          linear-gradient(to bottom, rgba(0, 240, 255, 0.65), rgba(0, 240, 255, 0.65)),
+          linear-gradient(to right, rgba(56, 189, 248, 0.42), rgba(56, 189, 248, 0.42)),
+          linear-gradient(to top, rgba(56, 189, 248, 0.42), rgba(56, 189, 248, 0.42)),
+          linear-gradient(to left, rgba(56, 189, 248, 0.42), rgba(56, 189, 248, 0.42)),
+          linear-gradient(to top, rgba(56, 189, 248, 0.42), rgba(56, 189, 248, 0.42));
+        background-position: 0 0, 0 0, 100% 0, 100% 0, 0 100%, 0 100%, 100% 100%, 100% 100%;
+        background-size: 16px 2px, 2px 16px, 16px 2px, 2px 16px, 12px 1.5px, 1.5px 12px, 12px 1.5px, 1.5px 12px;
+        background-repeat: no-repeat;
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 12px; padding: 20px 22px;
+        box-shadow: inset 0 1px 0 rgba(125, 211, 252, 0.16), 0 18px 40px -18px rgba(2, 6, 23, 0.85);
       }
-      .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding-top: 2px; margin-bottom: 16px; gap: 12px; }
-      .section-kicker { display: block; margin-bottom: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #7c8ba1; text-transform: uppercase; }
+      .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 2px 0 12px; margin-bottom: 16px; gap: 12px; border-bottom: 1px solid rgba(56, 189, 248, 0.14); }
+      .card-header > div:first-child { border-left: 3px solid #00f0ff; padding-left: 11px; }
+      .section-kicker { display: block; margin-bottom: 3px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; color: #7c8ba1; text-transform: uppercase; }
+      .section-kicker::before { content: '// '; color: #00f0ff; }
       .card-title { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size-adjust: from-font; font-size: 1.06rem; font-weight: 700; letter-spacing: -0.03em; color: #f1f5f9; }
-      .badge-tag { font-family: 'JetBrains Mono', monospace; font-size-adjust: from-font; font-variant-numeric: tabular-nums; padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.22); color: var(--accent-cyan); }
+      .badge-tag { font-family: 'JetBrains Mono', monospace; font-size-adjust: from-font; font-variant-numeric: tabular-nums; padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; background: #030712; border: 1px solid rgba(0, 240, 255, 0.32); color: #00f0ff; }
       .chat-card { display: flex; flex-direction: column; height: calc(100dvh - 135px); min-height: 540px; }
       .chat-messages { flex: 1; overflow-y: auto; padding: 18px 6px; display: flex; flex-direction: column; gap: 16px; }
       @media (max-width: 1024px) {
