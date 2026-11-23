@@ -2,6 +2,7 @@
    Tab 1 UI View: 🤖 Asistente Táctico IA & Header System Controls
    ========================================================================== */
 
+import gsap from 'gsap';
 import { api } from '../services/api.js';
 import {
   state,
@@ -36,21 +37,29 @@ export async function checkBackendHealth() {
 export async function syncWikipediaKnowledge() {
   if (!dom.syncWikiBtn) return;
   dom.syncWikiBtn.disabled = true;
-  dom.syncWikiBtn.textContent = '⏳ Sincronizando...';
+  dom.syncWikiBtn.textContent = 'Sincronizando...';
 
   try {
     const data = await api.syncWikipediaKnowledge();
     const count = data.chunksSaved ?? data.chunksInDatabase ?? 0;
     showToast(
-      'Conocimiento Wikipedia Sincronizado',
-      `Base vectorial lista con ${count} fragmentos tácticos bajo namespace 'api-externa'.`,
+      'Base Vectorial Actualizada',
+      `Se indexaron ${count} fragmentos tácticos en PostgreSQL + pgvector.`,
       'success'
     );
   } catch (err) {
-    showToast('Error en Sync Wikipedia', err.message, 'error');
+    showToast('Error de Sincronización', err.message, 'error');
   } finally {
     dom.syncWikiBtn.disabled = false;
-    dom.syncWikiBtn.textContent = '🌐 Sincronizar Base Táctica Wikipedia';
+    dom.syncWikiBtn.innerHTML = `
+      <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+        <path d="M3 3v5h5" />
+        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+        <path d="M16 16h5v5" />
+      </svg>
+      <span>Sincronizar Base Vectorial</span>
+    `;
   }
 }
 
@@ -97,12 +106,12 @@ export function appendWelcomeMessage() {
   const activeSetup = getActiveFormationSetup();
   appendAssistantMessage({
     reply:
-      '¡Hola míster! Soy tu entrenador asistente en **TacticalPlay RAG**.\n\n' +
-      '* Puedes preguntarme cualquier duda táctica, analizar tu formación o pedir ajustes personalizados sobre los jugadores de **Tu Propia Plantilla**.\n' +
-      '* En la pestaña **🏟️ Pizarra & Formaciones** tienes 30 alineaciones, el **DT Referente** para cada sistema y **Jugadas Preparadas de Balón Parado** animadas sobre la cancha.',
+      'Bienvenido al módulo de análisis de **TacticalPlay RAG**.\n\n' +
+      '* Consulta ajustes posicionales, superioridades por zona o variantes tácticas adaptadas a los perfiles registrados en **Gestión de Plantilla**.\n' +
+      '* En **Pizarra Táctica** dispones de 30 sistemas estructurados, el **Modelo Táctico de Referencia** y secuencias de **Balón Parado** sincronizadas en 2D, 2.5D y Estadio 3D.',
     modality: state.modality,
     suggestedFormation: activeSetup.code,
-    sources: ['Base Vectorial pgvector + Wikipedia API']
+    sources: ['Motor Vectorial pgvector + Wikipedia API']
   });
 }
 
@@ -118,6 +127,18 @@ function appendUserMessage(text, modality, formation, playStyle) {
     <div class="message-bubble">${escapeHtml(text)}</div>
   `;
   dom.chatMessages.appendChild(row);
+
+  const progressiveEls = row.querySelectorAll(
+    '.chat-heading, .chat-paragraph, .chat-list li, .rag-context-block, .message-footer-tags'
+  );
+  if (progressiveEls.length > 0) {
+    gsap.fromTo(
+      progressiveEls,
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, duration: 0.34, stagger: 0.07, ease: 'power2.out' }
+    );
+  }
+
   scrollToBottom();
 }
 
@@ -138,6 +159,18 @@ function showTypingIndicator() {
     </div>
   `;
   dom.chatMessages.appendChild(row);
+
+  const progressiveEls = row.querySelectorAll(
+    '.chat-heading, .chat-paragraph, .chat-list li, .rag-context-block, .message-footer-tags'
+  );
+  if (progressiveEls.length > 0) {
+    gsap.fromTo(
+      progressiveEls,
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, duration: 0.34, stagger: 0.07, ease: 'power2.out' }
+    );
+  }
+
   scrollToBottom();
 }
 
@@ -245,7 +278,7 @@ export function appendAssistantMessage(data) {
 
     ragContextBlockHtml = `
       <div class="rag-context-block">
-        <div class="rag-context-title">📑 Contexto Documental Recuperado (PostgreSQL + pgvector)</div>
+        <div class="rag-context-title">Contexto Documental Recuperado (PostgreSQL + pgvector)</div>
         ${snippetLines.map((line) => `<div class="rag-snippet-item">${escapeHtml(line)}</div>`).join('')}
       </div>
     `;
@@ -253,14 +286,14 @@ export function appendAssistantMessage(data) {
 
   const formattedAnalysisHtml = formatMarkdownToHtml(mainAnalysis);
   const sourcesHtml = sources
-    .map((src) => `<span class="source-chip">📄 ${escapeHtml(src)}</span>`)
+    .map((src) => `<span class="source-chip">${escapeHtml(src)}</span>`)
     .join('');
 
   const row = document.createElement('div');
   row.className = 'message-row assistant';
   row.innerHTML = `
     <div class="message-meta">
-      <span>Entrenador IA</span>
+      <span>Asistente RAG</span>
       <span>·</span>
       <span>${escapeHtml(data.modality || state.modality)}</span>
     </div>
@@ -268,14 +301,14 @@ export function appendAssistantMessage(data) {
       <div class="chat-formatted-content">${formattedAnalysisHtml}</div>
       ${ragContextBlockHtml}
       <div class="message-footer-tags">
-        <span class="formation-tag">📐 Formación: ${escapeHtml(formation)}</span>
+        <span class="formation-tag">Sistema: ${escapeHtml(formation)}</span>
         ${sourcesHtml}
         <button
           type="button"
           class="play-on-board-btn"
-          title="Llevar esta formación, estilo y jugada directamente a la Pizarra Táctica animada"
+          title="Aplicar y animar este sistema en la Pizarra Táctica"
         >
-          ▶ Reproducir en Pizarra
+          <span>Simular en Pizarra</span>
         </button>
       </div>
     </div>
@@ -289,6 +322,18 @@ export function appendAssistantMessage(data) {
   }
 
   dom.chatMessages.appendChild(row);
+
+  const progressiveEls = row.querySelectorAll(
+    '.chat-heading, .chat-paragraph, .chat-list li, .rag-context-block, .message-footer-tags'
+  );
+  if (progressiveEls.length > 0) {
+    gsap.fromTo(
+      progressiveEls,
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, duration: 0.34, stagger: 0.07, ease: 'power2.out' }
+    );
+  }
+
   scrollToBottom();
 }
 

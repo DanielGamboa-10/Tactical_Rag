@@ -1,0 +1,28 @@
+{
+  "name": "TacticalPlay RAG",
+  "short_name": "TacticalPlay",
+  "description": "Entrenador Táctico IA Vectorial, Pizarra Dinámica 2D/2.5D/3D y Optimizador de Plantilla",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060913",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "/blue-rose-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/blue-rose-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/blue-rose.ico",
+      "sizes": "16x16 32x32 48x48 64x64 256x256",
+      "type": "image/x-icon"
+    }
+  ]
+}

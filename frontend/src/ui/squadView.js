@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Tab 3 UI View: 👥 Tu Propia Plantilla (Drag & Drop, Química & Top 100)
    ========================================================================== */
 
@@ -10,6 +10,9 @@ import {
   escapeHtml,
   showToast,
   switchTab,
+  animateNumericCounter,
+  getPersonInitials,
+  updateContextBadges,
   PLAY_STYLE_MODIFIERS,
   FORMATIONS_BY_MODALITY,
   NATURAL_POSITIONS_FUTSAL,
@@ -21,12 +24,19 @@ import {
   clearPlaybackTimers,
   renderTacticalPitch,
   renderSquadPitch,
-  handleExportPrintableMatchPlan
+  handleExportPrintableMatchPlan,
+  exportPitchAsPng
 } from '../engine/pitchEngine.js';
 import { populateFormationDropdown, populateSetPieceDropdown } from './pitchView.js';
 import { setModality, sendChatMessage } from './chatView.js';
 
 let activeDragPayload = null;
+let lastWalkoutPlayerId = null;
+
+function updateCrackInitialsBadge(crackName) {
+  if (!dom.compCrackInitials) return;
+  dom.compCrackInitials.textContent = getPersonInitials(crackName);
+}
 
 export function isPlayerCompatibleWithActiveModality(positionCode, modality = state.squadModality) {
   const pos = String(positionCode || '').toUpperCase().trim();
@@ -139,7 +149,7 @@ export function renderIdealSquadBanner(showBanner = false) {
   const setup = getActiveSquadFormationSetup();
   const activeStyle = opt.playStyle || (dom.squadStyleSelect ? dom.squadStyleSelect.value : 'Posesión & Juego de Posición');
   if (dom.idealBannerTitle) {
-    dom.idealBannerTitle.textContent = `✨ Plantilla Ideal por Química Colectiva · ${setup.code} (${activeStyle})`;
+    dom.idealBannerTitle.textContent = `XI Óptimo por Sinergia Colectiva · ${setup.code} (${activeStyle})`;
   }
   if (dom.idealBannerText) {
     dom.idealBannerText.textContent =
@@ -149,7 +159,7 @@ export function renderIdealSquadBanner(showBanner = false) {
   if (dom.idealBannerPartners) {
     const partnerships = Array.isArray(opt.keyPartnerships) ? opt.keyPartnerships : [];
     dom.idealBannerPartners.innerHTML = partnerships
-      .map((p) => `<span class="ideal-partner-pill">⚡ ${escapeHtml(p)}</span>`)
+      .map((p) => `<span class="ideal-partner-pill">${escapeHtml(p)}</span>`)
       .join('');
   }
   dom.idealSquadBanner.classList.remove('hidden');
@@ -159,6 +169,13 @@ async function handleGenerateIdealSquad() {
   if (!dom.generateIdealSquadBtn) return;
   dom.generateIdealSquadBtn.disabled = true;
   const activeStyle = dom.squadStyleSelect ? dom.squadStyleSelect.value : 'Posesión & Juego de Posición';
+
+  if (dom.squadPitch) {
+    dom.squadPitch.classList.remove('shimmer-sweep-active');
+    void dom.squadPitch.offsetWidth;
+    dom.squadPitch.classList.add('shimmer-sweep-active');
+    setTimeout(() => dom.squadPitch?.classList.remove('shimmer-sweep-active'), 1100);
+  }
 
   try {
     await refreshSquadAndOptimize(true);
@@ -171,6 +188,32 @@ async function handleGenerateIdealSquad() {
   } finally {
     dom.generateIdealSquadBtn.disabled = false;
   }
+}
+
+function highlightCompatibleDropSlots(draggedPlayerId) {
+  if (!dom.squadPitchTokens) return;
+  const playerObj =
+    state.squadPlayers.find((p) => p.id === draggedPlayerId) ||
+    (state.squadOptimization?.substitutes || []).find((s) => s.playerId === draggedPlayerId) ||
+    (state.squadOptimization?.lineup || []).find((l) => l.playerId === draggedPlayerId);
+  const naturalPos = playerObj?.position || playerObj?.naturalPosition || '';
+  const setup = getActiveSquadFormationSetup();
+
+  dom.squadPitchTokens.querySelectorAll('.player-token').forEach((tokenEl) => {
+    const slotIdx = Number(tokenEl.dataset.slotIndex);
+    const slotDef = setup.players[slotIdx];
+    if (!slotDef) return;
+    if (isStrictNaturalPositionMatch(naturalPos, slotDef.role)) {
+      tokenEl.classList.add('drop-target-ready');
+    }
+  });
+}
+
+function clearCompatibleDropSlots() {
+  if (!dom.squadPitchTokens) return;
+  dom.squadPitchTokens.querySelectorAll('.player-token').forEach((tokenEl) => {
+    tokenEl.classList.remove('drop-target-ready', 'drag-over-target');
+  });
 }
 
 function handleExportSquadToBoard() {
@@ -321,8 +364,9 @@ function recalculateLineupSynergy() {
   const avgSynergy = opt.lineup.length > 0 ? Math.round(totalFit / opt.lineup.length) : 82;
   opt.globalSynergy = Math.max(55, Math.min(99, avgSynergy));
   if (dom.squadGlobalSynergy) {
-    dom.squadGlobalSynergy.textContent = `${opt.globalSynergy}%`;
+    animateNumericCounter(dom.squadGlobalSynergy, opt.globalSynergy, '%');
   }
+  updateContextBadges();
 }
 
 function handlePitchSlotDrop(targetSlotIdx) {
@@ -576,28 +620,73 @@ export function renderSelectedPlayerComparison() {
     null;
 
   if (!comp) {
+    const isFutsalMod = String(state.squadModality || '').toLowerCase().includes('futsal');
+    const defaultCrackName = isFutsalMod ? 'Ricardinho' : 'Alisson Becker';
+    const defaultCrackStyle = isFutsalMod
+      ? 'ALA · Crack Histórico · Regate & Magia en 20x40'
+      : 'POR · Crack Actual · Salida Limpia & Achique 1v1';
+    const defaultCrackWiki = isFutsalMod
+      ? 'Referente destacado de Futsal (6 veces Mejor Jugador del Mundo). Carga la Plantilla Demo o registra un jugador para comparar.'
+      : 'Referente destacado en Fútbol 11 (élite mundial en portería y juego de pies). Carga la Plantilla Demo o registra un jugador para comparar.';
+
     dom.compPlayerNumber.textContent = '—';
     dom.compPlayerName.textContent = 'Sin jugador seleccionado';
     dom.compPlayerMeta.textContent = 'Registra un jugador o carga la Plantilla Demo';
-    dom.compCrackName.textContent = 'Top 100 Mundial / Histórico';
-    dom.compCrackStyle.textContent = '75 Cracks de Fútbol 11 + 25 de Futsal';
-    dom.compCrackWiki.textContent = '';
-    dom.compWhyText.textContent = 'Agrega jugadores a la izquierda para compararlos con las leyendas y cracks actuales.';
-    dom.compPotentiateText.textContent = '—';
+    dom.compMirrorBadge.textContent = 'Referente Top 100';
+    dom.compCrackName.textContent = defaultCrackName;
+    dom.compCrackStyle.textContent = defaultCrackStyle;
+    dom.compCrackWiki.textContent = defaultCrackWiki;
+    dom.compWhyText.textContent = 'Agrega jugadores a la izquierda o pulsa "⚡ Cargar Plantilla Demo" para calcular la similitud frente al Top 100.';
+    dom.compPotentiateText.textContent = 'Selecciona un jugador de tu plantilla para recibir recomendaciones personalizadas de entrenamiento.';
     dom.compPartnersChips.innerHTML = '';
-    renderPlayerRadarChart(null, null, null);
+    updateCrackInitialsBadge(defaultCrackName);
+
+    const defaultCrackRef =
+      (state.top100Catalog || []).find((r) => r.name.includes(defaultCrackName)) || null;
+    renderPlayerRadarChart(null, defaultCrackRef, {
+      playerName: 'Tu Jugador',
+      jerseyNumber: '—',
+      similarCrackName: defaultCrackName
+    });
     return;
   }
 
   state.selectedSquadPlayerId = comp.playerId;
-  dom.compSimilarityBadge.textContent = `${comp.similarityPct || 92}% Similitud`;
+
+  // Animación Walkout 3D con GSAP al cambiar de jugador seleccionado
+  if (dom.holographicPlayerCard && comp.playerId !== lastWalkoutPlayerId) {
+    lastWalkoutPlayerId = comp.playerId;
+    gsap.fromTo(
+      dom.holographicPlayerCard,
+      {
+        rotateY: -22,
+        rotateX: 6,
+        scale: 0.94,
+        opacity: 0.72,
+        transformPerspective: 1000
+      },
+      {
+        rotateY: 0,
+        rotateX: 0,
+        scale: 1,
+        opacity: 1,
+        transformPerspective: 1000,
+        duration: 0.68,
+        ease: 'back.out(1.6)',
+        overwrite: 'auto'
+      }
+    );
+  }
+
+  animateNumericCounter(dom.compSimilarityBadge, comp.similarityPct || 92, '% Similitud');
   dom.compPlayerNumber.textContent = String(comp.jerseyNumber);
   dom.compPlayerName.textContent = comp.playerName;
-  dom.compPlayerMeta.textContent = `Posición: ${comp.position} · Pie ${comp.preferredFoot} · Media ${comp.overall}`;
+  dom.compPlayerMeta.textContent = `${comp.position} · Pie ${comp.preferredFoot} · Media ${comp.overall}`;
   dom.compMirrorBadge.textContent = comp.mirrorBadge || 'Top 100';
-  dom.compCrackName.textContent = `${comp.similarCrackName} (${comp.similarCrackEra})`;
-  dom.compCrackStyle.textContent = `${comp.similarCrackPosition} · ${comp.similarCrackStyle}`;
+  dom.compCrackName.textContent = comp.similarCrackName;
+  dom.compCrackStyle.textContent = `${comp.similarCrackPosition} · ${comp.similarCrackEra} · ${comp.similarCrackStyle}`;
   dom.compCrackWiki.textContent = comp.similarCrackWiki || '';
+  updateCrackInitialsBadge(comp.similarCrackName);
   dom.compWhyText.textContent = comp.whySimilar || '';
   dom.compPotentiateText.textContent = comp.whatToPotentiate || '';
 
@@ -608,8 +697,8 @@ export function renderSelectedPlayerComparison() {
 
   const partners = Array.isArray(comp.bestPartners) ? comp.bestPartners : [];
   dom.compPartnersChips.innerHTML = partners.length
-    ? partners.map((pt) => `<span class="source-chip">🤝 ${escapeHtml(pt)}</span>`).join('')
-    : '<span class="doc-item-meta">Agrega más compañeros para calcular sociedades.</span>';
+    ? partners.map((pt) => `<span class="source-chip">${escapeHtml(pt)}</span>`).join('')
+    : '<span class="doc-item-meta">Registra más jugadores para calcular sociedades tácticas.</span>';
 }
 
 async function handleCreateCustomPlayer(e) {
@@ -643,14 +732,14 @@ async function handleCreateCustomPlayer(e) {
 async function handleLoadDemoSquad() {
   if (!dom.loadDemoSquadBtn) return;
   dom.loadDemoSquadBtn.disabled = true;
-  dom.loadDemoSquadBtn.textContent = '⏳ Cargando...';
+  dom.loadDemoSquadBtn.textContent = 'Cargando...';
 
   try {
     const players = await api.loadDemoSquad(state.squadModality);
     state.selectedSquadPlayerId = players[0]?.id || null;
     showToast(
-      `Plantilla Demo (${state.squadModality})`,
-      `Se cargaron ${players.length} jugadores (titulares + suplentes en banca) comparados con el Top 100.`,
+      `Nómina Demo (${state.squadModality})`,
+      `Se cargaron ${players.length} jugadores (titulares + suplentes) evaluados frente al Top 100.`,
       'success'
     );
     await refreshSquadAndOptimize();
@@ -658,7 +747,7 @@ async function handleLoadDemoSquad() {
     showToast('Error', err.message, 'error');
   } finally {
     dom.loadDemoSquadBtn.disabled = false;
-    dom.loadDemoSquadBtn.textContent = '⚡ Cargar Plantilla Demo';
+    dom.loadDemoSquadBtn.textContent = 'Cargar Demo';
   }
 }
 
@@ -729,6 +818,10 @@ export function initSquadViewEvents() {
 
   if (dom.exportMatchPlanSquadBtn) {
     dom.exportMatchPlanSquadBtn.addEventListener('click', () => handleExportPrintableMatchPlan('squad'));
+  }
+
+  if (dom.exportPngSquadBtn) {
+    dom.exportPngSquadBtn.addEventListener('click', () => exportPitchAsPng('squad'));
   }
 
   if (dom.closeIdealBannerBtn && dom.idealSquadBanner) {
@@ -818,15 +911,21 @@ export function initSquadViewEvents() {
         e.preventDefault();
         return;
       }
+      const draggedId = Number(token.dataset.playerId);
       activeDragPayload = {
         source: 'pitch',
         slotIndex: Number(token.dataset.slotIndex),
-        playerId: Number(token.dataset.playerId)
+        playerId: draggedId
       };
+      highlightCompatibleDropSlots(draggedId);
       if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', String(token.dataset.playerId));
+        e.dataTransfer.setData('text/plain', String(draggedId));
       }
+    });
+
+    dom.squadPitchTokens.addEventListener('dragend', () => {
+      clearCompatibleDropSlots();
     });
 
     dom.squadPitchTokens.addEventListener('dragover', (e) => {
@@ -847,7 +946,7 @@ export function initSquadViewEvents() {
       const token = e.target.closest('.player-token');
       if (!token) return;
       e.preventDefault();
-      token.classList.remove('drag-over-target');
+      clearCompatibleDropSlots();
       const targetSlotIdx = Number(token.dataset.slotIndex);
       if (!Number.isNaN(targetSlotIdx)) {
         handlePitchSlotDrop(targetSlotIdx);
@@ -870,20 +969,23 @@ export function initSquadViewEvents() {
     dom.squadBenchList.addEventListener('dragstart', (e) => {
       const chip = e.target.closest('.bench-player-chip');
       if (!chip || !chip.dataset.playerId) return;
+      const draggedId = Number(chip.dataset.playerId);
       activeDragPayload = {
         source: 'bench',
-        playerId: Number(chip.dataset.playerId)
+        playerId: draggedId
       };
       chip.classList.add('dragging');
+      highlightCompatibleDropSlots(draggedId);
       if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', String(chip.dataset.playerId));
+        e.dataTransfer.setData('text/plain', String(draggedId));
       }
     });
 
     dom.squadBenchList.addEventListener('dragend', (e) => {
       const chip = e.target.closest('.bench-player-chip');
       if (chip) chip.classList.remove('dragging');
+      clearCompatibleDropSlots();
     });
 
     dom.squadBenchSection.addEventListener('dragover', (e) => {
@@ -900,6 +1002,7 @@ export function initSquadViewEvents() {
     dom.squadBenchSection.addEventListener('drop', (e) => {
       e.preventDefault();
       dom.squadBenchSection.classList.remove('drag-over-bench');
+      clearCompatibleDropSlots();
       handleSendStarterToBench();
     });
   }
@@ -928,6 +1031,50 @@ export function initSquadViewEvents() {
       switchTab('assistant');
       const prompt = `Míster, analiza mi alineación personalizada en ${state.squadModality} con formación ${setup.code}. Titulares en cancha: ${startersSummary || 'por definir'}. Suplentes en la banca: ${benchSummary || 'ninguno'}. ¿Qué ajustes, cambios desde la banca o sociedades tácticas me recomiendas?`;
       sendChatMessage(prompt);
+    });
+  }
+
+  // Inclinación 3D interactiva al cursor + reflejo especular holográfico (Espejo Top 100)
+  if (dom.holographicPlayerCard) {
+    dom.holographicPlayerCard.addEventListener('mousemove', (e) => {
+      const rect = dom.holographicPlayerCard.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const relX = (e.clientX - rect.left) / rect.width;
+      const relY = (e.clientY - rect.top) / rect.height;
+      const rotateY = (relX - 0.5) * 18;
+      const rotateX = (0.5 - relY) * 14;
+
+      gsap.to(dom.holographicPlayerCard, {
+        rotateX,
+        rotateY,
+        scale: 1.015,
+        transformPerspective: 1000,
+        duration: 0.25,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+
+      if (dom.holoGlareLayer) {
+        const glareX = Math.round(relX * 100);
+        const glareY = Math.round(relY * 100);
+        dom.holoGlareLayer.style.opacity = '1';
+        dom.holoGlareLayer.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(56, 189, 248, 0.32) 0%, rgba(56, 189, 248, 0.22) 38%, transparent 72%)`;
+      }
+    });
+
+    dom.holographicPlayerCard.addEventListener('mouseleave', () => {
+      gsap.to(dom.holographicPlayerCard, {
+        rotateX: 0,
+        rotateY: 0,
+        scale: 1,
+        transformPerspective: 1000,
+        duration: 0.55,
+        ease: 'elastic.out(1, 0.65)',
+        overwrite: 'auto'
+      });
+      if (dom.holoGlareLayer) {
+        dom.holoGlareLayer.style.opacity = '0';
+      }
     });
   }
 }

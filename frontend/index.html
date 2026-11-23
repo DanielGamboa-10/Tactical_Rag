@@ -3,16 +3,309 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0284c7" />
     <title>TacticalPlay RAG — Inteligencia Táctica &amp; Pizarra Dinámica</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/blue-rose.ico" sizes="any" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-64 -64 128 128'%3E%3Cdefs%3E%3ClinearGradient id='pOut' x1='0%25' y1='100%25' x2='0%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23020617'/%3E%3Cstop offset='50%25' stop-color='%23002b80'/%3E%3Cstop offset='100%25' stop-color='%230284c7'/%3E%3C/linearGradient%3E%3ClinearGradient id='pMid' x1='0%25' y1='100%25' x2='20%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23020617'/%3E%3Cstop offset='45%25' stop-color='%231d4ed8'/%3E%3Cstop offset='100%25' stop-color='%2338bdf8'/%3E%3C/linearGradient%3E%3ClinearGradient id='pCore' x1='0%25' y1='100%25' x2='0%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23002b80'/%3E%3Cstop offset='55%25' stop-color='%230284c7'/%3E%3Cstop offset='100%25' stop-color='%23bae6fd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg stroke='%23020617' stroke-width='2.2' stroke-linejoin='round'%3E%3Cpath d='M0 -56 L18 -44 L24 -22 L0 -12 L-24 -22 L-18 -44 Z' fill='url(%23pOut)' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M-22 -38 C-44 -36 -56 -16 -52 6 L-34 22 L-14 8 Z' fill='url(%23pOut)' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M22 -38 C44 -36 56 -16 52 6 L34 22 L14 8 Z' fill='url(%23pOut)' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M-46 10 C-48 32 -30 50 -8 54 L0 36 L-20 16 Z' fill='url(%23pOut)' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M46 10 C48 32 30 50 8 54 L0 36 L20 16 Z' fill='url(%23pOut)' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M-24 38 L0 58 L24 38 L12 18 L-12 18 Z' fill='url(%23pOut)' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M0 -40 C18 -38 32 -24 28 -4 L0 10 L-28 -4 C-32 -24 -18 -38 0 -40 Z' fill='url(%23pMid)' stroke='%237dd3fc' stroke-width='1.6'/%3E%3Cpath d='M-32 -14 C-40 4 -30 28 -10 34 L4 14 L-14 -8 Z' fill='url(%23pMid)' stroke='%237dd3fc' stroke-width='1.6'/%3E%3Cpath d='M32 -14 C40 4 30 28 10 34 L-4 14 L14 -8 Z' fill='url(%23pMid)' stroke='%237dd3fc' stroke-width='1.6'/%3E%3Cpath d='M-18 22 C-8 38 8 38 18 22 L0 6 Z' fill='url(%23pMid)' stroke='%237dd3fc' stroke-width='1.6'/%3E%3Cpath d='M0 -24 C14 -22 20 -10 14 4 L0 12 L-14 4 C-20 -10 -14 -22 0 -24 Z' fill='url(%23pCore)' stroke='%23e0f2fe' stroke-width='1.8'/%3E%3Cpath d='M-12 -8 C-4 -18 8 -16 12 -4 C8 8 -6 10 -12 -8 Z' fill='%23020617' stroke='%237dd3fc' stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E"
+    />
+    <link rel="apple-touch-icon" href="/blue-rose-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
+    <!-- ========================================================================
+         BLUE ROSE OPENING CINEMATIC OVERLAY (4.2s 60FPS Canvas + SVG + GSAP)
+         ======================================================================== -->
+    <div id="intro-rose-overlay" class="intro-rose-overlay" aria-label="Cinemática de apertura de TacticalPlay RAG">
+      <div id="intro-rose-bg-pattern" class="intro-rose-bg-pattern" aria-hidden="true"></div>
+      <canvas id="intro-rose-canvas" class="intro-rose-canvas" aria-hidden="true"></canvas>
+
+      <div id="intro-rose-centerpiece" class="intro-rose-centerpiece">
+        <svg id="intro-rose-dome-svg" class="intro-rose-dome-svg" viewBox="0 0 360 440" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Sculpted Anime / Blue Lock Rose Gradients (Deep Ink -> Cobalt -> Electric Cyan) -->
+            <linearGradient id="rosePetalOuter" x1="0%" y1="100%" x2="15%" y2="0%">
+              <stop offset="0%" stop-color="#020617" />
+              <stop offset="45%" stop-color="#002b80" />
+              <stop offset="85%" stop-color="#1d4ed8" />
+              <stop offset="100%" stop-color="#38bdf8" />
+            </linearGradient>
+            <linearGradient id="rosePetalMid" x1="0%" y1="100%" x2="25%" y2="0%">
+              <stop offset="0%" stop-color="#020617" />
+              <stop offset="38%" stop-color="#002b80" />
+              <stop offset="78%" stop-color="#0284c7" />
+              <stop offset="100%" stop-color="#7dd3fc" />
+            </linearGradient>
+            <linearGradient id="rosePetalCore" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="#020617" />
+              <stop offset="42%" stop-color="#1d4ed8" />
+              <stop offset="82%" stop-color="#38bdf8" />
+              <stop offset="100%" stop-color="#e0f2fe" />
+            </linearGradient>
+            <linearGradient id="roseSepalGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stop-color="#0284c7" />
+              <stop offset="65%" stop-color="#002b80" />
+              <stop offset="100%" stop-color="#020617" />
+            </linearGradient>
+            <linearGradient id="introStemGrad" x1="180" y1="192" x2="180" y2="364" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#e0f2fe" />
+              <stop offset="40%" stop-color="#38bdf8" />
+              <stop offset="80%" stop-color="#0284c7" />
+              <stop offset="100%" stop-color="#1d4ed8" />
+            </linearGradient>
+            <linearGradient id="introDomeStrokeGrad" x1="96" y1="50" x2="264" y2="365" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.96" />
+              <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.82" />
+              <stop offset="100%" stop-color="#0284c7" stop-opacity="0.95" />
+            </linearGradient>
+            <filter id="introCyanGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4.5" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Translucent Glass Dome / Bell Jar (Phase 2 — Completely Closed Symmetric Path) -->
+          <path
+            id="intro-glass-dome-path"
+            d="M 180 56 C 226 56 258 96 258 162 L 258 362 L 102 362 L 102 162 C 102 96 134 56 180 56 Z"
+            fill="rgba(2, 132, 199, 0.07)"
+            stroke="url(#introDomeStrokeGrad)"
+            stroke-width="2.6"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            filter="url(#introCyanGlow)"
+          />
+
+          <!-- Glass Dome Top Crystal Finial & Specular Highlights -->
+          <g id="intro-glass-dome-reflection" opacity="0">
+            <circle cx="180" cy="47" r="7.5" fill="rgba(56, 189, 248, 0.25)" stroke="#bae6fd" stroke-width="1.8" />
+            <path d="M 116 162 C 116 112 140 76 170 70" stroke="rgba(224, 242, 254, 0.58)" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M 116 182 L 116 340" stroke="rgba(125, 211, 252, 0.32)" stroke-width="1.6" stroke-linecap="round" />
+            <path d="M 244 166 C 244 122 226 88 198 74" stroke="rgba(56, 189, 248, 0.34)" stroke-width="1.6" stroke-linecap="round" />
+            <path d="M 244 185 L 244 342" stroke="rgba(56, 189, 248, 0.38)" stroke-width="1.8" stroke-linecap="round" />
+          </g>
+
+          <!-- Incandescent Pedestal Base -->
+          <g id="intro-dome-base">
+            <ellipse cx="180" cy="362" rx="88" ry="12" fill="rgba(2, 132, 199, 0.35)" stroke="#38bdf8" stroke-width="2.2" filter="url(#introCyanGlow)" />
+            <ellipse cx="180" cy="362" rx="58" ry="6" fill="#e0f2fe" opacity="0.82" />
+          </g>
+
+          <!-- Organic Curved Stem with Thorns & Serrated Leaves (Phase 2) -->
+          <path
+            id="intro-rose-stem-path"
+            d="M 180 194 C 177 230 185 268 178 308 C 175 330 179 346 180 362"
+            stroke="url(#introStemGrad)"
+            stroke-width="4.2"
+            stroke-linecap="round"
+            filter="url(#introCyanGlow)"
+          />
+          <!-- Sharp Rose Thorns & Serrated Toothed Leaves -->
+          <g id="intro-leaf-left">
+            <!-- Left Thorn -->
+            <path d="M 180 236 L 169 231 L 179 243 Z" fill="#7dd3fc" stroke="#020617" stroke-width="0.9" />
+            <!-- Left Serrated Leaf + Vein -->
+            <path
+              d="M 178 268 L 162 256 L 158 261 L 143 255 L 141 262 L 126 264 L 136 276 L 133 282 L 148 288 L 152 284 L 166 286 L 178 274 Z"
+              fill="url(#rosePetalOuter)"
+              stroke="#7dd3fc"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            />
+            <path d="M 177 271 Q 154 268 131 265" stroke="#bae6fd" stroke-width="1.2" fill="none" />
+          </g>
+          <g id="intro-leaf-right">
+            <!-- Right Thorn -->
+            <path d="M 179 318 L 190 313 L 180 325 Z" fill="#7dd3fc" stroke="#020617" stroke-width="0.9" />
+            <!-- Right Serrated Leaf + Vein -->
+            <path
+              d="M 181 292 L 197 280 L 201 285 L 216 279 L 218 286 L 233 288 L 223 300 L 226 306 L 211 312 L 207 308 L 193 310 L 181 298 Z"
+              fill="url(#rosePetalOuter)"
+              stroke="#7dd3fc"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            />
+            <path d="M 182 295 Q 205 292 228 289" stroke="#bae6fd" stroke-width="1.2" fill="none" />
+          </g>
+
+          <!-- ================================================================
+               SCULPTED ANIME / BLUE LOCK BLUE ROSE (18 Organic Angular Paths)
+               Revealed by Staggered Layers in Phase 1: Core -> Mid -> Outer
+               ================================================================ -->
+          <g id="intro-assembled-rose-group" transform="translate(180, 146)">
+            <!-- LAYER 1 (OUTER): 2 Pointed Lower Sepals + 6 Angular Open Outer Petals -->
+            <g id="intro-rose-layer-outer">
+              <!-- Calyx / Pointed Sepals flanking the stem base -->
+              <path d="M -8 42 L -32 62 L -18 36 Z" fill="url(#roseSepalGrad)" stroke="#38bdf8" stroke-width="1.3" />
+              <path d="M 8 42 L 32 62 L 18 36 Z" fill="url(#roseSepalGrad)" stroke="#38bdf8" stroke-width="1.3" />
+              <path d="M 0 45 L 0 64 L -6 44 L 6 44 Z" fill="#38bdf8" />
+              <!-- Outer Crown Top Petal (Angular Peak) -->
+              <path
+                d="M 0 -58 L 19 -48 L 28 -30 L 14 -14 L -14 -14 L -28 -30 L -19 -48 Z"
+                fill="url(#rosePetalOuter)"
+                stroke="#38bdf8"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Outer Upper-Left Angular Petal -->
+              <path
+                d="M -22 -44 L -44 -40 L -58 -20 L -50 4 L -26 10 L -16 -16 Z"
+                fill="url(#rosePetalOuter)"
+                stroke="#38bdf8"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Outer Upper-Right Angular Petal -->
+              <path
+                d="M 22 -44 L 44 -40 L 58 -20 L 50 4 L 26 10 L 16 -16 Z"
+                fill="url(#rosePetalOuter)"
+                stroke="#38bdf8"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Outer Lower-Left Sweeping Petal -->
+              <path
+                d="M -52 2 L -56 22 L -40 42 L -16 46 L -8 24 L -28 6 Z"
+                fill="url(#rosePetalOuter)"
+                stroke="#38bdf8"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Outer Lower-Right Sweeping Petal -->
+              <path
+                d="M 52 2 L 56 22 L 40 42 L 16 46 L 8 24 L 28 6 Z"
+                fill="url(#rosePetalOuter)"
+                stroke="#38bdf8"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Outer Bottom Center Cupped Petal -->
+              <path
+                d="M -24 36 L 0 54 L 24 36 L 16 16 L -16 16 Z"
+                fill="url(#rosePetalOuter)"
+                stroke="#7dd3fc"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+            </g>
+
+            <!-- LAYER 2 (MIDDLE): 6 Overlapping Enveloping Petals with Ink-Black Fold Lines -->
+            <g id="intro-rose-layer-mid">
+              <!-- Mid Top-Left Enveloping Petal -->
+              <path
+                d="M -4 -42 L -26 -36 L -38 -16 L -24 6 L -2 -6 Z"
+                fill="url(#rosePetalMid)"
+                stroke="#7dd3fc"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Mid Top-Right Enveloping Petal -->
+              <path
+                d="M 4 -42 L 26 -36 L 38 -16 L 24 6 L 2 -6 Z"
+                fill="url(#rosePetalMid)"
+                stroke="#7dd3fc"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Mid Left Folded Petal + Deep Ink Crease -->
+              <path
+                d="M -36 -14 L -42 8 L -28 28 L -6 22 L -14 -2 Z"
+                fill="url(#rosePetalMid)"
+                stroke="#7dd3fc"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <path d="M -34 -4 L -22 16 L -10 14" stroke="#020617" stroke-width="2.2" stroke-linecap="round" />
+              <!-- Mid Right Folded Petal + Deep Ink Crease -->
+              <path
+                d="M 36 -14 L 42 8 L 28 28 L 6 22 L 14 -2 Z"
+                fill="url(#rosePetalMid)"
+                stroke="#7dd3fc"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <path d="M 34 -4 L 22 16 L 10 14" stroke="#020617" stroke-width="2.2" stroke-linecap="round" />
+              <!-- Mid Lower-Left Cupped Petal -->
+              <path
+                d="M -26 18 L -14 36 L 6 32 L 4 12 L -14 8 Z"
+                fill="url(#rosePetalMid)"
+                stroke="#bae6fd"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Mid Lower-Right Cupped Petal -->
+              <path
+                d="M 26 18 L 14 36 L -6 32 L -4 12 L 14 8 Z"
+                fill="url(#rosePetalMid)"
+                stroke="#bae6fd"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+            </g>
+
+            <!-- LAYER 3 (CORE BUD): 5 Tightly Furled Inner Crown Petals with Cyan Rim Lighting -->
+            <g id="intro-rose-layer-core">
+              <!-- Core Outer Cup -->
+              <path
+                d="M 0 -28 L 18 -20 L 22 -2 L 8 14 L -8 14 L -22 -2 L -18 -20 Z"
+                fill="url(#rosePetalCore)"
+                stroke="#bae6fd"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+              <!-- Core Left Furled Petal -->
+              <path
+                d="M -18 -14 L -22 4 L -8 18 L 4 8 L -6 -6 Z"
+                fill="url(#rosePetalCore)"
+                stroke="#e0f2fe"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+              <!-- Core Right Furled Petal -->
+              <path
+                d="M 18 -14 L 22 4 L 8 18 L -4 8 L 6 -6 Z"
+                fill="url(#rosePetalCore)"
+                stroke="#e0f2fe"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+              <!-- Deep Ink Inner Shadow Pocket -->
+              <path
+                d="M -12 -8 L 0 -16 L 12 -8 L 8 4 L 0 8 L -8 4 Z"
+                fill="#020617"
+                stroke="#7dd3fc"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <!-- Razor-Sharp Cyan Inner Whorl -->
+              <path
+                d="M -7 -5 L 0 -10 L 7 -5 L 3 2 L -4 1 Z"
+                fill="#0284c7"
+                stroke="#e0f2fe"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+            </g>
+          </g>
+        </svg>
+
+        <p id="intro-rose-quote" class="intro-rose-quote">&ldquo;Nothing is impossible for me.&rdquo;</p>
+      </div>
+
+      <div id="intro-flash-layer" class="intro-flash-layer" aria-hidden="true"></div>
+      <button type="button" id="skip-intro-rose-btn" class="skip-intro-rose-btn">
+        Saltar intro ➔
+      </button>
+    </div>
     <!-- Ambient Animated Background -->
     <div class="ambient-bg" aria-hidden="true">
       <div class="glow-orb orb-1"></div>
@@ -27,18 +320,50 @@
     <!-- Top Header with 2 Dedicated View Tabs -->
     <header class="topbar fade-slide-up" style="--delay: 0.05s">
       <div class="brand">
-        <div class="brand-logo">
-          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="32" height="32" rx="9" stroke="url(#gradLogo)" stroke-width="2.2" />
-            <circle cx="18" cy="18" r="6" stroke="#c084fc" stroke-width="1.8" />
-            <path d="M18 2V34M2 18H34" stroke="rgba(192,132,252,0.35)" stroke-width="1.4" />
-            <circle cx="18" cy="18" r="2.2" fill="#a855f7" />
+        <div class="brand-logo" title="Emblema Oficial: La Rosa Azul de TacticalPlay RAG">
+          <svg viewBox="-64 -64 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="gradLogo" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#c084fc" />
-                <stop offset="1" stop-color="#6d28d9" />
+              <linearGradient id="logoPetalOuter" x1="0%" y1="100%" x2="15%" y2="0%">
+                <stop offset="0%" stop-color="#020617" />
+                <stop offset="45%" stop-color="#002b80" />
+                <stop offset="85%" stop-color="#1d4ed8" />
+                <stop offset="100%" stop-color="#38bdf8" />
+              </linearGradient>
+              <linearGradient id="logoPetalMid" x1="0%" y1="100%" x2="25%" y2="0%">
+                <stop offset="0%" stop-color="#020617" />
+                <stop offset="38%" stop-color="#002b80" />
+                <stop offset="78%" stop-color="#0284c7" />
+                <stop offset="100%" stop-color="#7dd3fc" />
+              </linearGradient>
+              <linearGradient id="logoPetalCore" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#020617" />
+                <stop offset="42%" stop-color="#1d4ed8" />
+                <stop offset="82%" stop-color="#38bdf8" />
+                <stop offset="100%" stop-color="#e0f2fe" />
               </linearGradient>
             </defs>
+            <!-- Outer Angular Petals & Sepals -->
+            <path d="M -8 42 L -28 58 L -16 36 Z" fill="#002b80" stroke="#38bdf8" stroke-width="1.4" />
+            <path d="M 8 42 L 28 58 L 16 36 Z" fill="#002b80" stroke="#38bdf8" stroke-width="1.4" />
+            <path d="M 0 -58 L 19 -48 L 28 -30 L 14 -14 L -14 -14 L -28 -30 L -19 -48 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M -22 -44 L -44 -40 L -58 -20 L -50 4 L -26 10 L -16 -16 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M 22 -44 L 44 -40 L 58 -20 L 50 4 L 26 10 L 16 -16 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M -52 2 L -56 22 L -40 42 L -16 46 L -8 24 L -28 6 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M 52 2 L 56 22 L 40 42 L 16 46 L 8 24 L 28 6 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M -24 36 L 0 54 L 24 36 L 16 16 L -16 16 Z" fill="url(#logoPetalOuter)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
+            <!-- Middle Enveloping Petals + Ink Fold Shadows -->
+            <path d="M -4 -42 L -26 -36 L -38 -16 L -24 6 L -2 -6 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M 4 -42 L 26 -36 L 38 -16 L 24 6 L 2 -6 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M -36 -14 L -42 8 L -28 28 L -6 22 L -14 -2 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M 36 -14 L 42 8 L 28 28 L 6 22 L 14 -2 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M -26 18 L -14 36 L 6 32 L 4 12 L -14 8 Z" fill="url(#logoPetalMid)" stroke="#bae6fd" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M 26 18 L 14 36 L -6 32 L -4 12 L 14 8 Z" fill="url(#logoPetalMid)" stroke="#bae6fd" stroke-width="1.8" stroke-linejoin="round" />
+            <!-- Core Bud Cupped Petals -->
+            <path d="M 0 -28 L 18 -20 L 22 -2 L 8 14 L -8 14 L -22 -2 L -18 -20 Z" fill="url(#logoPetalCore)" stroke="#bae6fd" stroke-width="2" stroke-linejoin="round" />
+            <path d="M -18 -14 L -22 4 L -8 18 L 4 8 L -6 -6 Z" fill="url(#logoPetalCore)" stroke="#e0f2fe" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M 18 -14 L 22 4 L 8 18 L -4 8 L 6 -6 Z" fill="url(#logoPetalCore)" stroke="#e0f2fe" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M -12 -8 L 0 -16 L 12 -8 L 8 4 L 0 8 L -8 4 Z" fill="#020617" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M -7 -5 L 0 -10 L 7 -5 L 3 2 L -4 1 Z" fill="#0284c7" stroke="#e0f2fe" stroke-width="1.8" stroke-linejoin="round" />
           </svg>
           <span class="logo-pulse"></span>
         </div>
@@ -58,7 +383,11 @@
           role="tab"
           aria-selected="true"
         >
-          <span>🤖 Asistente Táctico IA</span>
+          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            <path d="M8 9h8M8 13h5" />
+          </svg>
+          <span>Asistente RAG</span>
         </button>
         <button
           type="button"
@@ -68,7 +397,12 @@
           role="tab"
           aria-selected="false"
         >
-          <span>🏟️ Pizarra &amp; Formaciones</span>
+          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <line x1="12" y1="4" x2="12" y2="20" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span>Pizarra Táctica</span>
         </button>
         <button
           type="button"
@@ -78,29 +412,55 @@
           role="tab"
           aria-selected="false"
         >
-          <span>👥 Tu Propia Plantilla</span>
+          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span>Gestión de Plantilla</span>
         </button>
       </nav>
 
       <div class="header-meta">
         <div class="active-modality-pill">
-          <span class="pill-label">Táctica activa:</span>
+          <span class="pill-label">Sistema activo:</span>
           <strong id="header-modality-badge">Futsal · 1-3-1 (Rombo)</strong>
         </div>
 
-        <button id="backend-status-btn" class="status-badge checking" title="Click para verificar conexión con Spring Boot">
+        <button
+          id="replay-intro-rose-btn"
+          type="button"
+          class="replay-rose-btn"
+          title="Reproducir cinemática de marca (Rosa Azul)"
+          aria-label="Reproducir cinemática de apertura"
+        >
+          <svg viewBox="-64 -64 128 128" width="18" height="18" fill="none" aria-hidden="true">
+            <path d="M 0 -54 L 18 -44 L 26 -26 L 12 -12 L -12 -12 L -26 -26 L -18 -44 Z" fill="#1d4ed8" stroke="#38bdf8" stroke-width="4" />
+            <path d="M -20 -40 L -42 -36 L -54 -16 L -44 6 L -20 10 L -14 -14 Z" fill="#002b80" stroke="#38bdf8" stroke-width="4" />
+            <path d="M 20 -40 L 42 -36 L 54 -16 L 44 6 L 20 10 L 14 -14 Z" fill="#002b80" stroke="#38bdf8" stroke-width="4" />
+            <path d="M -24 32 L 0 50 L 24 32 L 16 14 L -16 14 Z" fill="#1d4ed8" stroke="#7dd3fc" stroke-width="4" />
+            <path d="M 0 -24 L 16 -16 L 18 0 L 6 12 L -6 12 L -18 0 L -16 -16 Z" fill="#0284c7" stroke="#e0f2fe" stroke-width="5" />
+          </svg>
+        </button>
+
+        <button id="backend-status-btn" class="status-badge checking" title="Verificar estado del servicio Spring Boot (:8000)">
           <span class="status-dot"></span>
           <span id="backend-status-text">Verificando API (8000)...</span>
         </button>
 
-        <button id="shutdown-system-btn" type="button" class="shutdown-btn" title="Apagar Backend, Frontend y Docker limpiamente">
-          <span>⏻ Apagar</span>
+        <button id="shutdown-system-btn" type="button" class="shutdown-btn" title="Detener servicios de aplicación">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+            <line x1="12" y1="2" x2="12" y2="12" />
+          </svg>
+          <span>Apagar</span>
         </button>
       </div>
     </header>
 
     <!-- ========================================================================
-         TAB 1: 🤖 ASISTENTE TÁCTICO IA (Chat + Contexto Táctico Activo)
+         TAB 1: ASISTENTE TÁCTICO RAG (Chat + Contexto Táctico Activo)
          ======================================================================== -->
     <main id="view-assistant" class="tab-view active-view">
       <div class="assistant-layout">
@@ -118,53 +478,65 @@
 
             <div class="modality-grid" id="modality-selector" role="radiogroup" aria-label="Selector rápido de modalidad">
               <button type="button" class="modality-btn active" data-modality="Futsal" data-players="5 vs 5">
-                <span class="mod-icon">⚡</span>
+                <span class="mod-icon">5v5</span>
                 <span class="mod-name">Futsal</span>
-                <span class="mod-meta">40×20m · 5v5</span>
+                <span class="mod-meta">40×20m · Pista</span>
               </button>
               <button type="button" class="modality-btn" data-modality="Fútbol 7" data-players="7 vs 7">
-                <span class="mod-icon">🛡️</span>
+                <span class="mod-icon">7v7</span>
                 <span class="mod-name">Fútbol 7</span>
-                <span class="mod-meta">Carrileros · 7v7</span>
+                <span class="mod-meta">Carrileros · Sintético</span>
               </button>
               <button type="button" class="modality-btn" data-modality="Fútbol 9" data-players="9 vs 9">
-                <span class="mod-icon">🎯</span>
+                <span class="mod-icon">9v9</span>
                 <span class="mod-name">Fútbol 9</span>
-                <span class="mod-meta">Puente · 9v9</span>
+                <span class="mod-meta">Transición · Formativo</span>
               </button>
               <button type="button" class="modality-btn" data-modality="Fútbol 11" data-players="11 vs 11">
-                <span class="mod-icon">🏟️</span>
+                <span class="mod-icon">11v11</span>
                 <span class="mod-name">Fútbol 11</span>
-                <span class="mod-meta">Campo completo · 11v11</span>
+                <span class="mod-meta">Campo reglamentario</span>
               </button>
             </div>
 
             <div class="active-context-strip">
               <div class="context-item">
-                <span class="ctx-label">Formación activa:</span>
+                <span class="ctx-label">Sistema activo:</span>
                 <strong id="sidebar-formation-label">1-3-1 (Rombo)</strong>
               </div>
               <div class="context-item">
-                <span class="ctx-label">Estilo de juego:</span>
+                <span class="ctx-label">Modelo de juego:</span>
                 <strong id="sidebar-style-label">Posesión &amp; Juego de Posición</strong>
               </div>
               <div class="context-item">
-                <span class="ctx-label">Plantilla conectada:</span>
-                <strong id="sidebar-squad-label">PostgreSQL + Top 100 Activa</strong>
+                <span class="ctx-label">Base de plantilla:</span>
+                <strong id="sidebar-squad-label">PostgreSQL + Top 100</strong>
               </div>
               <button type="button" id="go-to-board-btn" class="ghost-mini-btn full-width-btn">
-                Ir a Pizarra &amp; Jugadas Preparadas 🏟️ →
+                <span>Abrir Pizarra Táctica</span>
+                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 5l7 7-7 7" />
+                </svg>
               </button>
               <button type="button" id="go-to-squad-btn" class="ghost-mini-btn full-width-btn">
-                Gestionar Tu Propia Plantilla 👥 →
+                <span>Abrir Gestión de Plantilla</span>
+                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 5l7 7-7 7" />
+                </svg>
               </button>
               <button
                 type="button"
                 id="sync-wiki-btn"
                 class="ghost-mini-btn full-width-btn"
-                title="Sincronizar artículos tácticos reales desde Wikipedia API en pgvector"
+                title="Indexar conceptos tácticos desde Wikipedia en pgvector"
               >
-                🌐 Sincronizar Base Táctica Wikipedia
+                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                  <path d="M16 16h5v5" />
+                </svg>
+                <span>Sincronizar Base Vectorial</span>
               </button>
             </div>
           </article>
@@ -180,30 +552,30 @@
                   <span class="avatar-ring"></span>
                 </div>
                 <div>
-                  <h2 class="card-title">Entrenador Táctico IA</h2>
+                  <h2 class="card-title">Asistente Táctico RAG</h2>
                   <p class="chat-subtitle">
-                    Lenguaje claro de cancha · Conectado a tu <code>Pizarra</code>, <code>Plantilla Propia</code> y <code>pgvector</code>
+                    Análisis posicional conectado a <code>Pizarra</code>, <code>Plantilla</code> y motor vectorial <code>pgvector</code>
                   </p>
                 </div>
               </div>
-              <button type="button" id="clear-chat-btn" class="ghost-mini-btn" title="Limpiar conversación">
-                Limpiar chat
+              <button type="button" id="clear-chat-btn" class="ghost-mini-btn" title="Reiniciar historial de sesión">
+                Limpiar sesión
               </button>
             </div>
 
             <!-- Quick Prompt Chips -->
             <div class="quick-Chips-bar" id="quick-prompts">
               <button type="button" class="prompt-chip" data-prompt="¿Cómo salimos jugando desde atrás si el rival nos presiona arriba?">
-                ⚡ Salida ante presión alta
+                Salida ante presión alta
               </button>
               <button type="button" class="prompt-chip" data-prompt="¿Qué movimientos y rotaciones hacemos en ataque para abrir espacios?">
-                🔄 Movimientos en ataque
+                Rotaciones y amplitud ofensiva
               </button>
               <button type="button" class="prompt-chip" data-prompt="¿Cómo armamos el contragolpe rápido apenas recuperamos la pelota?">
-                🚀 Contragolpe tras robo
+                Transición ofensiva tras robo
               </button>
               <button type="button" class="prompt-chip" data-prompt="¿Cómo nos repartimos las marcas y ayudas en el mediocampo?">
-                🛡️ Ayudas y marcas en el medio
+                Coberturas y vasculación media
               </button>
             </div>
 
@@ -216,15 +588,15 @@
                 <input
                   type="text"
                   id="chat-input"
-                  placeholder="Pregúntale al entrenador sobre tu formación, estilo, jugadas preparadas o plantilla..."
+                  placeholder="Consulta ajustes de sistema, superioridades, balón parado o variantes de plantilla..."
                   autocomplete="off"
                   required
                 />
                 <span class="input-modality-indicator" id="input-modality-tag">Futsal · 1-3-1</span>
               </div>
               <button type="submit" id="send-chat-btn" class="btn-primary shimmer-btn send-btn">
-                <span>Preguntar</span>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <span>Consultar</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 5l7 7-7 7" />
                 </svg>
               </button>
@@ -235,7 +607,7 @@
     </main>
 
     <!-- ========================================================================
-         TAB 2: 🏟️ PIZARRA & FORMACIONES (Cancha amplia + Catálogo + Estilos)
+         TAB 2: PIZARRA TÁCTICA (Cancha interactiva + Sistemas + Modelos)
          ======================================================================== -->
     <main id="view-board" class="tab-view hidden-view">
       <div class="board-layout">
@@ -245,45 +617,45 @@
             <div class="board-selectors-grid">
               <!-- 1. Modality Selector -->
               <div class="selector-group">
-                <label class="selector-label">1. Modalidad Deportiva</label>
+                <label class="selector-label">01 · Modalidad</label>
                 <div class="board-modality-pills" id="board-modality-pills">
-                  <button type="button" class="board-mod-pill active" data-modality="Futsal">⚡ Futsal (5v5)</button>
-                  <button type="button" class="board-mod-pill" data-modality="Fútbol 7">🛡️ Fútbol 7 (7v7)</button>
-                  <button type="button" class="board-mod-pill" data-modality="Fútbol 9">🎯 Fútbol 9 (9v9)</button>
-                  <button type="button" class="board-mod-pill" data-modality="Fútbol 11">🏟️ Fútbol 11 (11v11)</button>
+                  <button type="button" class="board-mod-pill active" data-modality="Futsal">Futsal · 5v5</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 7">Fútbol 7 · 7v7</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 9">Fútbol 9 · 9v9</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 11">Fútbol 11 · 11v11</button>
                 </div>
               </div>
 
               <!-- 2. Formation Catalog Selector -->
               <div class="selector-group">
-                <label for="formation-select" class="selector-label">2. Sistema / Formación Táctica</label>
+                <label for="formation-select" class="selector-label">02 · Sistema Táctico</label>
                 <select id="formation-select" class="tactical-select"></select>
               </div>
 
               <!-- 3. Play Style Selector -->
               <div class="selector-group">
-                <label for="style-select" class="selector-label">3. Estilo de Juego (Desplaza líneas)</label>
+                <label for="style-select" class="selector-label">03 · Modelo de Juego</label>
                 <select id="style-select" class="tactical-select">
-                  <option value="Posesión & Juego de Posición">🎯 Posesión &amp; Juego de Posición</option>
-                  <option value="Presión Alta (Gegenpressing)">🔥 Presión Alta (Gegenpressing)</option>
-                  <option value="Bloque Bajo & Contragolpe">🛡️ Bloque Bajo &amp; Contragolpe</option>
-                  <option value="Juego Directo & Vertical">⚡ Juego Directo &amp; Vertical</option>
-                  <option value="Rotación Dinámica">🔄 Rotación Dinámica</option>
+                  <option value="Posesión & Juego de Posición">Posesión &amp; Juego de Posición</option>
+                  <option value="Presión Alta (Gegenpressing)">Presión Alta (Gegenpressing)</option>
+                  <option value="Bloque Bajo & Contragolpe">Bloque Bajo &amp; Contragolpe</option>
+                  <option value="Juego Directo & Vertical">Juego Directo &amp; Vertical</option>
+                  <option value="Rotación Dinámica">Rotación Dinámica</option>
                 </select>
               </div>
 
               <!-- 4. Set Piece / Prepared Play Sub-apartados (4A Categoría + 4B Jugada) -->
               <div class="selector-group setpiece-dual-group">
                 <div class="sub-selector">
-                  <label for="setpiece-category-select" class="selector-label">4A. Fase / Tipo de Acción</label>
+                  <label for="setpiece-category-select" class="selector-label">04A · Fase Táctica</label>
                   <select id="setpiece-category-select" class="tactical-select">
-                    <option value="free">⚽ Juego Libre (Posicional)</option>
-                    <option value="attack">⚔️ Ataque / Balón Parado Ofensivo</option>
-                    <option value="defense">🛡️ Defensa / Organización Defensiva</option>
+                    <option value="free">Juego Libre (Posicional)</option>
+                    <option value="attack">Balón Parado Ofensivo</option>
+                    <option value="defense">Organización Defensiva</option>
                   </select>
                 </div>
                 <div class="sub-selector" id="setpiece-specific-wrap">
-                  <label for="setpiece-select" class="selector-label">4B. Jugada Específica</label>
+                  <label for="setpiece-select" class="selector-label">04B · Acción de Pizarra</label>
                   <select id="setpiece-select" class="tactical-select" disabled>
                     <option value="0">Sin jugada seleccionada (Posicional)</option>
                   </select>
@@ -302,12 +674,84 @@
               <div class="pitch-header-badges">
                 <button
                   type="button"
+                  id="toggle-expand-board-btn"
+                  class="tv-view-toggle-btn expand-board-btn"
+                  aria-pressed="false"
+                  title="Alternar modo presentación a ancho completo"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="15 3 21 3 21 9" />
+                    <polyline points="9 21 3 21 3 15" />
+                    <line x1="21" y1="3" x2="14" y2="10" />
+                    <line x1="3" y1="21" x2="10" y2="14" />
+                  </svg>
+                  <span>Expandir</span>
+                </button>
+                <button
+                  type="button"
                   id="toggle-tv-view-btn"
                   class="tv-view-toggle-btn"
                   aria-pressed="false"
-                  title="Alternar cámara de transmisión televisiva con perspectiva 2.5D y fichas verticales (Billboarding)"
+                  title="Alternar cámara con perspectiva táctica 2.5D"
                 >
-                  <span>🎥 Vista TV 2.5D</span>
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                  <span>Vista 2.5D</span>
+                </button>
+                <button
+                  type="button"
+                  id="toggle-stadium-3d-btn"
+                  class="tv-view-toggle-btn stadium-3d-btn"
+                  aria-pressed="false"
+                  title="Activar simulación WebGL en Estadio 3D"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                  <span>Estadio 3D</span>
+                </button>
+                <button
+                  type="button"
+                  id="toggle-heatmap-btn"
+                  class="tv-view-toggle-btn heatmap-toggle-btn"
+                  aria-pressed="false"
+                  title="Proyectar densidad térmica de ocupación espacial"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                  <span>Mapa de Calor</span>
+                </button>
+                <button
+                  type="button"
+                  id="toggle-draw-btn"
+                  class="tv-view-toggle-btn draw-toggle-btn"
+                  aria-pressed="false"
+                  title="Trazar vectores y líneas de movimiento sobre el campo"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                    <path d="M2 2l7.586 7.586" />
+                  </svg>
+                  <span>Trazar Jugada</span>
+                </button>
+                <button
+                  type="button"
+                  id="clear-draw-btn"
+                  class="tv-view-toggle-btn clear-draw-btn hidden"
+                  title="Limpiar trazos manuales del campo"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                  <span>Limpiar</span>
                 </button>
                 <span class="badge-tag" id="board-style-badge">Posesión &amp; Juego de Posición</span>
                 <div class="formation-pill" id="formation-badge">1-3-1 (Rombo)</div>
@@ -328,9 +772,9 @@
                     <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" />
                   </marker>
                   <radialGradient id="vision-aura-grad" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.34" />
-                    <stop offset="55%" stop-color="#a855f7" stop-opacity="0.16" />
-                    <stop offset="100%" stop-color="#a855f7" stop-opacity="0" />
+                    <stop offset="0%" stop-color="#00d2ff" stop-opacity="0.36" />
+                    <stop offset="55%" stop-color="#2563eb" stop-opacity="0.18" />
+                    <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0" />
                   </radialGradient>
                   <!-- Broadcast Grass Mowing Stripes Pattern (Fútbol 7 / 9 / 11) -->
                   <pattern id="grass-stripes-pattern" width="42.5" height="220" patternUnits="userSpaceOnUse">
@@ -339,8 +783,8 @@
                   </pattern>
                   <!-- Synthetic Futsal Parquet / Court Pattern (Futsal 5v5) -->
                   <pattern id="futsal-court-pattern" width="28" height="14" patternUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="28" height="14" fill="rgba(30, 27, 75, 0.18)" />
-                    <path d="M 0 7 L 28 7 M 14 0 L 14 7 M 0 0 L 0 14" stroke="rgba(139, 92, 246, 0.08)" stroke-width="0.6" />
+                    <rect x="0" y="0" width="28" height="14" fill="rgba(15, 41, 82, 0.22)" />
+                    <path d="M 0 7 L 28 7 M 14 0 L 14 7 M 0 0 L 0 14" stroke="rgba(56, 189, 248, 0.1)" stroke-width="0.6" />
                   </pattern>
                   <!-- Radial Perimeter Vignette -->
                   <radialGradient id="pitch-vignette-grad" cx="50%" cy="50%" r="65%">
@@ -348,34 +792,51 @@
                     <stop offset="72%" stop-color="#05050d" stop-opacity="0.18" />
                     <stop offset="100%" stop-color="#030308" stop-opacity="0.62" />
                   </radialGradient>
+                  <!-- Tactical Heatmap Blur Filter & Thermal Gradients -->
+                  <filter id="heatmap-blur-filter" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="13" />
+                  </filter>
+                  <radialGradient id="heat-grad-core" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#ef4444" stop-opacity="0.82" />
+                    <stop offset="42%" stop-color="#f59e0b" stop-opacity="0.58" />
+                    <stop offset="78%" stop-color="#10b981" stop-opacity="0.26" />
+                    <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+                  </radialGradient>
+                  <radialGradient id="heat-grad-bridge" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.52" />
+                    <stop offset="55%" stop-color="#10b981" stop-opacity="0.24" />
+                    <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+                  </radialGradient>
                 </defs>
                 <!-- Surface Turf / Parquet Texture + Vignette -->
                 <rect class="pitch-surface-turf" x="10" y="10" width="340" height="200" rx="8" />
                 <rect class="pitch-surface-vignette" x="10" y="10" width="340" height="200" rx="8" fill="url(#pitch-vignette-grad)" />
+                <!-- Dynamic Tactical Heatmap Layer -->
+                <g id="heatmap-overlay-layer" class="heatmap-overlay-layer hidden" filter="url(#heatmap-blur-filter)"></g>
                 <g class="pitch-regulatory-lines">
                   <!-- Outer boundary -->
-                  <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(168, 85, 247, 0.42)" stroke-width="1.8" />
+                  <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.8" />
                   <!-- Tactical thirds guide lines -->
-                  <line x1="123" y1="10" x2="123" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
-                  <line x1="236" y1="10" x2="236" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
+                  <line x1="123" y1="10" x2="123" y2="210" stroke="rgba(56, 189, 248, 0.16)" stroke-width="1" stroke-dasharray="3 4" />
+                  <line x1="236" y1="10" x2="236" y2="210" stroke="rgba(56, 189, 248, 0.16)" stroke-width="1" stroke-dasharray="3 4" />
                   <!-- Halfway line -->
-                  <line x1="180" y1="10" x2="180" y2="210" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
+                  <line x1="180" y1="10" x2="180" y2="210" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
                   <!-- Center circle -->
-                  <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.5" />
-                  <circle cx="180" cy="110" r="3" fill="#c084fc" />
+                  <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(56, 189, 248, 0.38)" stroke-width="1.5" />
+                  <circle cx="180" cy="110" r="3" fill="#38bdf8" />
                   <!-- Left Penalty Box -->
-                  <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
-                  <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
+                  <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
+                  <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
                   <!-- Right Penalty Box -->
-                  <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
-                  <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
+                  <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
+                  <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
                   <!-- Attack Direction Arrow -->
-                  <path d="M150 202 L210 202 M204 198 L210 202 L204 206" stroke="rgba(192,132,252,0.45)" stroke-width="1.4" fill="none" />
+                  <path d="M150 202 L210 202 M204 198 L210 202 L204 206" stroke="rgba(56, 189, 248, 0.48)" stroke-width="1.4" fill="none" />
                 </g>
                 <!-- Dynamic Hover Influence Aura & Passing Triangles Layer -->
                 <g id="hover-influence-layer"></g>
                 <!-- Tactical passing lines container -->
-                <g id="synergy-links" stroke="rgba(192, 132, 252, 0.36)" stroke-width="1.5" stroke-dasharray="4 4"></g>
+                <g id="synergy-links" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5" stroke-dasharray="4 4"></g>
                 <!-- Set Piece / Prepared Play Overlay Layer -->
                 <g id="setpiece-overlay"></g>
               </svg>
@@ -385,6 +846,22 @@
 
               <!-- Animated Soccer Ball Token for Set Pieces -->
               <div id="ball-token" class="ball-token hidden" aria-hidden="true">⚽</div>
+
+              <!-- Freehand Tactical Drawing SVG Layer (Pointer Events enabled when Pencil active) -->
+              <svg id="freehand-draw-svg" class="freehand-draw-svg" viewBox="0 0 360 220" preserveAspectRatio="none">
+                <defs>
+                  <marker id="arrow-freehand-cyan" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#38bdf8" />
+                  </marker>
+                  <marker id="arrow-freehand-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#fbbf24" />
+                  </marker>
+                </defs>
+                <g id="freehand-paths-group"></g>
+              </svg>
+
+              <!-- WebGL 3D Night Stadium Canvas Container (Three.js) -->
+              <div id="stadium-3d-container" class="stadium-3d-container hidden" aria-label="Estadio 3D WebGL"></div>
 
               <!-- Live Step-by-Step Banner Overlay on Pitch -->
               <div id="setpiece-live-banner" class="setpiece-live-banner hidden">
@@ -429,24 +906,32 @@
 
             <p id="tactic-overview-text" class="tactic-overview-text"></p>
 
-            <!-- Featured Reference Coach Card -->
-            <div class="reference-coach-card" id="reference-coach-card">
+            <!-- Featured Reference Coach 3D Holographic Card -->
+            <div class="reference-coach-card holographic-card-3d coach-holo-card" id="reference-coach-card">
+              <div class="holo-glare-layer" id="coach-holo-glare-layer"></div>
               <div class="coach-card-header">
-                <span class="coach-kicker">🎓 DT REFERENTE / MODELO A SEGUIR</span>
+                <span class="coach-kicker">MODELO TÁCTICO DE REFERENCIA</span>
                 <span class="coach-origin-badge" id="coach-origin-badge">Referente Directo</span>
               </div>
-              <strong class="coach-name" id="coach-name-text">Pep Guardiola / Luis Enrique</strong>
-              <p class="coach-note" id="coach-note-text"></p>
+              <div class="coach-profile-row">
+                <div class="coach-avatar-neon" id="coach-avatar">
+                  <span id="coach-avatar-initials" class="coach-avatar-initials">PG</span>
+                </div>
+                <div class="coach-profile-info">
+                  <strong class="coach-name" id="coach-name-text">Pep Guardiola / Luis Enrique</strong>
+                  <p class="coach-note" id="coach-note-text"></p>
+                </div>
+              </div>
             </div>
 
             <!-- Set Piece Step-by-Step Instructions Box (Visible when a Set Piece is selected) -->
             <div class="setpiece-steps-box hidden" id="setpiece-steps-box">
               <div class="setpiece-steps-header">
-                <span class="setpiece-kicker">📋 EJECUCIÓN DE JUGADA PREPARADA</span>
+                <span class="setpiece-kicker">SECUENCIA DE BALÓN PARADO</span>
                 <div class="setpiece-legend">
                   <span class="leg-item run">╌➔ Desmarque</span>
                   <span class="leg-item pass">━➔ Pase</span>
-                  <span class="leg-item shot">━➔ Remate</span>
+                  <span class="leg-item shot">━➔ Finalización</span>
                 </div>
               </div>
               <strong id="setpiece-title-text" class="setpiece-title"></strong>
@@ -480,22 +965,46 @@
             </div>
 
             <div class="style-effect-box">
-              <span class="style-effect-title">⚡ Efecto del estilo en cancha:</span>
+              <span class="style-effect-title">Comportamiento posicional del bloque:</span>
               <p id="style-effect-description"></p>
             </div>
 
             <div class="board-cta-actions">
               <button type="button" id="analyze-with-bot-btn" class="btn-primary shimmer-btn analyze-cta-btn">
-                <span>Analizar esta táctica con el Bot →</span>
+                <span>Analizar Sistema en Asistente RAG</span>
+                <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 5l7 7-7 7" />
+                </svg>
               </button>
-              <button
-                type="button"
-                id="export-match-plan-board-btn"
-                class="btn-primary shimmer-btn print-plan-btn"
-                title="Generar ficha táctica imprimible / PDF con formación, titulares, funciones por línea y jugada preparada"
-              >
-                <span>📄 Exportar Plan de Partido (PDF / Imprimir)</span>
-              </button>
+              <div class="export-dual-row">
+                <button
+                  type="button"
+                  id="export-match-plan-board-btn"
+                  class="btn-primary shimmer-btn print-plan-btn"
+                  title="Generar informe táctico imprimible / PDF con sistema, funciones de línea y balón parado"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                  <span>Exportar Plan (PDF)</span>
+                </button>
+                <button
+                  type="button"
+                  id="export-png-board-btn"
+                  class="btn-primary shimmer-btn export-png-btn"
+                  title="Descargar captura PNG de alta resolución de la pizarra activa"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                  <span>PNG</span>
+                </button>
+              </div>
             </div>
           </article>
         </aside>
@@ -503,7 +1012,7 @@
     </main>
 
     <!-- ========================================================================
-         TAB 3: 👥 TU PROPIA PLANTILLA (Registro + Cancha Sinergias + Comparativa Top 100)
+         TAB 3: GESTIÓN DE PLANTILLA (Registro + Sinergia Posicional + Top 100)
          ======================================================================== -->
     <main id="view-squad" class="tab-view hidden-view">
       <div class="squad-layout">
@@ -512,25 +1021,25 @@
           <article class="glass-card">
             <div class="card-header">
               <div>
-                <span class="section-kicker">REGISTRO EN POSTGRESQL</span>
-                <h2 class="card-title">Agregar Jugador</h2>
+                <span class="section-kicker">BASE DE DATOS POSTGRESQL</span>
+                <h2 class="card-title">Registro de Jugador</h2>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
                 <button
                   type="button"
                   id="load-demo-squad-btn"
                   class="ghost-mini-btn"
-                  title="Cargar jugadores de demostración al instante"
+                  title="Cargar plantilla de demostración para la modalidad activa"
                 >
-                  ⚡ Cargar Plantilla Demo
+                  Cargar Demo
                 </button>
                 <button
                   type="button"
                   id="clear-squad-btn"
                   class="ghost-mini-btn"
-                  title="Vaciar toda la plantilla personalizada en un clic"
+                  title="Eliminar todos los registros de plantilla personalizada"
                 >
-                  🗑️ Vaciar
+                  Vaciar
                 </button>
               </div>
             </div>
@@ -571,7 +1080,7 @@
                   </select>
                 </div>
                 <div class="form-field">
-                  <label for="player-foot-select">Pie Hábil</label>
+                  <label for="player-foot-select">Perfil Hábil</label>
                   <select id="player-foot-select" class="tactical-select">
                     <option value="Derecho">Derecho</option>
                     <option value="Izquierdo">Izquierdo</option>
@@ -583,44 +1092,44 @@
               <!-- Attribute Sliders (1-99) -->
               <div class="stats-sliders-grid">
                 <div class="slider-item">
-                  <div class="slider-header"><span>⚡ Ritmo</span><strong id="val-pace">84</strong></div>
+                  <div class="slider-header"><span>RIT · Ritmo</span><strong id="val-pace">84</strong></div>
                   <input type="range" id="stat-pace" min="40" max="99" value="84" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>🎯 Pase</span><strong id="val-passing">86</strong></div>
+                  <div class="slider-header"><span>PAS · Pase</span><strong id="val-passing">86</strong></div>
                   <input type="range" id="stat-passing" min="40" max="99" value="86" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>🪄 Regate</span><strong id="val-dribbling">85</strong></div>
+                  <div class="slider-header"><span>REG · Regate</span><strong id="val-dribbling">85</strong></div>
                   <input type="range" id="stat-dribbling" min="40" max="99" value="85" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>🛡️ Defensa</span><strong id="val-defending">70</strong></div>
+                  <div class="slider-header"><span>DEF · Defensa</span><strong id="val-defending">70</strong></div>
                   <input type="range" id="stat-defending" min="40" max="99" value="70" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>🚀 Tiro</span><strong id="val-shooting">82</strong></div>
+                  <div class="slider-header"><span>TIR · Tiro</span><strong id="val-shooting">82</strong></div>
                   <input type="range" id="stat-shooting" min="40" max="99" value="82" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>🧠 Visión</span><strong id="val-vision">86</strong></div>
+                  <div class="slider-header"><span>VIS · Visión</span><strong id="val-vision">86</strong></div>
                   <input type="range" id="stat-vision" min="40" max="99" value="86" />
                 </div>
               </div>
 
               <button type="submit" id="save-player-btn" class="btn-primary shimmer-btn">
-                <span>+ Guardar en Tu Plantilla</span>
+                <span>Registrar en Plantilla</span>
               </button>
             </form>
 
             <!-- Registered Players Roster -->
             <div class="squad-roster-section">
               <div class="indexed-header">
-                <span>Jugadores en tu plantilla (Click para comparar)</span>
+                <span>Nómina Registrada (Seleccionar para análisis)</span>
                 <span id="squad-count-badge" class="count-pill">0</span>
               </div>
               <ul id="squad-roster-list" class="squad-roster-list">
-                <li class="empty-docs-msg">Agrega jugadores o carga la Plantilla Demo.</li>
+                <li class="empty-docs-msg">Registra jugadores o carga la nómina de demostración.</li>
               </ul>
             </div>
           </article>
@@ -632,26 +1141,26 @@
             <div class="squad-top-controls">
               <div class="squad-selectors-row">
                 <div class="selector-group">
-                  <label for="squad-modality-select" class="selector-label">Modalidad de tu Plantilla</label>
+                  <label for="squad-modality-select" class="selector-label">Modalidad de Plantilla</label>
                   <select id="squad-modality-select" class="tactical-select">
-                    <option value="Futsal">⚡ Futsal (5 vs 5)</option>
-                    <option value="Fútbol 7">🛡️ Fútbol 7 (7 vs 7)</option>
-                    <option value="Fútbol 9">🎯 Fútbol 9 (9 vs 9)</option>
-                    <option value="Fútbol 11" selected>🏟️ Fútbol 11 (11 vs 11)</option>
+                    <option value="Futsal">Futsal (5 vs 5)</option>
+                    <option value="Fútbol 7">Fútbol 7 (7 vs 7)</option>
+                    <option value="Fútbol 9">Fútbol 9 (9 vs 9)</option>
+                    <option value="Fútbol 11" selected>Fútbol 11 (11 vs 11)</option>
                   </select>
                 </div>
                 <div class="selector-group">
-                  <label for="squad-formation-select" class="selector-label">Formación Predeterminada</label>
+                  <label for="squad-formation-select" class="selector-label">Sistema Base</label>
                   <select id="squad-formation-select" class="tactical-select"></select>
                 </div>
                 <div class="selector-group">
-                  <label for="squad-style-select" class="selector-label">Estilo de Juego del Equipo</label>
+                  <label for="squad-style-select" class="selector-label">Modelo de Juego del Equipo</label>
                   <select id="squad-style-select" class="tactical-select">
-                    <option value="Posesión & Juego de Posición" selected>🎯 Posesión &amp; Juego de Posición</option>
-                    <option value="Presión Alta (Gegenpressing)">🔥 Presión Alta (Gegenpressing)</option>
-                    <option value="Bloque Bajo & Contragolpe">🛡️ Bloque Bajo &amp; Contragolpe</option>
-                    <option value="Juego Directo & Vertical">⚡ Juego Directo &amp; Vertical</option>
-                    <option value="Rotación Dinámica">🔄 Rotación Dinámica</option>
+                    <option value="Posesión & Juego de Posición" selected>Posesión &amp; Juego de Posición</option>
+                    <option value="Presión Alta (Gegenpressing)">Presión Alta (Gegenpressing)</option>
+                    <option value="Bloque Bajo & Contragolpe">Bloque Bajo &amp; Contragolpe</option>
+                    <option value="Juego Directo & Vertical">Juego Directo &amp; Vertical</option>
+                    <option value="Rotación Dinámica">Rotación Dinámica</option>
                   </select>
                 </div>
               </div>
@@ -661,9 +1170,12 @@
                   type="button"
                   id="generate-ideal-squad-btn"
                   class="btn-primary shimmer-btn ideal-squad-btn"
-                  title="Evaluar combinaciones de titulares y suplentes por complementariedad, pie hábil y estilo de juego"
+                  title="Calcular alineación óptima por sinergia de roles, perfil hábil y modelo de juego"
                 >
-                  <span>✨ Generar Plantilla Ideal</span>
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  <span>Optimizar XI por Sinergia</span>
                 </button>
                 <div class="synergy-meter-box">
                   <span class="selector-label">Sinergia Global</span>
@@ -675,11 +1187,42 @@
             <!-- Ideal Chemistry Explanation Banner -->
             <div id="ideal-squad-banner" class="ideal-squad-banner hidden">
               <div class="ideal-banner-header">
-                <span class="ideal-banner-badge" id="ideal-banner-title">✨ XI Ideal por Química Colectiva</span>
-                <button type="button" id="close-ideal-banner-btn" class="roster-delete-btn" title="Ocultar explicación">✕</button>
+                <span class="ideal-banner-badge" id="ideal-banner-title">XI Óptimo por Sinergia Colectiva</span>
+                <button type="button" id="close-ideal-banner-btn" class="roster-delete-btn" title="Cerrar informe">✕</button>
               </div>
               <p id="ideal-banner-text" class="ideal-banner-text"></p>
               <div id="ideal-banner-partners" class="ideal-partnerships-row"></div>
+            </div>
+
+            <!-- Collective Tactical Balance Meter (ATAQUE / CREACIÓN / DEFENSA) -->
+            <div class="collective-balance-strip" id="squad-collective-balance">
+              <div class="balance-meter-item">
+                <div class="balance-meter-top">
+                  <span class="balance-meter-label">ATAQUE <small>(TIR · REG)</small></span>
+                  <strong class="balance-meter-score attack" id="balance-val-attack">84</strong>
+                </div>
+                <div class="balance-bar-track">
+                  <div class="balance-bar-fill attack" id="balance-bar-attack" style="width: 84%"></div>
+                </div>
+              </div>
+              <div class="balance-meter-item">
+                <div class="balance-meter-top">
+                  <span class="balance-meter-label">CREACIÓN <small>(PAS · VIS)</small></span>
+                  <strong class="balance-meter-score creation" id="balance-val-creation">86</strong>
+                </div>
+                <div class="balance-bar-track">
+                  <div class="balance-bar-fill creation" id="balance-bar-creation" style="width: 86%"></div>
+                </div>
+              </div>
+              <div class="balance-meter-item">
+                <div class="balance-meter-top">
+                  <span class="balance-meter-label">DEFENSA <small>(DEF · RIT)</small></span>
+                  <strong class="balance-meter-score defense" id="balance-val-defense">82</strong>
+                </div>
+                <div class="balance-bar-track">
+                  <div class="balance-bar-fill defense" id="balance-bar-defense" style="width: 82%"></div>
+                </div>
+              </div>
             </div>
 
             <div class="tactical-pitch large-pitch" id="squad-pitch">
@@ -687,16 +1230,16 @@
                 <rect class="pitch-surface-turf" x="10" y="10" width="340" height="200" rx="8" />
                 <rect class="pitch-surface-vignette" x="10" y="10" width="340" height="200" rx="8" fill="url(#pitch-vignette-grad)" />
                 <g class="pitch-regulatory-lines">
-                  <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(168, 85, 247, 0.42)" stroke-width="1.8" />
-                  <line x1="123" y1="10" x2="123" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
-                  <line x1="236" y1="10" x2="236" y2="210" stroke="rgba(139, 92, 246, 0.14)" stroke-width="1" stroke-dasharray="3 4" />
-                  <line x1="180" y1="10" x2="180" y2="210" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
-                  <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.5" />
-                  <circle cx="180" cy="110" r="3" fill="#c084fc" />
-                  <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
-                  <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
-                  <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(168, 85, 247, 0.32)" stroke-width="1.5" />
-                  <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" />
+                  <rect x="10" y="10" width="340" height="200" rx="8" fill="none" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.8" />
+                  <line x1="123" y1="10" x2="123" y2="210" stroke="rgba(56, 189, 248, 0.16)" stroke-width="1" stroke-dasharray="3 4" />
+                  <line x1="236" y1="10" x2="236" y2="210" stroke="rgba(56, 189, 248, 0.16)" stroke-width="1" stroke-dasharray="3 4" />
+                  <line x1="180" y1="10" x2="180" y2="210" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
+                  <circle cx="180" cy="110" r="32" fill="none" stroke="rgba(56, 189, 248, 0.38)" stroke-width="1.5" />
+                  <circle cx="180" cy="110" r="3" fill="#38bdf8" />
+                  <rect x="10" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
+                  <rect x="10" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
+                  <rect x="302" y="55" width="48" height="110" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
+                  <rect x="332" y="82" width="18" height="56" fill="none" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
                 </g>
                 <g id="squad-hover-influence-layer"></g>
                 <g id="squad-synergy-links" stroke="rgba(52, 211, 153, 0.42)" stroke-width="1.6" stroke-dasharray="4 4"></g>
@@ -708,16 +1251,16 @@
             <div class="bench-section" id="squad-bench-section">
               <div class="bench-header">
                 <div class="bench-title-wrap">
-                  <span class="bench-title">🪑 Banca &amp; Suplentes (Arrastra hacia la cancha o intercambia titulares)</span>
+                  <span class="bench-title">Banca &amp; Suplentes (Arrastrar al campo para permutar titulares)</span>
                   <span class="bench-legend">
                     <span class="leg-dot natural"></span> Posición natural
-                    <span class="leg-dot adapted"></span> Improvisado / Fuera de puesto
+                    <span class="leg-dot adapted"></span> Adaptado / Fuera de puesto
                   </span>
                 </div>
                 <div class="bench-actions">
                   <span id="bench-count-badge" class="count-pill">0 en banca</span>
-                  <button type="button" id="reset-lineup-btn" class="ghost-mini-btn" title="Restaurar asignación automática por posición natural">
-                    ↺ Auto-ordenar
+                  <button type="button" id="reset-lineup-btn" class="ghost-mini-btn" title="Restaurar asignación automática por puesto natural">
+                    Auto-ordenar
                   </button>
                 </div>
               </div>
@@ -728,27 +1271,48 @@
 
             <div class="pitch-footer">
               <span class="formation-caption">
-                Arrastra jugadores entre la <strong>Banca</strong> y la <strong>Cancha</strong> o exporta tu XI a la Pizarra Táctica
+                Intercambia jugadores mediante Drag &amp; Drop entre <strong>Banca</strong> y <strong>Cancha</strong> o sincroniza el XI con la Pizarra Táctica
               </span>
               <div class="squad-footer-actions">
                 <button
                   type="button"
                   id="export-match-plan-squad-btn"
                   class="btn-primary shimmer-btn print-plan-btn"
-                  title="Imprimir o guardar en PDF el Plan de Partido completo con tu alineación titular, banca e instrucciones"
+                  title="Imprimir o guardar en PDF el Plan de Partido completo"
                 >
-                  <span>📄 Exportar Plan de Partido</span>
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  <span>Exportar Plan (PDF)</span>
+                </button>
+                <button
+                  type="button"
+                  id="export-png-squad-btn"
+                  class="btn-primary shimmer-btn export-png-btn"
+                  title="Guardar captura PNG del XI titular actual"
+                >
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                  <span>PNG</span>
                 </button>
                 <button
                   type="button"
                   id="export-squad-to-board-btn"
                   class="btn-primary shimmer-btn export-board-btn"
-                  title="Enviar modalidad, formación, estilo y titulares con sus nombres/dorsales reales a la Pizarra Táctica para ejecutar Jugadas Preparadas"
+                  title="Enviar titulares con dorsales y nombres reales a la Pizarra Táctica"
                 >
-                  <span>📤 Exportar Plantilla Ideal a Pizarra</span>
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
+                  <span>Enviar XI a Pizarra</span>
                 </button>
                 <button type="button" id="ask-bot-about-squad-btn" class="btn-primary shimmer-btn" style="flex: 0 0 auto; padding: 8px 16px;">
-                  <span>Consultar mi plantilla con el Bot IA 🤖 →</span>
+                  <span>Analizar Plantilla en RAG</span>
                 </button>
               </div>
             </div>
@@ -760,30 +1324,43 @@
           <article class="glass-card crack-comparison-card">
             <div class="card-header">
               <div>
-                <span class="section-kicker">API TOP 100 MUNDIAL &amp; HISTÓRICO</span>
-                <h2 class="card-title">Espejo &amp; Sinergia Individual</h2>
+                <span class="section-kicker">BENCHMARK TOP 100 MUNDIAL &amp; HISTÓRICO</span>
+                <h2 class="card-title">Perfil Comparativo &amp; Sinergia</h2>
               </div>
-              <span class="badge-tag" id="comp-similarity-badge">94% Similitud</span>
+              <span class="coach-origin-badge" id="comp-mirror-badge">Top 100</span>
             </div>
 
             <div id="crack-comparison-content" class="crack-comparison-content">
-              <div class="comp-player-header">
-                <div class="comp-avatar" id="comp-player-number">10</div>
-                <div>
-                  <h3 id="comp-player-name" class="comp-player-name">Selecciona un jugador</h3>
-                  <span id="comp-player-meta" class="comp-player-meta">Posición · Pie hábil · Media</span>
-                </div>
-              </div>
+              <div id="holographic-player-card" class="holographic-card-3d face-to-face-card">
+                <div class="holo-glare-layer" id="holo-glare-layer"></div>
 
-              <!-- Homologous Top 100 Crack Box -->
-              <div class="homologous-crack-box">
-                <div class="coach-card-header">
-                  <span class="coach-kicker">🌟 ESTILO DE JUEGO SIMILAR A:</span>
-                  <span class="coach-origin-badge" id="comp-mirror-badge">Top 100</span>
+                <div class="duel-cards-grid">
+                  <!-- Left Column: User's Custom Player -->
+                  <div class="duel-fighter-col user-fighter">
+                    <span class="duel-role-kicker">TU JUGADOR</span>
+                    <div class="comp-avatar duel-avatar-user" id="comp-player-number">10</div>
+                    <h3 id="comp-player-name" class="comp-player-name">Selecciona un jugador</h3>
+                    <span id="comp-player-meta" class="comp-player-meta">Posición · Pie hábil · Media</span>
+                  </div>
+
+                  <!-- Center Column: VS Emblem & Animated Similarity -->
+                  <div class="duel-vs-col">
+                    <div class="duel-vs-medallion">VS</div>
+                    <span class="badge-tag duel-similarity-pill" id="comp-similarity-badge">94% Similitud</span>
+                  </div>
+
+                  <!-- Right Column: Homologous Top 100 World / Historical Crack -->
+                  <div class="duel-fighter-col crack-fighter">
+                    <span class="duel-role-kicker crack-kicker">REFERENTE TOP 100</span>
+                    <div class="duel-avatar-crack" id="comp-crack-avatar">
+                      <span id="comp-crack-initials" class="duel-crack-initials">AB</span>
+                    </div>
+                    <strong class="crack-name" id="comp-crack-name">Andrés Iniesta</strong>
+                    <span class="crack-style-tag" id="comp-crack-style">Conducción &amp; Visión</span>
+                  </div>
                 </div>
-                <strong class="crack-name" id="comp-crack-name">Andrés Iniesta / Ricardinho</strong>
-                <span class="crack-style-tag" id="comp-crack-style">Conducción Pegada al Pie &amp; Visión</span>
-                <p class="crack-wiki-text" id="comp-crack-wiki"></p>
+
+                <p class="crack-wiki-text duel-wiki-footer" id="comp-crack-wiki"></p>
               </div>
 
               <!-- Animated Hexagonal SVG Radar Chart (Player vs Top 100 Crack) -->
@@ -826,17 +1403,17 @@
               </div>
 
               <div class="comp-detail-box">
-                <strong>🔍 ¿Por qué se parecen?</strong>
+                <strong>Similitud de Perfil Técnico</strong>
                 <p id="comp-why-text">Carga o selecciona un jugador para analizar su perfil técnico.</p>
               </div>
 
               <div class="comp-detail-box">
-                <strong>📈 Qué potenciar en entrenamientos:</strong>
+                <strong>Foco de Desarrollo en Entrenamiento</strong>
                 <p id="comp-potentiate-text">—</p>
               </div>
 
               <div class="comp-detail-box">
-                <strong>🤝 Mejores socios dentro de tu plantilla:</strong>
+                <strong>Sociedades Tácticas en Plantilla</strong>
                 <div id="comp-partners-chips" class="comp-partners-chips"></div>
               </div>
             </div>

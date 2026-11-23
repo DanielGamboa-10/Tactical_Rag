@@ -8,6 +8,9 @@ import {
   state,
   dom,
   escapeHtml,
+  showToast,
+  animateNumericCounter,
+  getPersonInitials,
   PLAY_STYLE_MODIFIERS,
   FUTSAL_ATTACK_PLAYS,
   FIELD_ATTACK_PLAYS,
@@ -18,6 +21,11 @@ import {
   updateContextBadges,
   isStrictNaturalPositionMatch
 } from '../store/tacticalStore.js';
+import {
+  syncStadium3DScene,
+  animateBall3DParabolic,
+  toggleStadium3DView
+} from './stadium3DEngine.js';
 
 let currentBoardCoords = [];
 let currentSquadCoords = [];
@@ -143,6 +151,9 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
 }
 
 export function toggleTv25DView(forceState = null) {
+  if (state.isStadium3DView && forceState !== false) {
+    toggleStadium3DView(false, currentBoardCoords);
+  }
   state.isTv25DView = typeof forceState === 'boolean' ? forceState : !state.isTv25DView;
   const active = state.isTv25DView;
 
@@ -186,6 +197,34 @@ export function toggleTv25DView(forceState = null) {
       ease: 'power3.out'
     });
   }
+}
+
+export function handleToggleStadium3D(forceState = null) {
+  if (state.isTv25DView && forceState !== false) {
+    toggleTv25DView(false);
+  }
+  toggleStadium3DView(forceState, currentBoardCoords);
+}
+
+export function toggleExpandBoard(forceState = null) {
+  state.isBoardExpanded =
+    typeof forceState === 'boolean' ? forceState : !state.isBoardExpanded;
+  const expanded = state.isBoardExpanded;
+
+  if (dom.boardLayout) {
+    dom.boardLayout.classList.toggle('board-expanded', expanded);
+  }
+  if (dom.toggleExpandBoardBtn) {
+    dom.toggleExpandBoardBtn.classList.toggle('active', expanded);
+    dom.toggleExpandBoardBtn.setAttribute('aria-pressed', String(expanded));
+    dom.toggleExpandBoardBtn.innerHTML = expanded
+      ? '<span>🗗 Contraer</span>'
+      : '<span>⛶ Expandir</span>';
+  }
+
+  requestAnimationFrame(() => {
+    renderTacticalPitch(true);
+  });
 }
 
 /**
@@ -513,12 +552,22 @@ export function executeSetPieceStep(stepNum) {
 
   if (state.setPieceStep <= 1) {
     positionBallToken(bp[0].x, bp[0].y, true, false);
+    if (state.isStadium3DView) {
+      animateBall3DParabolic(bp[0], bp[0], false, false);
+    }
   } else if (state.setPieceStep === 2) {
     const targetPt = bp[Math.min(1, bp.length - 1)];
     positionBallToken(targetPt.x, targetPt.y, true, true);
+    if (state.isStadium3DView) {
+      animateBall3DParabolic(bp[0], targetPt, true, targetPt.type === 'shot');
+    }
   } else {
+    const prevPt = bp[Math.min(1, bp.length - 1)];
     const finalPt = bp[bp.length - 1];
     positionBallToken(finalPt.x, finalPt.y, true, true);
+    if (state.isStadium3DView) {
+      animateBall3DParabolic(prevPt, finalPt, false, true);
+    }
   }
 }
 
@@ -528,7 +577,7 @@ export function playSetPieceAnimation() {
 
   clearPlaybackTimers();
   const totalSteps = activeSetPiece.steps.length || 3;
-  const STEP_PAUSE_MS = 2500;
+  const STEP_PAUSE_MS = 2850;
 
   executeSetPieceStep(1);
 
@@ -537,6 +586,41 @@ export function playSetPieceAnimation() {
       executeSetPieceStep(s);
     }, (s - 1) * STEP_PAUSE_MS);
     state.playbackTimers.push(timer);
+  }
+}
+
+let lastCoachWalkoutKey = '';
+
+function updateReferenceCoachBadgeAndWalkout(coachName) {
+  if (dom.coachAvatarInitials) {
+    dom.coachAvatarInitials.textContent = getPersonInitials(coachName);
+  }
+
+  if (coachName === lastCoachWalkoutKey) return;
+  lastCoachWalkoutKey = coachName;
+
+  // Animación Walkout 3D con GSAP cada vez que cambia el DT referente
+  if (dom.referenceCoachCard) {
+    gsap.fromTo(
+      dom.referenceCoachCard,
+      {
+        rotateY: -22,
+        rotateX: 6,
+        scale: 0.94,
+        opacity: 0.72,
+        transformPerspective: 1000
+      },
+      {
+        rotateY: 0,
+        rotateX: 0,
+        scale: 1,
+        opacity: 1,
+        transformPerspective: 1000,
+        duration: 0.68,
+        ease: 'back.out(1.6)',
+        overwrite: 'auto'
+      }
+    );
   }
 }
 
@@ -587,6 +671,7 @@ export function renderTacticalPitch(animateMotionBlur = false) {
     dom.coachOriginBadge.textContent = coachInfo.badge;
     dom.coachOriginBadge.classList.toggle('adapted', coachInfo.isAdapted);
     dom.coachNoteText.textContent = coachInfo.note;
+    updateReferenceCoachBadgeAndWalkout(coachInfo.name);
   }
 
   dom.tacticOverviewText.textContent = activeSetup.overview;
@@ -756,6 +841,12 @@ export function renderTacticalPitch(animateMotionBlur = false) {
   if (activeSetPiece && state.setPieceStep > 0) {
     updateLiveStepHighlight(activeSetPiece, state.setPieceStep);
   }
+
+  renderTacticalHeatmap(adjustedCoords, activeSetup.links || [], styleMod);
+
+  if (state.isStadium3DView) {
+    syncStadium3DScene(adjustedCoords, activeSetPiece);
+  }
 }
 
 export function renderSquadPitch() {
@@ -767,8 +858,9 @@ export function renderSquadPitch() {
   applyPitchSurfaceTheme(dom.squadPitch, state.squadModality);
 
   if (dom.squadGlobalSynergy && opt?.globalSynergy) {
-    dom.squadGlobalSynergy.textContent = `${opt.globalSynergy}%`;
+    animateNumericCounter(dom.squadGlobalSynergy, opt.globalSynergy, '%');
   }
+  updateContextBadges();
 
   clearHoverInfluenceOnPitch(dom.squadHoverInfluenceLayer, dom.squadPitchTokens);
 
@@ -889,6 +981,464 @@ export function renderSquadPitch() {
     line.setAttribute('y2', p2.y);
     dom.squadSynergyLinks.appendChild(line);
   });
+
+  updateCollectiveBalanceMeters(setup, lineup);
+}
+
+/**
+ * 1. Mapa de Calor Táctico Dinámico (SVG Thermal Layer)
+ * Calcula zonas térmicas difuminadas a partir de las posiciones activas y el estilo de juego.
+ */
+export function renderTacticalHeatmap(adjustedCoords = [], links = [], styleMod = {}) {
+  if (!dom.heatmapOverlayLayer) return;
+  dom.heatmapOverlayLayer.innerHTML = '';
+
+  if (!state.isHeatmapActive) {
+    dom.heatmapOverlayLayer.classList.add('hidden');
+    return;
+  }
+
+  dom.heatmapOverlayLayer.classList.remove('hidden');
+
+  const isHighPress = state.playStyle.includes('Presión Alta') || state.playStyle.includes('Directo');
+  const isPossession = state.playStyle.includes('Posesión') || state.playStyle.includes('Rotación');
+  const isLowBlock = state.playStyle.includes('Bloque Bajo');
+
+  const thermalShiftX = isHighPress ? 14 : isLowBlock ? -12 : 4;
+  const rxBase = isHighPress ? 42 : isPossession ? 38 : 34;
+  const ryBase = isPossession ? 36 : 30;
+
+  // Puentes térmicos en las zonas de asociación entre socios conectados
+  links.forEach(([fromIdx, toIdx]) => {
+    const p1 = adjustedCoords[fromIdx];
+    const p2 = adjustedCoords[toIdx];
+    if (!p1 || !p2) return;
+    const midX = Math.max(22, Math.min(338, (p1.adjX + p2.adjX) / 2 + thermalShiftX * 0.6));
+    const midY = (p1.adjY + p2.adjY) / 2;
+
+    const bridgeBlob = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    bridgeBlob.setAttribute('cx', String(Math.round(midX)));
+    bridgeBlob.setAttribute('cy', String(Math.round(midY)));
+    bridgeBlob.setAttribute('rx', String(Math.round(rxBase * 0.85)));
+    bridgeBlob.setAttribute('ry', String(Math.round(ryBase * 0.78)));
+    bridgeBlob.setAttribute('fill', 'url(#heat-grad-bridge)');
+    dom.heatmapOverlayLayer.appendChild(bridgeBlob);
+  });
+
+  // Focos térmicos principales por jugador según su línea y estilo
+  adjustedCoords.forEach((p) => {
+    const shift = p.gk ? thermalShiftX * 0.2 : thermalShiftX;
+    const cx = Math.max(20, Math.min(340, p.adjX + shift));
+    const cy = p.adjY;
+    const rx = p.gk ? 26 : rxBase;
+    const ry = p.gk ? 24 : ryBase;
+
+    const coreBlob = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    coreBlob.setAttribute('cx', String(Math.round(cx)));
+    coreBlob.setAttribute('cy', String(Math.round(cy)));
+    coreBlob.setAttribute('rx', String(rx));
+    coreBlob.setAttribute('ry', String(ry));
+    coreBlob.setAttribute('fill', 'url(#heat-grad-core)');
+    dom.heatmapOverlayLayer.appendChild(coreBlob);
+  });
+
+  gsap.fromTo(
+    dom.heatmapOverlayLayer,
+    { opacity: 0.15 },
+    { opacity: 0.9, duration: 0.42, ease: 'power2.out', overwrite: 'auto' }
+  );
+}
+
+export function toggleHeatmapView(forceState = null) {
+  state.isHeatmapActive =
+    typeof forceState === 'boolean' ? forceState : !state.isHeatmapActive;
+  const active = state.isHeatmapActive;
+
+  if (dom.toggleHeatmapBtn) {
+    dom.toggleHeatmapBtn.classList.toggle('active', active);
+    dom.toggleHeatmapBtn.setAttribute('aria-pressed', String(active));
+  }
+
+  const activeSetup = getActiveFormationSetup();
+  const styleMod = PLAY_STYLE_MODIFIERS[state.playStyle] || PLAY_STYLE_MODIFIERS['Posesión & Juego de Posición'];
+  renderTacticalHeatmap(currentBoardCoords, activeSetup.links || [], styleMod);
+}
+
+/**
+ * 2. Lápiz Táctico Libre sobre la Cancha (SVG Pointer Drawing)
+ */
+let isDrawingStroke = false;
+let activeStrokePoints = [];
+let activeStrokePathEl = null;
+let strokeColorIndex = 0;
+
+function clientToSvgCoords(svgEl, clientX, clientY) {
+  const rect = svgEl.getBoundingClientRect();
+  if (!rect.width || !rect.height) return { x: 180, y: 110 };
+  const x = Math.max(8, Math.min(352, ((clientX - rect.left) / rect.width) * 360));
+  const y = Math.max(8, Math.min(212, ((clientY - rect.top) / rect.height) * 220));
+  return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+}
+
+function buildSmoothFreehandPathD(pts) {
+  if (pts.length === 0) return '';
+  if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const midX = Math.round(((pts[i].x + pts[i + 1].x) / 2) * 10) / 10;
+    const midY = Math.round(((pts[i].y + pts[i + 1].y) / 2) * 10) / 10;
+    d += ` Q ${pts[i].x} ${pts[i].y} ${midX} ${midY}`;
+  }
+  const last = pts[pts.length - 1];
+  d += ` L ${last.x} ${last.y}`;
+  return d;
+}
+
+export function toggleFreehandDrawMode(forceState = null) {
+  state.isDrawModeActive =
+    typeof forceState === 'boolean' ? forceState : !state.isDrawModeActive;
+  const active = state.isDrawModeActive;
+
+  if (dom.toggleDrawBtn) {
+    dom.toggleDrawBtn.classList.toggle('active', active);
+    dom.toggleDrawBtn.setAttribute('aria-pressed', String(active));
+  }
+  if (dom.freehandDrawSvg) {
+    dom.freehandDrawSvg.classList.toggle('drawing-enabled', active);
+  }
+  if (dom.clearDrawBtn) {
+    const hasStrokes = Boolean(dom.freehandPathsGroup && dom.freehandPathsGroup.children.length > 0);
+    dom.clearDrawBtn.classList.toggle('hidden', !active && !hasStrokes);
+  }
+}
+
+export function clearFreehandDrawings() {
+  if (dom.freehandPathsGroup) {
+    dom.freehandPathsGroup.innerHTML = '';
+  }
+  if (dom.clearDrawBtn && !state.isDrawModeActive) {
+    dom.clearDrawBtn.classList.add('hidden');
+  }
+}
+
+export function initFreehandDrawingEvents() {
+  const svgEl = dom.freehandDrawSvg;
+  const groupEl = dom.freehandPathsGroup;
+  if (!svgEl || !groupEl) return;
+
+  svgEl.addEventListener('pointerdown', (e) => {
+    if (!state.isDrawModeActive) return;
+    e.preventDefault();
+    svgEl.setPointerCapture(e.pointerId);
+    isDrawingStroke = true;
+
+    const startPt = clientToSvgCoords(svgEl, e.clientX, e.clientY);
+    activeStrokePoints = [startPt];
+
+    const isAmber = e.shiftKey || strokeColorIndex % 2 === 1;
+    strokeColorIndex++;
+
+    activeStrokePathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    activeStrokePathEl.setAttribute('class', `freehand-stroke ${isAmber ? 'amber' : 'cyan'}`);
+    activeStrokePathEl.setAttribute('d', `M ${startPt.x} ${startPt.y}`);
+    activeStrokePathEl.setAttribute(
+      'marker-end',
+      isAmber ? 'url(#arrow-freehand-amber)' : 'url(#arrow-freehand-cyan)'
+    );
+    groupEl.appendChild(activeStrokePathEl);
+  });
+
+  svgEl.addEventListener('pointermove', (e) => {
+    if (!isDrawingStroke || !activeStrokePathEl) return;
+    const pt = clientToSvgCoords(svgEl, e.clientX, e.clientY);
+    const prev = activeStrokePoints[activeStrokePoints.length - 1];
+    if (Math.hypot(pt.x - prev.x, pt.y - prev.y) < 3.2) return;
+    activeStrokePoints.push(pt);
+    activeStrokePathEl.setAttribute('d', buildSmoothFreehandPathD(activeStrokePoints));
+  });
+
+  const finishStroke = (e) => {
+    if (!isDrawingStroke) return;
+    isDrawingStroke = false;
+    if (e?.pointerId !== undefined && svgEl.hasPointerCapture(e.pointerId)) {
+      svgEl.releasePointerCapture(e.pointerId);
+    }
+    if (dom.clearDrawBtn && groupEl.children.length > 0) {
+      dom.clearDrawBtn.classList.remove('hidden');
+    }
+    activeStrokePathEl = null;
+    activeStrokePoints = [];
+  };
+
+  svgEl.addEventListener('pointerup', finishStroke);
+  svgEl.addEventListener('pointercancel', finishStroke);
+}
+
+/**
+ * 3. Medidor de Balance Colectivo (ATAQUE / CREACIÓN / DEFENSA) con GSAP
+ */
+export function updateCollectiveBalanceMeters(
+  setup = getActiveSquadFormationSetup(),
+  lineup = state.squadOptimization?.lineup || []
+) {
+  if (!dom.balanceValAttack || !dom.balanceBarAttack) return;
+
+  const totalSlots = setup?.players?.length || 5;
+  let sumAttack = 0;
+  let sumCreation = 0;
+  let sumDefense = 0;
+
+  for (let i = 0; i < totalSlots; i++) {
+    const slotPlayer = setup.players[i];
+    const assigned = lineup[i];
+    const isAssigned = Boolean(assigned?.assigned && assigned?.playerId);
+    const fullPlayer = isAssigned
+      ? state.squadPlayers.find((sp) => sp.id === assigned.playerId)
+      : null;
+
+    if (fullPlayer) {
+      sumAttack += (Number(fullPlayer.shooting || 80) + Number(fullPlayer.dribbling || 80)) / 2;
+      sumCreation += (Number(fullPlayer.passing || 82) + Number(fullPlayer.vision || 82)) / 2;
+      sumDefense += (Number(fullPlayer.defending || 78) + Number(fullPlayer.pace || 80)) / 2;
+    } else if (isAssigned) {
+      const ovr = Number(assigned.overall || 82);
+      sumAttack += ovr - (slotPlayer?.gk ? 10 : 1);
+      sumCreation += ovr;
+      sumDefense += ovr;
+    } else {
+      sumAttack += 74;
+      sumCreation += 76;
+      sumDefense += 74;
+    }
+  }
+
+  const attackScore = Math.max(45, Math.min(99, Math.round(sumAttack / totalSlots)));
+  const creationScore = Math.max(45, Math.min(99, Math.round(sumCreation / totalSlots)));
+  const defenseScore = Math.max(45, Math.min(99, Math.round(sumDefense / totalSlots)));
+
+  animateNumericCounter(dom.balanceValAttack, attackScore, '');
+  animateNumericCounter(dom.balanceValCreation, creationScore, '');
+  animateNumericCounter(dom.balanceValDefense, defenseScore, '');
+
+  gsap.to(dom.balanceBarAttack, {
+    width: `${attackScore}%`,
+    duration: 0.75,
+    ease: 'power3.out',
+    overwrite: 'auto'
+  });
+  gsap.to(dom.balanceBarCreation, {
+    width: `${creationScore}%`,
+    duration: 0.75,
+    delay: 0.05,
+    ease: 'power3.out',
+    overwrite: 'auto'
+  });
+  gsap.to(dom.balanceBarDefense, {
+    width: `${defenseScore}%`,
+    duration: 0.75,
+    delay: 0.1,
+    ease: 'power3.out',
+    overwrite: 'auto'
+  });
+}
+
+/**
+ * 4. Exportación Rápida de la Pizarra Táctica a Imagen PNG (tacticalplay-pizarra.png)
+ */
+export function exportPitchAsPng(sourceTab = 'board') {
+  const isFromSquad = sourceTab === 'squad';
+  const activeModality = isFromSquad ? state.squadModality : state.modality;
+  const activeSetup = isFromSquad ? getActiveSquadFormationSetup() : getActiveFormationSetup();
+  const activeStyle = isFromSquad
+    ? (dom.squadStyleSelect ? dom.squadStyleSelect.value : state.playStyle)
+    : state.playStyle;
+  const coachInfo = resolveReferenceCoach(activeModality, activeSetup.code, activeStyle);
+  const isFutsal = String(activeModality || '').toLowerCase().includes('futsal');
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1440;
+  canvas.height = 940;
+  const ctx = canvas.getContext('2d');
+
+  // 1. Fondo general Slate/Obsidian
+  ctx.fillStyle = '#0b0d14';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 2. Encabezado Broadcast
+  ctx.fillStyle = '#0b1222';
+  ctx.fillRect(40, 24, 1360, 76);
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(40, 24, 1360, 76);
+
+  ctx.fillStyle = '#f1f5f9';
+  ctx.font = 'bold 26px "Space Grotesk", "Inter", sans-serif';
+  ctx.fillText(`TacticalPlay RAG · ${activeModality} · Sistema ${activeSetup.code}`, 64, 58);
+
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = '600 17px "Inter", sans-serif';
+  ctx.fillText(`Estilo: ${activeStyle}   |   DT Referente: ${coachInfo.name}`, 64, 84);
+
+  // 3. Superficie de cancha (X: 40..1400, Y: 120..880 -> 1360 x 760)
+  const pitchX = 40;
+  const pitchY = 120;
+  const pitchW = 1360;
+  const pitchH = 760;
+
+  if (isFutsal) {
+    const grad = ctx.createRadialGradient(720, 500, 80, 720, 500, 780);
+    grad.addColorStop(0, '#0f2952');
+    grad.addColorStop(0.65, '#091936');
+    grad.addColorStop(1, '#040b1a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(pitchX, pitchY, pitchW, pitchH);
+  } else {
+    const stripeCount = 16;
+    const stripeW = pitchW / stripeCount;
+    for (let i = 0; i < stripeCount; i++) {
+      ctx.fillStyle = i % 2 === 0 ? '#064e3b' : '#043927';
+      ctx.fillRect(pitchX + i * stripeW, pitchY, stripeW, pitchH);
+    }
+  }
+
+  // Escala del viewBox SVG (360 x 220) al rectángulo de cancha en canvas
+  const mapX = (x2d) => pitchX + (x2d / 360) * pitchW;
+  const mapY = (y2d) => pitchY + (y2d / 220) * pitchH;
+
+  // 4. Mapa de Calor si está activo
+  const coordsToDraw = isFromSquad
+    ? (currentSquadCoords.length > 0
+        ? currentSquadCoords
+        : activeSetup.players.map((p) => ({ ...p, adjX: p.x, adjY: p.y })))
+    : (currentBoardCoords.length > 0
+        ? currentBoardCoords
+        : activeSetup.players.map((p) => ({ ...p, adjX: p.x, adjY: p.y })));
+
+  if (!isFromSquad && state.isHeatmapActive) {
+    coordsToDraw.forEach((p) => {
+      const hx = mapX(p.adjX ?? p.x);
+      const hy = mapY(p.adjY ?? p.y);
+      const rad = ctx.createRadialGradient(hx, hy, 12, hx, hy, 135);
+      rad.addColorStop(0, 'rgba(239, 68, 68, 0.55)');
+      rad.addColorStop(0.45, 'rgba(245, 158, 11, 0.35)');
+      rad.addColorStop(0.8, 'rgba(16, 185, 129, 0.16)');
+      rad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+      ctx.fillStyle = rad;
+      ctx.beginPath();
+      ctx.arc(hx, hy, 135, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // 5. Líneas reglamentarias de la cancha
+  ctx.strokeStyle = isFutsal ? 'rgba(56, 189, 248, 0.65)' : 'rgba(110, 231, 183, 0.65)';
+  ctx.lineWidth = 3.5;
+  ctx.strokeRect(mapX(10), mapY(10), (340 / 360) * pitchW, (200 / 220) * pitchH);
+
+  // Línea media y círculo central
+  ctx.beginPath();
+  ctx.moveTo(mapX(180), mapY(10));
+  ctx.lineTo(mapX(180), mapY(210));
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(mapX(180), mapY(110), (32 / 360) * pitchW, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Áreas izquierda y derecha
+  ctx.strokeRect(mapX(10), mapY(55), (48 / 360) * pitchW, (110 / 220) * pitchH);
+  ctx.strokeRect(mapX(10), mapY(82), (18 / 360) * pitchW, (56 / 220) * pitchH);
+  ctx.strokeRect(mapX(302), mapY(55), (48 / 360) * pitchW, (110 / 220) * pitchH);
+  ctx.strokeRect(mapX(332), mapY(82), (18 / 360) * pitchW, (56 / 220) * pitchH);
+
+  // 6. Líneas de sinergia
+  ctx.save();
+  ctx.setLineDash([10, 10]);
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.48)';
+  ctx.lineWidth = 2.5;
+  (activeSetup.links || []).forEach(([i1, i2]) => {
+    const p1 = coordsToDraw[i1];
+    const p2 = coordsToDraw[i2];
+    if (!p1 || !p2) return;
+    ctx.beginPath();
+    ctx.moveTo(mapX(p1.adjX ?? p1.x), mapY(p1.adjY ?? p1.y));
+    ctx.lineTo(mapX(p2.adjX ?? p2.x), mapY(p2.adjY ?? p2.y));
+    ctx.stroke();
+  });
+  ctx.restore();
+
+  // 7. Trazos manuales dibujados con el lápiz táctico
+  if (!isFromSquad && dom.freehandPathsGroup && dom.freehandPathsGroup.children.length > 0) {
+    Array.from(dom.freehandPathsGroup.children).forEach((pathEl) => {
+      const dAttr = pathEl.getAttribute('d');
+      if (!dAttr) return;
+      const isAmber = pathEl.classList.contains('amber');
+      ctx.save();
+      ctx.translate(pitchX, pitchY);
+      ctx.scale(pitchW / 360, pitchH / 220);
+      ctx.strokeStyle = isAmber ? '#fbbf24' : '#38bdf8';
+      ctx.lineWidth = 2.6;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      const path2d = new Path2D(dAttr);
+      ctx.stroke(path2d);
+      ctx.restore();
+    });
+  }
+
+  // 8. Fichas de jugadores (Dorsal + Nombre/Rol)
+  const rawLineup = isFromSquad
+    ? (state.squadOptimization?.lineup || [])
+    : (state.exportedBoardLineup?.modality === activeModality
+        ? state.exportedBoardLineup.starters
+        : []);
+
+  coordsToDraw.forEach((p, idx) => {
+    const px = mapX(p.adjX ?? p.x);
+    const py = mapY(p.adjY ?? p.y);
+    const assigned = rawLineup?.[idx];
+    const hasPlayer = Boolean(assigned && assigned.assigned && assigned.playerId);
+    const dorsal = hasPlayer ? String(assigned.jerseyNumber) : String(p.num);
+    const labelText = hasPlayer
+      ? `${assigned.name.split(' ')[0]} (${p.role})`
+      : p.role;
+
+    // Círculo del jugador
+    ctx.beginPath();
+    ctx.arc(px, py, 24, 0, Math.PI * 2);
+    ctx.fillStyle = p.gk ? '#059669' : p.isActor ? '#0284c7' : '#1d4ed8';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = p.isActor ? '#00d2ff' : '#bae6fd';
+    ctx.stroke();
+
+    // Dorsal
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 19px "Space Grotesk", "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(dorsal, px, py);
+
+    // Etiqueta inferior
+    ctx.fillStyle = '#bae6fd';
+    ctx.font = 'bold 14px "Inter", sans-serif';
+    ctx.fillText(labelText, px, py + 36);
+  });
+
+  // 9. Descargar archivo PNG
+  const dataUrl = canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.download = 'tacticalplay-pizarra.png';
+  link.href = dataUrl;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  showToast(
+    '📸 Imagen Guardada',
+    'Se descargó la captura táctica en alta resolución (tacticalplay-pizarra.png).',
+    'success'
+  );
 }
 
 export function handleExportPrintableMatchPlan(sourceTab = 'board') {

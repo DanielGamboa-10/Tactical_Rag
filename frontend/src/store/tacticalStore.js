@@ -2,7 +2,10 @@
    Reactive Pub/Sub Store, Tactical Catalogs & Shared UI Helpers
    ========================================================================== */
 
+import gsap from 'gsap';
+
 const listeners = new Map();
+let lastHudText = '';
 
 export const state = {
   activeTab: 'assistant',
@@ -13,6 +16,10 @@ export const state = {
   setPieceIndex: 0,
   setPieceStep: 0, // 0 = initial setup, 1 = step 1, 2 = step 2, 3 = step 3
   isTv25DView: false,
+  isStadium3DView: false,
+  isHeatmapActive: false,
+  isDrawModeActive: false,
+  isBoardExpanded: false,
   playbackTimers: [],
   motionBlurTimers: [],
   selectedFile: null,
@@ -83,7 +90,17 @@ export const dom = {
   boardPitchTitle: document.getElementById('board-pitch-title'),
   boardStyleBadge: document.getElementById('board-style-badge'),
   formationBadge: document.getElementById('formation-badge'),
+  toggleExpandBoardBtn: document.getElementById('toggle-expand-board-btn'),
   toggleTvViewBtn: document.getElementById('toggle-tv-view-btn'),
+  toggleStadium3dBtn: document.getElementById('toggle-stadium-3d-btn'),
+  toggleHeatmapBtn: document.getElementById('toggle-heatmap-btn'),
+  heatmapOverlayLayer: document.getElementById('heatmap-overlay-layer'),
+  toggleDrawBtn: document.getElementById('toggle-draw-btn'),
+  clearDrawBtn: document.getElementById('clear-draw-btn'),
+  freehandDrawSvg: document.getElementById('freehand-draw-svg'),
+  freehandPathsGroup: document.getElementById('freehand-paths-group'),
+  stadium3dContainer: document.getElementById('stadium-3d-container'),
+  boardLayout: document.querySelector('.board-layout'),
   tacticalPitch: document.getElementById('tactical-pitch'),
   hoverInfluenceLayer: document.getElementById('hover-influence-layer'),
   formationFullText: document.getElementById('formation-full-text'),
@@ -100,7 +117,10 @@ export const dom = {
   synergyLinks: document.getElementById('synergy-links'),
   setpieceOverlay: document.getElementById('setpiece-overlay'),
   tacticOverviewText: document.getElementById('tactic-overview-text'),
+  referenceCoachCard: document.getElementById('reference-coach-card'),
+  coachHoloGlareLayer: document.getElementById('coach-holo-glare-layer'),
   coachOriginBadge: document.getElementById('coach-origin-badge'),
+  coachAvatarInitials: document.getElementById('coach-avatar-initials'),
   coachNameText: document.getElementById('coach-name-text'),
   coachNoteText: document.getElementById('coach-note-text'),
   setpieceStepsBox: document.getElementById('setpiece-steps-box'),
@@ -112,8 +132,16 @@ export const dom = {
   styleEffectDescription: document.getElementById('style-effect-description'),
   analyzeWithBotBtn: document.getElementById('analyze-with-bot-btn'),
   exportMatchPlanBoardBtn: document.getElementById('export-match-plan-board-btn'),
+  exportPngBoardBtn: document.getElementById('export-png-board-btn'),
   exportMatchPlanSquadBtn: document.getElementById('export-match-plan-squad-btn'),
+  exportPngSquadBtn: document.getElementById('export-png-squad-btn'),
   printableMatchPlan: document.getElementById('printable-match-plan'),
+  balanceValAttack: document.getElementById('balance-val-attack'),
+  balanceValCreation: document.getElementById('balance-val-creation'),
+  balanceValDefense: document.getElementById('balance-val-defense'),
+  balanceBarAttack: document.getElementById('balance-bar-attack'),
+  balanceBarCreation: document.getElementById('balance-bar-creation'),
+  balanceBarDefense: document.getElementById('balance-bar-defense'),
   // Tab 3 DOM References
   loadDemoSquadBtn: document.getElementById('load-demo-squad-btn'),
   clearSquadBtn: document.getElementById('clear-squad-btn'),
@@ -157,10 +185,14 @@ export const dom = {
   exportSquadToBoardBtn: document.getElementById('export-squad-to-board-btn'),
   askBotAboutSquadBtn: document.getElementById('ask-bot-about-squad-btn'),
   compSimilarityBadge: document.getElementById('comp-similarity-badge'),
+  holographicPlayerCard: document.getElementById('holographic-player-card'),
+  holoGlareLayer: document.getElementById('holo-glare-layer'),
   compPlayerNumber: document.getElementById('comp-player-number'),
   compPlayerName: document.getElementById('comp-player-name'),
   compPlayerMeta: document.getElementById('comp-player-meta'),
   compMirrorBadge: document.getElementById('comp-mirror-badge'),
+  compCrackAvatar: document.getElementById('comp-crack-avatar'),
+  compCrackInitials: document.getElementById('comp-crack-initials'),
   compCrackName: document.getElementById('comp-crack-name'),
   compCrackStyle: document.getElementById('comp-crack-style'),
   compCrackWiki: document.getElementById('comp-crack-wiki'),
@@ -228,6 +260,42 @@ export function showToast(title, message, type = 'info') {
   }, 4500);
 }
 
+export function animateNumericCounter(el, targetValue, suffix = '%') {
+  if (!el) return;
+  const targetNum = Math.round(Number(targetValue) || 0);
+  const currentMatch = String(el.textContent || '').match(/\d+/);
+  const startNum = currentMatch ? Number(currentMatch[0]) : Math.max(50, targetNum - 12);
+
+  if (startNum === targetNum) {
+    el.textContent = `${targetNum}${suffix}`;
+    return;
+  }
+
+  const counter = { val: startNum };
+  gsap.to(counter, {
+    val: targetNum,
+    duration: 0.65,
+    ease: 'power2.out',
+    overwrite: 'auto',
+    onUpdate: () => {
+      el.textContent = `${Math.round(counter.val)}${suffix}`;
+    }
+  });
+}
+
+export function getPersonInitials(rawName) {
+  const clean = String(rawName || '')
+    .replace(/\(.*?\)/g, '')
+    .replace(/["'“”‘’].*?["'“”‘’]/g, '')
+    .split('/')[0]
+    .split('·')[0]
+    .trim();
+  if (!clean) return 'DT';
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
 export function switchTab(tabName) {
   state.activeTab = tabName;
   const isAssistant = tabName === 'assistant';
@@ -250,6 +318,16 @@ export function switchTab(tabName) {
   if (dom.viewSquad) {
     dom.viewSquad.classList.toggle('active-view', isSquad);
     dom.viewSquad.classList.toggle('hidden-view', !isSquad);
+  }
+
+  const activeViewEl = isAssistant ? dom.viewAssistant : isBoard ? dom.viewBoard : dom.viewSquad;
+  if (activeViewEl) {
+    const cards = activeViewEl.querySelectorAll('.glass-card');
+    gsap.fromTo(
+      cards,
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: 0.35, stagger: 0.05, ease: 'power2.out', overwrite: 'auto' }
+    );
   }
 
   tacticalStore.emit('tab:changed', tabName);
@@ -1345,7 +1423,24 @@ export function resolveReferenceCoach(modality, formationCode, playStyle) {
 
 export function updateContextBadges() {
   const setup = getActiveFormationSetup();
-  dom.headerModalityBadge.textContent = `${state.modality} · ${setup.code}`;
+  const shortStyle = state.playStyle.split('(')[0].split('&')[0].trim();
+  const synergyPct = state.squadOptimization?.globalSynergy;
+  const synergyClause = synergyPct ? ` · ⚡ ${synergyPct}%` : '';
+  const nextHudText = `${state.modality} · ${setup.code} · ${shortStyle}${synergyClause}`;
+
+  if (dom.headerModalityBadge) {
+    dom.headerModalityBadge.textContent = nextHudText;
+    if (lastHudText && lastHudText !== nextHudText) {
+      const pillEl = dom.headerModalityBadge.closest('.active-modality-pill') || dom.headerModalityBadge;
+      gsap.fromTo(
+        pillEl,
+        { scale: 1.08 },
+        { scale: 1, duration: 0.3, ease: 'back.out(2)', overwrite: 'auto' }
+      );
+    }
+    lastHudText = nextHudText;
+  }
+
   dom.inputModalityTag.textContent = `${state.modality} · ${setup.code.split(' ')[0]}`;
   dom.sidebarFormationLabel.textContent = setup.code;
   dom.sidebarStyleLabel.textContent = state.playStyle;

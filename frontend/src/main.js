@@ -20,6 +20,10 @@ import {
   refreshSquadAndOptimize,
   initSquadViewEvents
 } from './ui/squadView.js';
+import {
+  initBlueRoseIntroEvents,
+  playBlueRoseIntroCinematic
+} from './engine/introRoseEngine.js';
 
 // Subscribe reactive view updates on tab navigation
 tacticalStore.subscribe('tab:changed', (tabName) => {
@@ -52,3 +56,5 @@ populateSquadFormationDropdown();
 checkBackendHealth();
 renderTacticalPitch();
 appendWelcomeMessage();
+initBlueRoseIntroEvents();
+playBlueRoseIntroCinematic();
