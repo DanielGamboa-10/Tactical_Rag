@@ -18,5 +18,49 @@ services:
       timeout: 5s
       retries: 5
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tacticalplay_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@tacticalplay.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-tactical_admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./deploy/pgadmin-servers.json:/pgadmin4/servers.json:ro
+
+  caddy-https:
+    image: caddy:2-alpine
+    container_name: tacticalplay_https_proxy
+    profiles: ["https", "vps"]
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  clamav:
+    image: clamav/clamav:stable
+    container_name: tacticalplay_clamav
+    profiles: ["security", "vps"]
+    restart: unless-stopped
+    ports:
+      - "3310:3310"
+
 volumes:
   pgdata:
+  pgadmin_data:
+  caddy_data:
+  caddy_config:

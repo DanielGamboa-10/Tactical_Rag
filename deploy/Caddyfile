@@ -1,0 +1,15 @@
+# Proxy HTTPS inverso para despliegue en VPS / producción con TLS automático.
+# En VPS real sustituye {$DOMAIN:localhost} por tu dominio público (p. ej. tactical.tudominio.com).
+# Para activar en Docker: docker compose --profile https up -d
+{$DOMAIN:localhost} {
+	encode zstd gzip
+
+	@api path /health /api/*
+	handle @api {
+		reverse_proxy host.docker.internal:8000
+	}
+
+	handle {
+		reverse_proxy host.docker.internal:5173
+	}
+}
