@@ -74,9 +74,12 @@ const supportsAnchorSlidingPill =
 function syncSlidingIndicator(container) {
   if (!container || supportsAnchorSlidingPill) return;
   const activeBtn = container.querySelector('.active');
-  if (!activeBtn || activeBtn.offsetWidth === 0) return;
-  container.style.setProperty('--pill-x', `${activeBtn.offsetLeft}px`);
-  container.style.setProperty('--pill-w', `${activeBtn.offsetWidth}px`);
+  if (!activeBtn) return;
+  const btnW = activeBtn.offsetWidth;
+  if (btnW === 0) return;
+  const btnX = activeBtn.offsetLeft;
+  container.style.setProperty('--pill-x', `${btnX}px`);
+  container.style.setProperty('--pill-w', `${btnW}px`);
   container.classList.add('indicator-ready');
 }
 
@@ -88,41 +91,18 @@ function createKaiserVineCornerSvg(cornerClass) {
   svg.setAttribute('fill', 'none');
   svg.setAttribute('aria-hidden', 'true');
 
-  svg.innerHTML = `
-    <g class="kaiser-vine-layer">
-      <!-- Tallos principales entrelazados: contorno negro tinta #02050c + núcleo cobalto #1e3a8a + filo cian #38bdf8 -->
-      <path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10" stroke="#02050c" stroke-width="7.2" stroke-linecap="round" />
-      <path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10" stroke="#1e3a8a" stroke-width="4.2" stroke-linecap="round" />
-      <path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10" stroke="#38bdf8" stroke-width="1.25" stroke-opacity="0.88" stroke-linecap="round" />
-
-      <path d="M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#02050c" stroke-width="5.2" stroke-linecap="round" />
-      <path d="M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#1e3a8a" stroke-width="2.8" stroke-linecap="round" />
-      <path d="M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.82" stroke-linecap="round" />
-
-      <!-- Espinas triangulares afiladas a lo largo de los tallos -->
-      <path d="M10 116 L0 105 L14 108 Z M19 88 L8 76 L24 81 Z M35 58 L27 42 L44 51 Z M65 34 L62 18 L75 29 Z M102 18 L104 4 L112 16 Z M136 12 L144 2 L146 13 Z M26 98 L40 105 L31 90 Z M54 50 L68 57 L58 43 Z M94 25 L106 34 L99 20 Z" fill="#1e3a8a" stroke="#02050c" stroke-width="1.3" stroke-linejoin="round" />
-      <path d="M10 116 L0 105 M19 88 L8 76 M35 58 L27 42 M65 34 L62 18 M102 18 L104 4 M136 12 L144 2 M26 98 L40 105 M54 50 L68 57" stroke="#38bdf8" stroke-width="1.05" stroke-linecap="round" />
-
-      <!-- Brote de Rosa Azul Esculpida en la esquina -->
-      <g transform="translate(30, 30)">
-        <path d="M-12 12 L-22 20 L-10 4 Z M12 -12 L22 -20 L4 -10 Z" fill="#02050c" stroke="#38bdf8" stroke-width="1" />
-        <path d="M0 -22 L12 -16 L17 -4 L9 10 L-9 10 L-17 -4 L-12 -16 Z" fill="#1e3a8a" stroke="#02050c" stroke-width="1.8" stroke-linejoin="round" />
-        <path d="M0 -22 L12 -16 L17 -4 L9 10 L-9 10 L-17 -4 L-12 -16 Z" stroke="#38bdf8" stroke-width="1.15" stroke-linejoin="round" />
-        <path d="M-10 -12 L0 -18 L10 -12 L11 0 L0 8 L-11 0 Z" fill="#2563eb" stroke="#7dd3fc" stroke-width="1.15" stroke-linejoin="round" />
-        <path d="M-6 -6 L0 -12 L6 -6 L4 2 L0 5 L-4 2 Z" fill="#02050c" stroke="#38bdf8" stroke-width="1.1" />
-        <path d="M-3 -3 L0 -7 L3 -3 L0 2 Z" fill="#00f0ff" />
-      </g>
-
-      <!-- Haces de impulso nervioso cian (animados con stroke-dashoffset en :hover o cambio de pestaña) -->
-      <path class="kaiser-vine-nerve" pathLength="100" d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10" stroke="#00f0ff" stroke-width="2.2" stroke-linecap="round" />
-      <path class="kaiser-vine-nerve nerve-alt" pathLength="100" d="M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#e0f2fe" stroke-width="1.4" stroke-linecap="round" />
-    </g>
-  `;
+  // 4 trazos SVG compuestos (en lugar de 13 nodos por esquina) para mantener DOM ligero
+  svg.innerHTML =
+    `<path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10 M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#02050c" stroke-width="6.4" stroke-linecap="round"/>` +
+    `<path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10 M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#1e3a8a" stroke-width="3.6" stroke-linecap="round"/>` +
+    `<path d="M10 116 L0 105 L14 108 Z M19 88 L8 76 L24 81 Z M35 58 L27 42 L44 51 Z M65 34 L62 18 L75 29 Z M102 18 L104 4 L112 16 Z M136 12 L144 2 L146 13 Z M26 98 L40 105 L31 90 Z M54 50 L68 57 L58 43 Z M30 8 L42 14 L47 26 L39 40 L21 40 L13 26 L18 14 Z" fill="#1e3a8a" stroke="#02050c" stroke-width="1.3" stroke-linejoin="round"/>` +
+    `<path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10 M20 18 L30 12 L40 18 L41 30 L30 38 L19 30 Z M27 27 L30 23 L33 27 L30 32 Z" stroke="#38bdf8" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" fill="none"/>` +
+    `<path d="M27 27 L30 23 L33 27 L30 32 Z" fill="#00f0ff"/>`;
   return svg;
 }
 
-function initKaiserCardVineFrames() {
-  const cards = document.querySelectorAll('.glass-card');
+function initKaiserCardVineFrames(scopeEl = document) {
+  const cards = scopeEl.querySelectorAll('.tab-view.active-view .glass-card');
   if (!cards.length) return;
 
   const template = document.createElement('div');
@@ -130,6 +110,9 @@ function initKaiserCardVineFrames() {
   template.setAttribute('aria-hidden', 'true');
   template.appendChild(createKaiserVineCornerSvg('tl'));
   template.appendChild(createKaiserVineCornerSvg('br'));
+  const pulseSweep = document.createElement('span');
+  pulseSweep.className = 'kaiser-vine-pulse';
+  template.appendChild(pulseSweep);
 
   cards.forEach((cardEl) => {
     if (cardEl.querySelector('.kaiser-card-vines')) return;
@@ -137,15 +120,13 @@ function initKaiserCardVineFrames() {
   });
 }
 
-function triggerVineNervePulseOnActiveTab() {
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+function triggerVineNervePulseOnActiveTab(isTabSwitch = false) {
+  if (!isTabSwitch || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
   const activeCards = document.querySelectorAll('.tab-view.active-view .glass-card');
   if (!activeCards.length) return;
   activeCards.forEach((c) => c.classList.remove('vine-surge'));
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      activeCards.forEach((c) => c.classList.add('vine-surge'));
-    });
+    activeCards.forEach((c) => c.classList.add('vine-surge'));
   });
 }
 
@@ -154,7 +135,6 @@ function initKineticHudInteractions() {
   const hoverFineQuery = window.matchMedia?.('(hover: hover) and (pointer: fine)');
 
   initKaiserCardVineFrames();
-  triggerVineNervePulseOnActiveTab();
 
   // 1. Segmented sliding indicator fallback when CSS Anchor Positioning isn't supported
   if (!supportsAnchorSlidingPill) {
@@ -214,7 +194,7 @@ function initKineticHudInteractions() {
 tacticalStore.subscribe('tab:changed', (tabName) => {
   loadDeferredStyles();
   initKaiserCardVineFrames();
-  triggerVineNervePulseOnActiveTab();
+  triggerVineNervePulseOnActiveTab(true);
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     const activeViewEl = document.querySelector('.tab-view.active-view');
     if (activeViewEl) {

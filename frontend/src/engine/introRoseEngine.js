@@ -253,13 +253,13 @@ export function playBlueRoseIntroCinematic() {
     scale: 0.55,
     transformOrigin: '0px 0px'
   });
-  gsap.set([leafLeft, leafRight], { opacity: 0, scale: 0.35, transformOrigin: '50% 50%' });
-  gsap.set(domeBase, { opacity: 0, scaleX: 0.3, transformOrigin: '50% 50%' });
+  gsap.set([leafLeft, leafRight], { opacity: 0, scale: 0.35, transformOrigin: '0px 0px' });
+  gsap.set(domeBase, { opacity: 0, scaleX: 0.3, transformOrigin: '0px 0px' });
   gsap.set(domeReflection, { opacity: 0 });
-  gsap.set(quoteEl, { opacity: 0, y: 14 });
+  gsap.set(quoteEl, { opacity: 0.88, y: 0, scale: 1 });
   gsap.set(flashLayer, { opacity: 0 });
 
-  // Preparar trazos laterales Kaiser (enredaderas espinosas, espinas, mini-coronas y brotes)
+  // Preparar trazos SVG usando transformOrigin fijo (0px 0px) para evitar getBBox() forced reflows
   const vineTraces = Array.from(overlay.querySelectorAll('.intro-vine-trace'));
   const vineBodies = Array.from(overlay.querySelectorAll('.intro-vine-body'));
   const vineThorns = Array.from(overlay.querySelectorAll('.intro-vine-thorn'));
@@ -267,9 +267,9 @@ export function playBlueRoseIntroCinematic() {
   const sideBlooms = Array.from(overlay.querySelectorAll('.intro-side-bloom'));
 
   gsap.set(vineBodies, { opacity: 0 });
-  gsap.set(vineThorns, { opacity: 0, scale: 0.7, transformOrigin: '50% 50%' });
-  gsap.set(miniCrowns, { opacity: 0, scale: 0.72, transformOrigin: '50% 50%' });
-  gsap.set(sideBlooms, { opacity: 0, scale: 0.6, transformOrigin: '50% 50%' });
+  gsap.set(vineThorns, { opacity: 0 });
+  gsap.set(miniCrowns, { opacity: 0 });
+  gsap.set(sideBlooms, { opacity: 0 });
 
   // Respetar preferencia del SO prefers-reduced-motion mostrando emblema estático breve
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -546,10 +546,9 @@ export function playBlueRoseIntroCinematic() {
       vineThorns,
       {
         opacity: 0.92,
-        scale: 1,
-        duration: 0.42,
-        stagger: 0.035,
-        ease: 'back.out(1.8)'
+        duration: 0.4,
+        stagger: 0.03,
+        ease: 'power2.out'
       },
       1.85
     );
@@ -560,10 +559,9 @@ export function playBlueRoseIntroCinematic() {
       miniCrowns,
       {
         opacity: 0.86,
-        scale: 1,
-        duration: 0.52,
-        stagger: 0.14,
-        ease: 'back.out(1.7)'
+        duration: 0.48,
+        stagger: 0.12,
+        ease: 'power2.out'
       },
       2.25
     );
@@ -576,14 +574,24 @@ export function playBlueRoseIntroCinematic() {
         bloomEl,
         {
           opacity: targetOpacity,
-          scale: 1,
-          duration: 0.72,
-          ease: 'back.out(1.5)'
+          duration: 0.68,
+          ease: 'power2.out'
         },
         2.15 + idx * 0.14
       );
     });
   }
+
+  // Reveal inmediato del quote (evita LCP delay de 3.1s) + climax visual en Fase 3
+  introTimeline.to(
+    quoteEl,
+    {
+      opacity: 1,
+      duration: 0.28,
+      ease: 'power2.out'
+    },
+    0.05
+  );
 
   // FASE 3 (2.8s – 4.3s): Fuego Azul ascendente, entramado floral de alta definición y lema legible durante 1.5s
   introTimeline.to(
@@ -610,10 +618,9 @@ export function playBlueRoseIntroCinematic() {
   introTimeline.to(
     quoteEl,
     {
-      opacity: 1,
-      y: 0,
-      duration: 0.65,
-      ease: 'power3.out'
+      scale: 1.03,
+      duration: 0.55,
+      ease: 'power2.out'
     },
     2.8
   );
@@ -694,7 +701,7 @@ export function initBlueRoseIntroEvents() {
 }
 
 /* ==========================================================================
-   Ambient Background Canvas: 24 Floating Kaiser Blue Rose Petals (3D Tumble + DoF)
+   Ambient Background Canvas: 26 Floating Kaiser Blue Rose Petals (3D Tumble + DoF)
    Auto-pauses on reduced-motion, hidden tab, opening intro, or print.
    ========================================================================== */
 let ambientRafId = null;
@@ -711,7 +718,7 @@ export function initAmbientBluePetalsCanvas() {
   if (!ctx) return;
 
   const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const PETAL_COUNT = 24;
+  const PETAL_COUNT = 26;
   let width = window.innerWidth || 1280;
   let height = window.innerHeight || 720;
 

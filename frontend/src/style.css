@@ -162,13 +162,9 @@ body {
 /* ==========================================================================
    Entry & Micro-interaction Animations
    ========================================================================== */
-@media (prefers-reduced-motion: no-preference) {
-  .fade-slide-up {
-    opacity: 0;
-    transform: translateY(12px);
-    animation: fadeSlideUp 0.42s var(--transition-smooth) forwards;
-    animation-delay: var(--delay, 0s);
-  }
+.fade-slide-up {
+  opacity: 1;
+  transform: none;
 }
 
 @keyframes fadeSlideUp {
@@ -370,7 +366,7 @@ body {
   font-weight: 600;
   letter-spacing: -0.015em;
   cursor: pointer;
-  transition: color 160ms var(--transition-smooth), background-color 160ms ease;
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .view-tab-btn:hover {
@@ -434,6 +430,8 @@ body {
 }
 
 .status-badge {
+  min-width: 194px;
+  justify-content: center;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -445,7 +443,7 @@ body {
   background: #030712;
   border: 1px solid rgba(56, 189, 248, 0.24);
   cursor: pointer;
-  transition: border-color 160ms var(--transition-smooth), background-color 160ms ease;
+  transition: opacity 160ms ease;
 }
 
 .status-badge:hover {
@@ -481,7 +479,7 @@ body {
   background: #111827;
   border: 1px solid rgba(244, 63, 94, 0.24);
   cursor: pointer;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .shutdown-btn:hover:not(:disabled) {
@@ -512,11 +510,7 @@ body {
   display: block;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .active-view {
-    animation: fadeSlideUp 0.28s var(--transition-smooth);
-  }
-}
+
 
 .assistant-layout {
   display: grid;
@@ -566,7 +560,7 @@ body {
   box-shadow:
     inset 0 1px 0 rgba(125, 211, 252, 0.16),
     0 18px 40px -18px rgba(2, 6, 23, 0.85);
-  transition: border-color 180ms var(--transition-smooth), box-shadow 200ms var(--transition-smooth);
+  transition: opacity 180ms ease;
 }
 
 .glass-card::before {
@@ -694,7 +688,7 @@ body {
   color: var(--text-primary);
   cursor: pointer;
   text-align: left;
-  transition: transform 160ms var(--transition-smooth), border-color 160ms ease, background 180ms ease, box-shadow 180ms ease;
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .modality-btn:hover {
@@ -783,8 +777,7 @@ body {
   grid-template-columns: 1fr 415px;
   gap: 20px;
   align-items: start;
-  transition: grid-template-columns 0.35s ease;
-}
+  }
 
 .board-layout.board-expanded {
   grid-template-columns: 1fr;
@@ -866,7 +859,7 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .board-mod-pill:hover {
@@ -895,7 +888,7 @@ body {
   line-height: 1.35;
   cursor: pointer;
   text-overflow: ellipsis;
-  transition: border-color 160ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 160ms ease;
   appearance: base-select;
   align-items: center;
   gap: 8px;
@@ -1054,7 +1047,7 @@ body {
   font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
-  transition: color 160ms ease, background-color 160ms ease;
+  transition: opacity 160ms ease;
 }
 
 .camera-seg-btn:hover {
@@ -1102,7 +1095,7 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .tv-view-toggle-btn:hover {
@@ -1169,7 +1162,7 @@ body {
     0 0 0 4px rgba(56, 189, 248, 0.06),
     0 24px 55px -16px rgba(2, 6, 23, 0.92),
     inset 0 0 46px rgba(0, 0, 0, 0.85);
-  transition: background 0.45s ease, border-color 0.35s ease;
+  transition: opacity 0.25s ease;
 }
 
 /* Broadcast Grass Surface (Fútbol 7 / 9 / 11) */
@@ -1267,12 +1260,8 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
-  transition:
-    filter 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.25s ease,
-    opacity 0.3s ease;
-  will-change: transform, filter;
+  transition: opacity 0.25s ease;
+  will-change: transform;
   user-select: none;
   cursor: pointer;
   z-index: 2;
@@ -1407,11 +1396,8 @@ body {
   font-size: 0.86rem;
   z-index: 6;
   pointer-events: none;
-  transition:
-    filter 0.3s ease,
-    box-shadow 0.3s ease,
-    opacity 0.25s ease;
-  will-change: transform, filter;
+  transition: opacity 0.25s ease;
+  will-change: transform;
 }
 
 .ball-token.is-moving {
@@ -1499,7 +1485,7 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .play-action-btn:hover {
@@ -1745,7 +1731,7 @@ body {
 .setpiece-steps-list li {
   padding: 5px 8px;
   border-radius: 6px;
-  transition: all 0.25s ease;
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .setpiece-steps-list li.active-step {
@@ -1773,7 +1759,7 @@ body {
   background: #060b18;
   border: 1px solid rgba(56, 189, 248, 0.16);
   border-left: 3px solid rgba(56, 189, 248, 0.45);
-  transition: border-color 180ms var(--transition-smooth), background-color 180ms ease;
+  transition: opacity 180ms ease;
 }
 
 .line-role-box.defense {
@@ -1868,7 +1854,7 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .ghost-mini-btn:hover {
@@ -1896,7 +1882,7 @@ body {
   cursor: pointer;
   overflow: hidden;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  transition: transform 160ms var(--transition-smooth), border-color 160ms ease, box-shadow 180ms ease;
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .btn-primary::after {
@@ -1950,7 +1936,7 @@ body {
   font-size: 0.78rem;
   letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 160ms var(--transition-smooth);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -1963,7 +1949,8 @@ body {
   content: '';
   position: absolute;
   top: 0;
-  left: -120%;
+  left: 0;
+  transform: translateX(-180%);
   width: 65%;
   height: 100%;
   background: linear-gradient(
@@ -1972,11 +1959,11 @@ body {
     rgba(255, 255, 255, 0.18),
     transparent
   );
-  transition: left 0.55s ease;
+  transition: transform 0.55s ease;
 }
 
 .shimmer-btn:hover:not(:disabled)::before {
-  left: 130%;
+  transform: translateX(260%);
 }
 
 /* ==========================================================================
@@ -2158,7 +2145,7 @@ body {
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+  transition: opacity 160ms ease;
 }
 
 .scenario-mini-btn:hover {
@@ -2210,7 +2197,7 @@ body {
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+  transition: opacity 150ms ease;
 }
 
 .copy-msg-btn:hover {
@@ -2232,7 +2219,7 @@ body {
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
-  transition: transform 160ms var(--transition-smooth), border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .prompt-chip::before {
@@ -2431,7 +2418,7 @@ body {
   font-size: 0.73rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .play-on-board-btn:hover {
@@ -2496,7 +2483,7 @@ body {
   background: #030712;
   border: 1px solid rgba(56, 189, 248, 0.24);
   box-shadow: inset 0 2px 6px rgba(2, 6, 23, 0.7);
-  transition: border-color 160ms var(--transition-smooth), box-shadow 180ms var(--transition-smooth);
+  transition: opacity 160ms ease;
 }
 
 .input-wrapper:focus-within {
@@ -2584,10 +2571,11 @@ body {
 /* ==========================================================================
    5. Tab 3: Tu Propia Plantilla (Squad Builder + Pitch + Top 100 Comparison)
    ========================================================================== */
-.squad-layout {
+.squad-layout,
+.squad-workspace-grid {
   display: grid;
-  grid-template-columns: 345px minmax(460px, 1fr) 360px;
-  gap: 20px;
+  grid-template-columns: minmax(300px, 330px) minmax(460px, 1fr) minmax(330px, 370px);
+  gap: 16px;
   align-items: start;
 }
 
@@ -2595,6 +2583,13 @@ body {
 .squad-center-panel,
 .squad-right-panel {
   min-width: 0;
+}
+
+.squad-right-panel,
+.crack-comparison-card,
+.crack-comparison-content {
+  min-width: 0;
+  overflow: visible;
 }
 
 .squad-center-panel {
@@ -2649,7 +2644,7 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.16);
   color: #f1f5f9;
   font-size: 0.83rem;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .form-field input[type='number'] {
@@ -2745,7 +2740,7 @@ body {
   background: #e0f2fe;
   border: 2px solid #0284c7;
   box-shadow: 0 2px 6px rgba(2, 6, 23, 0.65);
-  transition: transform 0.14s ease, border-color 0.14s ease;
+  transition: transform 0.14s ease;
 }
 
 .slider-item input[type='range']::-moz-range-thumb {
@@ -2755,7 +2750,7 @@ body {
   background: #e0f2fe;
   border: 2px solid #0284c7;
   box-shadow: 0 2px 6px rgba(2, 6, 23, 0.65);
-  transition: transform 0.14s ease, border-color 0.14s ease;
+  transition: transform 0.14s ease;
 }
 
 .slider-item input[type='range']:hover::-webkit-slider-thumb {
@@ -2790,7 +2785,7 @@ body {
   background: #111827;
   border: 1px solid rgba(148, 163, 184, 0.16);
   cursor: pointer;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .roster-player-item:hover,
@@ -3065,7 +3060,7 @@ body {
   border-radius: 8px;
   background: #111827;
   border: 1px dashed rgba(148, 163, 184, 0.24);
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .bench-section.drag-over-bench {
@@ -3153,7 +3148,7 @@ body {
   font-size: 0.76rem;
   cursor: pointer;
   user-select: none;
-  transition: all 160ms var(--transition-smooth);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .bench-player-chip:hover,
@@ -3487,9 +3482,9 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transform-style: preserve-3d;
   perspective: 1000px;
-  overflow: hidden;
+  overflow: visible;
   will-change: transform;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -3518,9 +3513,10 @@ body {
 
 .duel-cards-grid {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
   align-items: stretch;
-  gap: 9px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .duel-fighter-col {
@@ -3593,10 +3589,11 @@ body {
 
 .duel-fighter-col .comp-player-name,
 .duel-fighter-col .crack-name {
-  font-size: 0.92rem;
-  line-height: 1.28;
-  word-break: normal;
+  font-size: clamp(0.82rem, 1vw, 0.95rem);
+  line-height: 1.24;
+  word-break: break-word;
   overflow-wrap: break-word;
+  max-width: 100%;
   hyphens: none;
 }
 
@@ -3612,7 +3609,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 0 2px;
+  min-width: 0;
+  padding: 0;
+  position: relative;
+  z-index: 5;
 }
 
 .duel-vs-medallion {
@@ -3633,9 +3633,12 @@ body {
 .duel-similarity-pill {
   font-family: 'JetBrains Mono', monospace;
   font-variant-numeric: tabular-nums;
-  font-size: 0.68rem;
-  padding: 3px 8px;
-  white-space: nowrap;
+  font-size: 0.61rem;
+  line-height: 1.15;
+  padding: 3px 4px;
+  max-width: 60px;
+  text-align: center;
+  white-space: normal;
   background: rgba(16, 185, 129, 0.14);
   border-color: rgba(52, 211, 153, 0.42);
   color: #6ee7b7;
@@ -3765,7 +3768,7 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+  transition: opacity 150ms ease;
 }
 
 .freehand-color-btn.active {
@@ -4067,7 +4070,7 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 160ms var(--transition-smooth);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .skip-intro-rose-btn:hover {
@@ -4087,7 +4090,7 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.16);
   color: #38bdf8;
   cursor: pointer;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 160ms var(--transition-smooth), opacity 160ms ease;
 }
 
 .replay-rose-btn:hover {
@@ -4194,7 +4197,7 @@ dialog.tactical-dialog[open]::backdrop {
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: filter 150ms ease, transform 150ms ease;
+  transition: transform 150ms ease, opacity 150ms ease;
 }
 
 .btn-danger-solid:hover {
@@ -4213,24 +4216,36 @@ dialog.tactical-dialog[open]::backdrop {
 }
 
 /* Multi-level Responsive Breakpoints */
-@media (max-width: 1360px) {
+@media (max-width: 1260px) {
   .topbar {
     padding: 10px 18px;
   }
 
-  .squad-layout {
-    grid-template-columns: 320px 1fr;
+  .squad-layout,
+  .squad-workspace-grid {
+    grid-template-columns: minmax(420px, 1.15fr) minmax(320px, 0.85fr);
+    gap: 16px;
+  }
+
+  .squad-center-panel {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .squad-right-panel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .squad-left-panel {
     grid-column: 1 / -1;
+    grid-row: 2;
   }
 }
 
 @media (max-width: 1024px) {
   .assistant-layout,
-  .board-layout,
-  .squad-layout {
+  .board-layout {
     grid-template-columns: 1fr;
   }
 
@@ -4241,6 +4256,20 @@ dialog.tactical-dialog[open]::backdrop {
   .chat-card {
     height: clamp(480px, 72dvh, 640px);
     min-height: 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .squad-layout,
+  .squad-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .squad-left-panel,
+  .squad-center-panel,
+  .squad-right-panel {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 
@@ -4558,8 +4587,7 @@ dialog.tactical-dialog[open]::backdrop {
   width: 156px;
   height: 156px;
   opacity: 0.72;
-  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.28));
-  transition: opacity 240ms ease, filter 260ms ease;
+  transition: opacity 240ms ease, transform 240ms var(--transition-smooth);
 }
 
 .kaiser-vine-corner.tl {
@@ -4573,46 +4601,43 @@ dialog.tactical-dialog[open]::backdrop {
   transform: rotate(180deg);
 }
 
-.kaiser-vine-nerve {
-  stroke-dasharray: 22 100;
-  stroke-dashoffset: 124;
+/* Pulso nervioso cian 100% compositado en GPU (transform + opacity, solo propiedades compositadas GPU) */
+.kaiser-vine-pulse {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.36) 0%, rgba(56, 189, 248, 0.14) 42%, transparent 70%);
   opacity: 0;
-  filter: drop-shadow(0 0 6px #00f0ff);
+  transform: translate3d(-40px, 40px, 0) scale(0.45);
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
-.kaiser-vine-nerve.nerve-alt {
-  stroke-dasharray: 16 100;
-  stroke-dashoffset: 118;
-}
-
-@keyframes kaiserVineNerveSurge {
+@keyframes kaiserVinePulseGpu {
   0% {
-    stroke-dashoffset: 124;
-    opacity: 0.96;
+    opacity: 0;
+    transform: translate3d(-36px, 36px, 0) scale(0.45);
   }
-  70% {
-    opacity: 0.92;
+  30% {
+    opacity: 0.85;
   }
   100% {
-    stroke-dashoffset: -24;
     opacity: 0;
+    transform: translate3d(52px, -34px, 0) scale(1.22);
   }
 }
 
 .glass-card:hover .kaiser-vine-corner {
-  opacity: 0.98;
-  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.45));
+  opacity: 0.96;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .glass-card:hover .kaiser-vine-nerve,
-  .glass-card.vine-surge .kaiser-vine-nerve {
-    animation: kaiserVineNerveSurge 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  .glass-card:hover .kaiser-vine-nerve.nerve-alt,
-  .glass-card.vine-surge .kaiser-vine-nerve.nerve-alt {
-    animation-delay: 0.14s;
+  .glass-card:hover .kaiser-vine-pulse,
+  .glass-card.vine-surge .kaiser-vine-pulse {
+    animation: kaiserVinePulseGpu 0.95s var(--transition-smooth) forwards;
   }
 }
 
@@ -4655,7 +4680,6 @@ dialog.tactical-dialog[open]::backdrop {
 .chat-metavision-watermark svg {
   width: min(310px, 72%);
   height: auto;
-  filter: drop-shadow(0 0 22px rgba(0, 240, 255, 0.45));
 }
 
 .chat-messages-stage .chat-messages {
@@ -4698,20 +4722,28 @@ dialog.tactical-dialog[open]::backdrop {
   }
 }
 
-@keyframes kaiserCtaAuraPulse {
-  0%,
+@keyframes kaiserCtaRingGpu {
+  0% {
+    opacity: 0.72;
+    transform: scale(0.96);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.06, 1.24);
+  }
   100% {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.22),
-      0 0 0 0 rgba(0, 240, 255, 0.45),
-      0 6px 20px -4px rgba(29, 78, 216, 0.55);
+    opacity: 0;
+    transform: scale(1.06, 1.24);
   }
-  50% {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.34),
-      0 0 0 5px rgba(0, 240, 255, 0),
-      0 8px 26px -2px rgba(0, 240, 255, 0.42);
-  }
+}
+
+.kaiser-cta-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 2px solid #00f0ff;
+  pointer-events: none;
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -4719,8 +4751,8 @@ dialog.tactical-dialog[open]::backdrop {
     animation: kaiserBorderScan 1.1s var(--transition-smooth) 1;
   }
 
-  #generate-ideal-squad-btn:not(:disabled) {
-    animation: kaiserCtaAuraPulse 2.6s ease-in-out infinite;
+  #generate-ideal-squad-btn:not(:disabled) .kaiser-cta-ring {
+    animation: kaiserCtaRingGpu 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
   }
 }
 
@@ -4895,7 +4927,7 @@ dialog.tactical-dialog[open]::backdrop {
   will-change: transform;
   clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 22px), calc(100% - 22px) 100%, 22px 100%, 0 calc(100% - 22px), 0 16px);
   filter: drop-shadow(0 10px 20px rgba(2, 6, 23, 0.8));
-  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), filter 200ms ease;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .duel-shield-frame.user-shield {
@@ -5084,6 +5116,61 @@ dialog.tactical-dialog[open]::backdrop {
   color: var(--gold-imperial);
 }
 
+
+/* ==========================================================================
+   Enredaderas Espinosas Laterales de Marco Completo (>= 1380px) & Corona Logo
+   ========================================================================== */
+.app-shell {
+  position: relative;
+  z-index: 2;
+}
+
+.kaiser-viewport-vines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.viewport-vine-side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(92px, 11.5vw, 220px);
+  height: 100%;
+  opacity: 0.78;
+}
+
+.viewport-vine-left {
+  left: 0;
+}
+
+.viewport-vine-right {
+  right: 0;
+}
+
+@media (max-width: 1379px) {
+  .kaiser-viewport-vines {
+    display: none !important;
+  }
+}
+
+.brand-logo {
+  overflow: visible;
+}
+
+.brand-logo svg.brand-imperial-crown {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  width: 18px;
+  height: 14px;
+  transform: rotate(14deg);
+  pointer-events: none;
+  z-index: 3;
+}
+
 /* Reduced Motion Respect (targeted per-rule — no global animation-duration reset) */
 @media (prefers-reduced-motion: reduce) {
   #kaiser-ambient-petals,
@@ -5098,8 +5185,8 @@ dialog.tactical-dialog[open]::backdrop {
   .fade-slide-up,
   .active-view,
   .active-view .glass-card::before,
-  .glass-card:hover .kaiser-vine-nerve,
-  .glass-card.vine-surge .kaiser-vine-nerve,
+  .glass-card:hover .kaiser-vine-pulse,
+  .glass-card.vine-surge .kaiser-vine-pulse,
   .player-token.active-actor::before,
   .player-token.squad-token.selected-token::before,
   .tactical-pitch .player-token:hover::before,
@@ -5107,7 +5194,7 @@ dialog.tactical-dialog[open]::backdrop {
   .radar-mv-ring-outer,
   .radar-mv-ring-mid,
   .radar-mv-ring-inner,
-  #generate-ideal-squad-btn {
+  #generate-ideal-squad-btn .kaiser-cta-ring {
     animation: none !important;
   }
 
@@ -5123,6 +5210,7 @@ dialog.tactical-dialog[open]::backdrop {
     background-image: none;
   }
 
+  .kaiser-viewport-vines,
   .kaiser-card-vines,
   .chat-metavision-watermark,
   .duel-engraved-vines,

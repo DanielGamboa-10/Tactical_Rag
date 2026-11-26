@@ -96,9 +96,12 @@ export function setModality(newModality, playersTag = null) {
 }
 
 function scrollToBottom() {
-  dom.chatMessages.scrollTo({
-    top: dom.chatMessages.scrollHeight,
-    behavior: 'smooth'
+  if (!dom.chatMessages) return;
+  requestAnimationFrame(() => {
+    dom.chatMessages.scrollTo({
+      top: dom.chatMessages.scrollHeight,
+      behavior: 'smooth'
+    });
   });
 }
 
