@@ -88,38 +88,47 @@ function drawSculptedRosePetalOnCanvas(ctx, x, y, size, rotation, palette, alpha
 
   const grad = ctx.createLinearGradient(0, size, 0, -size);
   grad.addColorStop(0, palette.base);
-  grad.addColorStop(0.55, palette.mid);
+  grad.addColorStop(0.5, palette.mid);
   grad.addColorStop(1, palette.rim);
 
   ctx.fillStyle = grad;
-  ctx.strokeStyle = palette.rim;
-  ctx.lineWidth = 1.3;
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.78)';
+  ctx.lineWidth = 1.45;
   ctx.shadowColor = palette.glow;
-  ctx.shadowBlur = 9;
+  ctx.shadowBlur = 10;
 
   // Silueta esculpida de pétalo de rosa con pico superior angular y pliegue lateral
   ctx.beginPath();
-  ctx.moveTo(0, -size * 1.05);
-  ctx.lineTo(size * 0.52, -size * 0.68);
-  ctx.quadraticCurveTo(size * 0.92, -size * 0.1, size * 0.54, size * 0.58);
-  ctx.lineTo(0, size * 0.98);
-  ctx.lineTo(-size * 0.54, size * 0.58);
-  ctx.quadraticCurveTo(-size * 0.92, -size * 0.1, -size * 0.52, -size * 0.68);
+  ctx.moveTo(0, -size * 1.08);
+  ctx.lineTo(size * 0.54, -size * 0.68);
+  ctx.quadraticCurveTo(size * 0.94, -size * 0.08, size * 0.54, size * 0.6);
+  ctx.lineTo(0, size * 1.0);
+  ctx.lineTo(-size * 0.54, size * 0.6);
+  ctx.quadraticCurveTo(-size * 0.94, -size * 0.08, -size * 0.54, -size * 0.68);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
 
-  // Nervadura central y pliegue interior en tinta oscura / luz cian
+  // Filo interior translúcido cian eléctrico en el borde superior del pétalo
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = 'rgba(224, 242, 254, 0.55)';
+  ctx.strokeStyle = 'rgba(224, 242, 254, 0.44)';
   ctx.lineWidth = 0.85;
   ctx.beginPath();
-  ctx.moveTo(0, -size * 0.78);
-  ctx.quadraticCurveTo(size * 0.12, 0, 0, size * 0.72);
-  ctx.moveTo(0, -size * 0.25);
-  ctx.lineTo(size * 0.34, -size * 0.46);
-  ctx.moveTo(0, 0.05);
-  ctx.lineTo(-size * 0.34, -size * 0.2);
+  ctx.moveTo(-size * 0.46, -size * 0.58);
+  ctx.lineTo(0, -size * 0.96);
+  ctx.lineTo(size * 0.46, -size * 0.58);
+  ctx.stroke();
+
+  // Nervadura central y pliegues laterales definidos
+  ctx.strokeStyle = 'rgba(186, 230, 253, 0.68)';
+  ctx.lineWidth = 0.9;
+  ctx.beginPath();
+  ctx.moveTo(0, -size * 0.82);
+  ctx.quadraticCurveTo(size * 0.12, 0, 0, size * 0.76);
+  ctx.moveTo(0, -size * 0.28);
+  ctx.lineTo(size * 0.36, -size * 0.48);
+  ctx.moveTo(0, 0.04);
+  ctx.lineTo(-size * 0.36, -size * 0.22);
   ctx.stroke();
 
   ctx.restore();
@@ -685,7 +694,7 @@ export function initBlueRoseIntroEvents() {
 }
 
 /* ==========================================================================
-   Ambient Background Canvas: 22 Floating Kaiser Blue Rose Petals (3D Tumble + DoF)
+   Ambient Background Canvas: 24 Floating Kaiser Blue Rose Petals (3D Tumble + DoF)
    Auto-pauses on reduced-motion, hidden tab, opening intro, or print.
    ========================================================================== */
 let ambientRafId = null;
@@ -702,7 +711,7 @@ export function initAmbientBluePetalsCanvas() {
   if (!ctx) return;
 
   const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const PETAL_COUNT = 22;
+  const PETAL_COUNT = 24;
   let width = window.innerWidth || 1280;
   let height = window.innerHeight || 720;
 
@@ -717,22 +726,22 @@ export function initAmbientBluePetalsCanvas() {
   // 3 depth-of-field tiers: 0 = far/soft, 1 = mid-field, 2 = crisp foreground cobalt/cyan
   const petals = Array.from({ length: PETAL_COUNT }, (_, i) => {
     const depthTier = i % 3;
-    const depthScale = depthTier === 0 ? 0.56 : depthTier === 1 ? 0.86 : 1.18;
+    const depthScale = depthTier === 0 ? 0.54 : depthTier === 1 ? 0.9 : 1.26;
     return {
       x: Math.random() * width,
       y: Math.random() * height,
       depthTier,
       depthScale,
-      size: (8.5 + Math.random() * 6.5) * depthScale,
-      vx: -0.14 - depthScale * 0.16,
-      vy: 0.22 + depthScale * 0.34,
+      size: (9 + Math.random() * 6.5) * depthScale,
+      vx: -0.15 - depthScale * 0.17,
+      vy: 0.24 + depthScale * 0.34,
       angle: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.014,
+      spin: (Math.random() - 0.5) * 0.015,
       tumble: Math.random() * Math.PI * 2,
-      tumbleSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.014 + depthScale * 0.012),
+      tumbleSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.015 + depthScale * 0.012),
       swayPhase: Math.random() * Math.PI * 2,
-      swayAmp: 0.24 + depthScale * 0.32,
-      alpha: depthTier === 0 ? 0.14 : depthTier === 1 ? 0.23 : 0.34,
+      swayAmp: 0.26 + depthScale * 0.34,
+      alpha: depthTier === 0 ? 0.17 : depthTier === 1 ? 0.27 : 0.38,
       palette: PETAL_COLORS[i % PETAL_COLORS.length]
     };
   });

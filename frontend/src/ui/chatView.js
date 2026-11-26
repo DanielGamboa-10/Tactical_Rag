@@ -10,6 +10,7 @@ import {
   escapeHtml,
   showToast,
   switchTab,
+  triggerKaiserImpactShockwave,
   FORMATIONS_BY_MODALITY,
   getActiveFormationSetup
 } from '../store/tacticalStore.js';
@@ -429,6 +430,8 @@ export async function sendChatMessage(messageText) {
   state.isSendingChat = true;
   dom.sendChatBtn.disabled = true;
   dom.chatInput.value = '';
+
+  triggerKaiserImpactShockwave(dom.sendChatBtn, dom.chatMessagesStage || dom.chatMessages?.parentElement);
 
   appendUserMessage(cleanMessage, state.modality, activeSetup.code, state.playStyle);
   showTypingIndicator();

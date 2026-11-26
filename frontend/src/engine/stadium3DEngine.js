@@ -424,47 +424,59 @@ function buildHoloFootAura3D(isFeatured = false) {
   const auraGroup = new THREE.Group();
   auraGroup.position.y = 0.06;
 
-  // Anillo interior fino de Metavision
-  const innerGeo = new THREE.RingGeometry(1.36, 1.44, 40);
+  // Doble anillo interior fino de Metavision
+  const innerGeo = new THREE.RingGeometry(1.26, 1.35, 40);
   innerGeo.rotateX(-Math.PI / 2);
   const innerMat = new THREE.MeshBasicMaterial({
     color: 0x38bdf8,
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: 0.72,
+    opacity: 0.8,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
   auraGroup.add(new THREE.Mesh(innerGeo, innerMat));
+
+  const corePulseGeo = new THREE.RingGeometry(1.44, 1.5, 40);
+  corePulseGeo.rotateX(-Math.PI / 2);
+  const corePulseMat = new THREE.MeshBasicMaterial({
+    color: 0xe0f2fe,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.56,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  auraGroup.add(new THREE.Mesh(corePulseGeo, corePulseMat));
 
   // 4 arcos segmentados exteriores cian eléctrico (rotan en tiempo real)
   const segMat = new THREE.MeshBasicMaterial({
     color: 0x00f0ff,
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: 0.94,
+    opacity: 0.98,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
   for (let i = 0; i < 4; i++) {
-    const startAngle = i * (Math.PI / 2) + 0.14;
-    const arcGeo = new THREE.RingGeometry(1.56, 1.76, 14, 1, startAngle, Math.PI * 0.34);
+    const startAngle = i * (Math.PI / 2) + 0.12;
+    const arcGeo = new THREE.RingGeometry(1.62, 1.88, 16, 1, startAngle, Math.PI * 0.36);
     arcGeo.rotateX(-Math.PI / 2);
     auraGroup.add(new THREE.Mesh(arcGeo, segMat));
   }
 
   // 4 marcas cardinales luminosas de mira óptica
   const tickMat = new THREE.MeshBasicMaterial({
-    color: 0xe0f2fe,
+    color: 0xffffff,
     transparent: true,
-    opacity: 0.92,
+    opacity: 0.95,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
-  const tickGeo = new THREE.BoxGeometry(0.42, 0.03, 0.08);
+  const tickGeo = new THREE.BoxGeometry(0.52, 0.035, 0.095);
   [0, Math.PI / 2, Math.PI, (Math.PI * 3) / 2].forEach((angle) => {
     const tick = new THREE.Mesh(tickGeo, tickMat);
-    const radius = 1.92;
+    const radius = 2.06;
     tick.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
     tick.rotation.y = -angle;
     auraGroup.add(tick);
@@ -1213,7 +1225,7 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
     new THREE.Vector3(x2, 0.56, z2)
   );
 
-  const outerGeo = new THREE.TubeGeometry(curve3D, 44, isShot ? 0.19 : 0.13, 8, false);
+  const outerGeo = new THREE.TubeGeometry(curve3D, 48, isShot ? 0.24 : 0.16, 10, false);
   const outerMat = new THREE.MeshBasicMaterial({
     color: 0x00f0ff,
     transparent: true,
@@ -1221,9 +1233,9 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
-  const coreGeo = new THREE.TubeGeometry(curve3D, 44, isShot ? 0.068 : 0.045, 6, false);
+  const coreGeo = new THREE.TubeGeometry(curve3D, 48, isShot ? 0.085 : 0.056, 8, false);
   const coreMat = new THREE.MeshBasicMaterial({
-    color: 0xe0f2fe,
+    color: 0xffffff,
     transparent: true,
     opacity: 0,
     blending: THREE.AdditiveBlending,
@@ -1240,12 +1252,12 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
   const flightProxy = { t: 0 };
   activeStepTimeline = gsap.timeline();
 
-  // Tiempo 2 (t = 0.22s): El balón sale con rastro Kaiser Impact y destello radial en recepción
+  // Tiempo 2 (t = 0.22s): El balón sale con rastro afilado Kaiser Impact cian-blanco y destello radial en recepción
   activeStepTimeline.to(
     [outerMat, coreMat],
     {
-      opacity: (i) => (i === 0 ? 0.78 : 0.96),
-      duration: 0.24,
+      opacity: (i) => (i === 0 ? 0.9 : 1),
+      duration: 0.2,
       ease: 'sine.out'
     },
     0.2

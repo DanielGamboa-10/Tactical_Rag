@@ -4503,10 +4503,19 @@ dialog.tactical-dialog[open]::backdrop {
   z-index: 1;
 }
 
+.topbar-imperial-emblem {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding-inline-end: 4px;
+  border-inline-end: 1px solid rgba(234, 179, 8, 0.35);
+}
+
+/* ==========================================================================
+   Enredaderas Espinosas Vectoriales + Brotes Rosa Azul + Pulso Nervioso Cian
+   ========================================================================== */
 .glass-card {
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96' fill='none'%3E%3Cpath d='M3 80 C7 52 19 26 48 12 C62 6 76 5 90 7' stroke='%231d4ed8' stroke-width='2.1' stroke-opacity='0.82' stroke-linecap='round'/%3E%3Cpath d='M8 62 C14 38 28 22 58 12' stroke='%2338bdf8' stroke-width='1.15' stroke-opacity='0.72' stroke-linecap='round'/%3E%3Cpath d='M10 56 L1 47 L13 49 Z M21 34 L14 23 L26 28 Z M39 17 L36 6 L46 13 Z M64 9 L66 1 L72 9 Z M25 44 L34 49 L27 39 Z M48 21 L57 27 L49 17 Z' fill='%2338bdf8' fill-opacity='0.78'/%3E%3Ccircle cx='7' cy='7' r='2.2' fill='%2300f0ff' fill-opacity='0.92'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96' fill='none'%3E%3Cg transform='rotate(180 48 48)'%3E%3Cpath d='M3 80 C7 52 19 26 48 12 C62 6 76 5 90 7' stroke='%231d4ed8' stroke-width='2.1' stroke-opacity='0.82' stroke-linecap='round'/%3E%3Cpath d='M8 62 C14 38 28 22 58 12' stroke='%2338bdf8' stroke-width='1.15' stroke-opacity='0.72' stroke-linecap='round'/%3E%3Cpath d='M10 56 L1 47 L13 49 Z M21 34 L14 23 L26 28 Z M39 17 L36 6 L46 13 Z M64 9 L66 1 L72 9 Z M25 44 L34 49 L27 39 Z M48 21 L57 27 L49 17 Z' fill='%2338bdf8' fill-opacity='0.78'/%3E%3Ccircle cx='7' cy='7' r='2.2' fill='%2300f0ff' fill-opacity='0.92'/%3E%3C/g%3E%3C/svg%3E"),
     linear-gradient(to right, rgba(0, 240, 255, 0.78), rgba(0, 240, 255, 0.78)),
     linear-gradient(to bottom, rgba(0, 240, 255, 0.78), rgba(0, 240, 255, 0.78)),
     linear-gradient(to left, rgba(0, 240, 255, 0.78), rgba(0, 240, 255, 0.78)),
@@ -4517,21 +4526,94 @@ dialog.tactical-dialog[open]::backdrop {
     linear-gradient(to top, rgba(56, 189, 248, 0.48), rgba(56, 189, 248, 0.48)),
     linear-gradient(180deg var(--in-oklab), rgba(29, 78, 216, 0.1), transparent 32%);
   background-position:
-    0 0,
-    100% 100%,
     0 0, 0 0,
     100% 0, 100% 0,
     0 100%, 0 100%,
     100% 100%, 100% 100%,
     0 0;
   background-size:
-    92px 92px,
-    92px 92px,
     18px 2px, 2px 18px,
     18px 2px, 2px 18px,
     14px 1.5px, 1.5px 14px,
     14px 1.5px, 1.5px 14px,
     100% 100%;
+}
+
+.glass-card > :not(.kaiser-card-vines) {
+  position: relative;
+  z-index: 2;
+}
+
+.kaiser-card-vines {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.kaiser-vine-corner {
+  position: absolute;
+  width: 156px;
+  height: 156px;
+  opacity: 0.72;
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.28));
+  transition: opacity 240ms ease, filter 260ms ease;
+}
+
+.kaiser-vine-corner.tl {
+  top: -2px;
+  left: -2px;
+}
+
+.kaiser-vine-corner.br {
+  right: -2px;
+  bottom: -2px;
+  transform: rotate(180deg);
+}
+
+.kaiser-vine-nerve {
+  stroke-dasharray: 22 100;
+  stroke-dashoffset: 124;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px #00f0ff);
+}
+
+.kaiser-vine-nerve.nerve-alt {
+  stroke-dasharray: 16 100;
+  stroke-dashoffset: 118;
+}
+
+@keyframes kaiserVineNerveSurge {
+  0% {
+    stroke-dashoffset: 124;
+    opacity: 0.96;
+  }
+  70% {
+    opacity: 0.92;
+  }
+  100% {
+    stroke-dashoffset: -24;
+    opacity: 0;
+  }
+}
+
+.glass-card:hover .kaiser-vine-corner {
+  opacity: 0.98;
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.45));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glass-card:hover .kaiser-vine-nerve,
+  .glass-card.vine-surge .kaiser-vine-nerve {
+    animation: kaiserVineNerveSurge 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .glass-card:hover .kaiser-vine-nerve.nerve-alt,
+  .glass-card.vine-surge .kaiser-vine-nerve.nerve-alt {
+    animation-delay: 0.14s;
+  }
 }
 
 .glass-card:hover {
@@ -4545,6 +4627,42 @@ dialog.tactical-dialog[open]::backdrop {
 .glass-card:hover::before {
   opacity: 1;
   background: linear-gradient(90deg, transparent, #38bdf8, #00f0ff, #38bdf8, transparent);
+}
+
+/* ==========================================================================
+   Asistente RAG: Marca de Agua Fija Metavision + Rosa Azul Coronada (0.06)
+   ========================================================================== */
+.chat-messages-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-metavision-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0.06;
+  z-index: 0;
+}
+
+.chat-metavision-watermark svg {
+  width: min(310px, 72%);
+  height: auto;
+  filter: drop-shadow(0 0 22px rgba(0, 240, 255, 0.45));
+}
+
+.chat-messages-stage .chat-messages {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  background: transparent;
 }
 
 @keyframes kaiserBorderScan {
@@ -4606,6 +4724,39 @@ dialog.tactical-dialog[open]::backdrop {
   }
 }
 
+/* Ondas de Choque Lineales "Kaiser Impact" en Acciones Principales */
+.btn-primary,
+.play-action-btn,
+.ideal-squad-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.kaiser-btn-linear-shockwave {
+  position: absolute;
+  inset-block: -2px;
+  left: 0;
+  width: 68%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 240, 255, 0.52) 45%, #ffffff 55%, rgba(0, 240, 255, 0.6) 65%, transparent 100%);
+  mix-blend-mode: screen;
+  transform: skewX(-24deg);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.kaiser-stage-linear-shockwave {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 36%;
+  background: linear-gradient(90deg, transparent 0%, rgba(29, 78, 216, 0.14) 24%, rgba(0, 240, 255, 0.48) 50%, rgba(255, 255, 255, 0.56) 54%, rgba(0, 240, 255, 0.18) 76%, transparent 100%);
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.48);
+  mix-blend-mode: screen;
+  transform: skewX(-18deg);
+  pointer-events: none;
+  z-index: 9;
+}
+
 /* Metavision Segmented Scan Ring on Active / Selected / Hovered Player Tokens */
 .player-token.active-actor::before,
 .player-token.squad-token.selected-token::before,
@@ -4613,20 +4764,20 @@ dialog.tactical-dialog[open]::backdrop {
 .tactical-pitch .player-token:focus-visible::before {
   content: '';
   position: absolute;
-  inset: -11px;
+  inset: -12px;
   border-radius: 50%;
   border: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'%3E%3Ccircle cx='32' cy='32' r='27' stroke='%2300f0ff' stroke-width='1.8' stroke-dasharray='11 6 4 6' stroke-opacity='0.94'/%3E%3Ccircle cx='32' cy='32' r='22' stroke='%2338bdf8' stroke-width='1' stroke-dasharray='6 5' stroke-opacity='0.65'/%3E%3Cpath d='M32 1 V7 M32 57 V63 M1 32 H7 M57 32 H63' stroke='%23e0f2fe' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'%3E%3Ccircle cx='32' cy='32' r='28' stroke='%2300f0ff' stroke-width='2' stroke-dasharray='11 5 4 5' stroke-opacity='0.96'/%3E%3Ccircle cx='32' cy='32' r='22.5' stroke='%2338bdf8' stroke-width='1.1' stroke-dasharray='6 4' stroke-opacity='0.78'/%3E%3Cpath d='M32 0.5 V7.5 M32 56.5 V63.5 M0.5 32 H7.5 M56.5 32 H63.5' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   pointer-events: none;
-  opacity: 0.96;
-  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.85));
+  opacity: 0.98;
+  filter: drop-shadow(0 0 7px rgba(0, 240, 255, 0.92));
 }
 
 .tactical-pitch .player-token:hover::before {
-  opacity: 0.72;
+  opacity: 0.78;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -4634,47 +4785,47 @@ dialog.tactical-dialog[open]::backdrop {
   .player-token.squad-token.selected-token::before,
   .tactical-pitch .player-token:hover::before,
   .tactical-pitch .player-token:focus-visible::before {
-    animation: metavisionRingSpin 7.2s linear infinite;
+    animation: metavisionRingSpin 6.4s linear infinite;
   }
 }
 
 /* Kaiser Impact Ball Trail (#00f0ff Electric Blade + White Plasma Core) & Arrival Shockwave */
 .bezier-motion-trail.kaiser-impact-trail {
   stroke: #00f0ff;
-  stroke-width: 4.2;
+  stroke-width: 4.8;
   filter:
-    drop-shadow(0 0 4px #ffffff)
-    drop-shadow(0 0 11px rgba(0, 240, 255, 0.98));
+    drop-shadow(0 0 5px #ffffff)
+    drop-shadow(0 0 14px rgba(0, 240, 255, 1));
 }
 
 .bezier-motion-trail.kaiser-impact-core {
   stroke: #ffffff;
-  stroke-width: 1.5;
-  filter: drop-shadow(0 0 4px rgba(224, 242, 254, 0.96));
+  stroke-width: 1.75;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.98));
 }
 
 .ball-token.kaiser-impact-active {
-  background: radial-gradient(circle, #ffffff 34%, #00f0ff 76%, #1d4ed8 100%);
+  background: radial-gradient(circle, #ffffff 38%, #00f0ff 78%, #1d4ed8 100%);
   box-shadow:
-    -14px 0 24px rgba(0, 240, 255, 0.98),
-    -28px 0 36px rgba(29, 78, 216, 0.88),
-    0 0 20px rgba(224, 242, 254, 0.98);
+    -16px 0 26px rgba(0, 240, 255, 0.98),
+    -32px 0 40px rgba(29, 78, 216, 0.92),
+    0 0 22px rgba(255, 255, 255, 0.98);
 }
 
 .kaiser-impact-shockwave {
   position: absolute;
   top: 0;
   left: 0;
-  width: 52px;
-  height: 52px;
-  margin-left: -26px;
-  margin-top: -26px;
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  margin-top: -28px;
   border-radius: 50%;
-  border: 2.2px solid #00f0ff;
-  background: radial-gradient(circle, rgba(224, 242, 254, 0.82) 0%, rgba(0, 240, 255, 0.42) 38%, rgba(29, 78, 216, 0.14) 68%, transparent 74%);
+  border: 2.4px solid #00f0ff;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.88) 0%, rgba(0, 240, 255, 0.48) 38%, rgba(29, 78, 216, 0.16) 68%, transparent 74%);
   box-shadow:
-    0 0 18px rgba(0, 240, 255, 0.95),
-    inset 0 0 12px rgba(255, 255, 255, 0.85);
+    0 0 20px rgba(0, 240, 255, 0.98),
+    inset 0 0 14px rgba(255, 255, 255, 0.9);
   pointer-events: none;
   z-index: 7;
   will-change: transform, opacity;
@@ -4684,8 +4835,8 @@ dialog.tactical-dialog[open]::backdrop {
 .player-token.squad-token.selected-token {
   box-shadow:
     0 0 0 2px #04070f,
-    0 0 0 4px rgba(0, 240, 255, 0.82),
-    0 0 22px rgba(0, 240, 255, 0.85);
+    0 0 0 4px rgba(0, 240, 255, 0.86),
+    0 0 24px rgba(0, 240, 255, 0.88);
 }
 
 /* Imperial Kaiser Crown + Blue Rose Emblem on Synergy Global (> 85%) */
@@ -4730,22 +4881,76 @@ dialog.tactical-dialog[open]::backdrop {
   filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.55));
 }
 
-/* Dual Fighter Holographic 3D Cards + SVG Watermarks */
+/* ==========================================================================
+   Cartas de Duelo Élite Blue Lock / Kaiser Edition (Escudo + Malla Hex + Tilt)
+   ========================================================================== */
 .duel-cards-grid {
-  perspective: 960px;
+  perspective: 980px;
+}
+
+.duel-shield-frame {
+  position: relative;
+  padding: 1.5px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 22px), calc(100% - 22px) 100%, 22px 100%, 0 calc(100% - 22px), 0 16px);
+  filter: drop-shadow(0 10px 20px rgba(2, 6, 23, 0.8));
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), filter 200ms ease;
+}
+
+.duel-shield-frame.user-shield {
+  background: linear-gradient(155deg, rgba(0, 240, 255, 0.85), rgba(29, 78, 216, 0.52) 48%, rgba(56, 189, 248, 0.82));
+}
+
+.duel-shield-frame.user-shield:hover {
+  filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.42));
+}
+
+.duel-shield-frame.crack-shield {
+  background: linear-gradient(155deg, rgba(250, 204, 21, 0.92), rgba(202, 138, 4, 0.5) 48%, rgba(56, 189, 248, 0.65));
+}
+
+.duel-shield-frame.crack-shield:hover {
+  filter: drop-shadow(0 0 16px rgba(234, 179, 8, 0.46));
 }
 
 .duel-fighter-col {
   position: relative;
+  height: 100%;
+  padding: 13px 10px 15px;
+  border: none;
+  border-radius: 0;
   overflow: hidden;
-  transform-style: preserve-3d;
-  will-change: transform;
-  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease, box-shadow 200ms ease;
+  clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 21px), calc(100% - 21px) 100%, 21px 100%, 0 calc(100% - 21px), 0 15px);
 }
 
-.duel-fighter-col > :not(.duel-glare-layer):not(.duel-watermark) {
+.duel-fighter-col > :not(.duel-glare-layer):not(.duel-watermark):not(.duel-engraved-vines) {
   position: relative;
   z-index: 2;
+}
+
+.duel-engraved-vines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.72;
+  z-index: 1;
+}
+
+.duel-shield-top-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 24px;
+  margin-bottom: 1px;
+  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.45));
+}
+
+.duel-shield-top-badge.crack-crest {
+  filter: drop-shadow(0 0 7px rgba(234, 179, 8, 0.65));
 }
 
 .duel-glare-layer {
@@ -4754,46 +4959,41 @@ dialog.tactical-dialog[open]::backdrop {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.24s ease;
-  z-index: 3;
+  z-index: 4;
   mix-blend-mode: screen;
-  border-radius: inherit;
 }
 
 .duel-watermark {
   position: absolute;
-  right: -10px;
-  bottom: -10px;
-  width: 88px;
-  height: 88px;
+  right: -8px;
+  bottom: -8px;
+  width: 90px;
+  height: 90px;
   pointer-events: none;
   opacity: 0.2;
   z-index: 1;
   transition: transform 280ms var(--transition-smooth), opacity 220ms ease;
 }
 
-.duel-fighter-col:hover .duel-watermark {
+.duel-shield-frame:hover .duel-watermark {
   opacity: 0.34;
   transform: scale(1.06) rotate(-4deg);
 }
 
 .duel-fighter-col.user-fighter {
-  background: linear-gradient(160deg var(--in-oklab), rgba(14, 165, 233, 0.14), #050914 78%);
-  border-color: rgba(56, 189, 248, 0.42);
-}
-
-.duel-fighter-col.user-fighter:hover {
-  border-color: #00f0ff;
-  box-shadow: 0 12px 28px -12px rgba(0, 240, 255, 0.42);
+  background-color: #050a16;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='24' viewBox='0 0 28 24'%3E%3Cpolygon points='14,1 27,7 27,17 14,23 1,17 1,7' fill='none' stroke='%231d4ed8' stroke-opacity='0.22' stroke-width='0.9'/%3E%3C/svg%3E"),
+    linear-gradient(160deg var(--in-oklab), rgba(14, 165, 233, 0.16), #040814 76%);
+  background-size: 28px 24px, 100% 100%;
 }
 
 .duel-fighter-col.crack-fighter {
-  background: linear-gradient(160deg var(--in-oklab), rgba(234, 179, 8, 0.16), #050914 78%);
-  border-color: rgba(234, 179, 8, 0.52);
-}
-
-.duel-fighter-col.crack-fighter:hover {
-  border-color: var(--gold-bright);
-  box-shadow: 0 12px 28px -12px rgba(234, 179, 8, 0.42);
+  background-color: #09080f;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='24' viewBox='0 0 28 24'%3E%3Cpolygon points='14,1 27,7 27,17 14,23 1,17 1,7' fill='none' stroke='%23eab308' stroke-opacity='0.18' stroke-width='0.9'/%3E%3C/svg%3E"),
+    linear-gradient(160deg var(--in-oklab), rgba(234, 179, 8, 0.17), #050814 76%);
+  background-size: 28px 24px, 100% 100%;
 }
 
 .duel-role-kicker.crack-kicker {
@@ -4809,44 +5009,60 @@ dialog.tactical-dialog[open]::backdrop {
   box-shadow: 0 0 18px rgba(234, 179, 8, 0.34);
 }
 
-/* Metavision Eye Concentric Radar Reticle */
+/* Metavision Eye Concentric Radar Reticle (Wide ViewBox, Zero Label Clipping) */
+.player-radar-svg {
+  max-width: 284px;
+}
+
 .radar-mv-ring-outer {
   fill: none;
-  stroke: rgba(0, 240, 255, 0.36);
-  stroke-width: 1.3;
+  stroke: rgba(0, 240, 255, 0.42);
+  stroke-width: 1.4;
   stroke-dasharray: 14 7 4 7;
+  transform-box: view-box;
+  transform-origin: 140px 108px;
+}
+
+.radar-mv-ring-mid {
+  fill: none;
+  stroke: rgba(29, 78, 216, 0.48);
+  stroke-width: 1.1;
+  stroke-dasharray: 6 6;
   transform-box: view-box;
   transform-origin: 140px 108px;
 }
 
 .radar-mv-ring-inner {
   fill: none;
-  stroke: rgba(56, 189, 248, 0.28);
-  stroke-width: 1;
+  stroke: rgba(56, 189, 248, 0.36);
+  stroke-width: 1.1;
   stroke-dasharray: 20 10;
   transform-box: view-box;
   transform-origin: 140px 108px;
 }
 
 .radar-mv-pupil {
-  fill: rgba(0, 240, 255, 0.14);
-  stroke: rgba(0, 240, 255, 0.65);
-  stroke-width: 1.1;
+  fill: rgba(0, 240, 255, 0.22);
+  stroke: rgba(0, 240, 255, 0.8);
+  stroke-width: 1.25;
 }
 
 .radar-mv-crosshair {
   fill: none;
-  stroke: rgba(125, 211, 252, 0.52);
-  stroke-width: 1.2;
+  stroke: rgba(186, 230, 253, 0.62);
+  stroke-width: 1.25;
   stroke-linecap: round;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .radar-mv-ring-outer {
-    animation: metavisionRingSpin 26s linear infinite;
+    animation: metavisionRingSpin 24s linear infinite;
+  }
+  .radar-mv-ring-mid {
+    animation: metavisionRingSpin 36s linear infinite;
   }
   .radar-mv-ring-inner {
-    animation: radarEyeRotateCCW 19s linear infinite;
+    animation: radarEyeRotateCCW 18s linear infinite;
   }
 }
 
@@ -4882,11 +5098,14 @@ dialog.tactical-dialog[open]::backdrop {
   .fade-slide-up,
   .active-view,
   .active-view .glass-card::before,
+  .glass-card:hover .kaiser-vine-nerve,
+  .glass-card.vine-surge .kaiser-vine-nerve,
   .player-token.active-actor::before,
   .player-token.squad-token.selected-token::before,
   .tactical-pitch .player-token:hover::before,
   .tactical-pitch .player-token:focus-visible::before,
   .radar-mv-ring-outer,
+  .radar-mv-ring-mid,
   .radar-mv-ring-inner,
   #generate-ideal-squad-btn {
     animation: none !important;
@@ -4902,6 +5121,19 @@ dialog.tactical-dialog[open]::backdrop {
 @media (forced-colors: active) {
   .glass-card {
     background-image: none;
+  }
+
+  .kaiser-card-vines,
+  .chat-metavision-watermark,
+  .duel-engraved-vines,
+  .duel-watermark {
+    display: none;
+  }
+
+  .duel-shield-frame,
+  .duel-fighter-col {
+    clip-path: none;
+    border: 1px solid CanvasText;
   }
 
   .view-tabs-nav::before,

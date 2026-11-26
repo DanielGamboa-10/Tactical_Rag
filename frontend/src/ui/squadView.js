@@ -11,6 +11,7 @@ import {
   showToast,
   switchTab,
   animateNumericCounter,
+  triggerKaiserImpactShockwave,
   getPersonInitials,
   updateContextBadges,
   PLAY_STYLE_MODIFIERS,
@@ -170,6 +171,8 @@ async function handleGenerateIdealSquad() {
   dom.generateIdealSquadBtn.disabled = true;
   const activeStyle = dom.squadStyleSelect ? dom.squadStyleSelect.value : 'Posesión & Juego de Posición';
 
+  triggerKaiserImpactShockwave(dom.generateIdealSquadBtn, dom.squadPitch);
+
   if (dom.squadPitch) {
     dom.squadPitch.classList.remove('shimmer-sweep-active');
     requestAnimationFrame(() => {
@@ -183,6 +186,8 @@ async function handleGenerateIdealSquad() {
   try {
     await refreshSquadAndOptimize(true);
     const synergyPct = state.squadOptimization?.globalSynergy || 95;
+    animateNumericCounter(dom.squadGlobalSynergy, synergyPct, '%');
+    syncSynergyBadgeVisuals(synergyPct);
     showToast(
       `XI Óptimo Calculado (${synergyPct}% Sinergia)`,
       `Titulares y banca optimizados por química colectiva, pie hábil y complementariedad para '${activeStyle}'.`,
@@ -1255,8 +1260,8 @@ export function initSquadViewEvents() {
       }
     });
 
-    // Inclinación 3D individual y reflejo holográfico diagonal azul/dorado en cada tarjeta duel-fighter-col
-    const fighterCols = dom.holographicPlayerCard.querySelectorAll('.duel-fighter-col[data-duel-tilt]');
+    // Inclinación 3D individual y reflejo holográfico diagonal azul/dorado en cada carta escudo Blue Lock
+    const fighterCols = dom.holographicPlayerCard.querySelectorAll('[data-duel-tilt]');
     fighterCols.forEach((colEl) => {
       const tiltKind = colEl.dataset.duelTilt;
       const glareEl = colEl.querySelector('.duel-glare-layer');

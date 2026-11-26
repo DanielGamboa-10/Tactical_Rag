@@ -221,6 +221,7 @@ export const dom = {
   compPotentiateText: document.getElementById('comp-potentiate-text'),
   compPartnersChips: document.getElementById('comp-partners-chips'),
   quickPrompts: document.getElementById('quick-prompts'),
+  chatMessagesStage: document.getElementById('chat-messages-stage'),
   chatMessages: document.getElementById('chat-messages'),
   chatForm: document.getElementById('chat-form'),
   chatInput: document.getElementById('chat-input'),
@@ -1528,5 +1529,49 @@ export function isStrictNaturalPositionMatch(playerPos, slotRole) {
       return slot.startsWith('DC') || slot === 'SD' || slot === 'F9' || slot === '9';
     default:
       return false;
+  }
+}
+
+/**
+ * Dispara una onda de choque lineal cian eléctrico ("Kaiser Impact") sobre el botón
+ * accionado y, opcionalmente, sobre el lienzo/etapa principal (respeta reduced-motion).
+ */
+export function triggerKaiserImpactShockwave(anchorEl, stageEl = null) {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+
+  if (anchorEl) {
+    const btnWave = document.createElement('span');
+    btnWave.className = 'kaiser-btn-linear-shockwave';
+    btnWave.setAttribute('aria-hidden', 'true');
+    anchorEl.appendChild(btnWave);
+    gsap.fromTo(
+      btnWave,
+      { xPercent: -115, opacity: 0.95 },
+      {
+        xPercent: 145,
+        opacity: 0,
+        duration: 0.56,
+        ease: 'power2.out',
+        onComplete: () => btnWave.remove()
+      }
+    );
+  }
+
+  if (stageEl) {
+    const stageWave = document.createElement('div');
+    stageWave.className = 'kaiser-stage-linear-shockwave';
+    stageWave.setAttribute('aria-hidden', 'true');
+    stageEl.appendChild(stageWave);
+    gsap.fromTo(
+      stageWave,
+      { xPercent: -105, opacity: 0.92 },
+      {
+        xPercent: 115,
+        opacity: 0,
+        duration: 0.68,
+        ease: 'power3.out',
+        onComplete: () => stageWave.remove()
+      }
+    );
   }
 }

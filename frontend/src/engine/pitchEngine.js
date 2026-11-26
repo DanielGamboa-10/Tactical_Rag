@@ -10,6 +10,7 @@ import {
   escapeHtml,
   showToast,
   animateNumericCounter,
+  triggerKaiserImpactShockwave,
   getPersonInitials,
   PLAY_STYLE_MODIFIERS,
   FUTSAL_ATTACK_PLAYS,
@@ -698,6 +699,8 @@ export function executeSetPieceStep(stepNum) {
 export function playSetPieceAnimation() {
   const activeSetPiece = getActiveSetPiece();
   if (!activeSetPiece) return;
+
+  triggerKaiserImpactShockwave(dom.playSetpieceBtn, dom.tacticalPitch);
 
   clearPlaybackTimers();
   const totalSteps = activeSetPiece.steps.length || 3;
