@@ -206,6 +206,7 @@ body {
 
 .topbar {
   position: relative;
+  z-index: 2;
   max-width: 1440px;
   margin: 16px auto 0;
   padding: 14px 24px;
@@ -497,6 +498,8 @@ body {
    Tab View Switching & Layouts
    ========================================================================== */
 .tab-view {
+  position: relative;
+  z-index: 2;
   max-width: 1440px;
   margin: 18px auto 28px;
   padding: 0 16px;
@@ -5129,25 +5132,58 @@ dialog.tactical-dialog[open]::backdrop {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
   overflow: hidden;
+  opacity: 0.28;
 }
 
-.viewport-vine-side {
+.viewport-vine-corner {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: clamp(92px, 11.5vw, 220px);
-  height: 100%;
-  opacity: 0.78;
+  width: clamp(140px, 13vw, 220px);
+  max-width: 220px;
+  max-height: 260px;
+  height: auto;
+  aspect-ratio: 220 / 260;
+  pointer-events: none;
 }
 
-.viewport-vine-left {
+.viewport-vine-corner.tl {
+  top: 0;
   left: 0;
 }
 
-.viewport-vine-right {
+.viewport-vine-corner.tr {
+  top: 0;
   right: 0;
+  transform: scaleX(-1);
+}
+
+.viewport-vine-corner.bl {
+  bottom: 0;
+  left: 0;
+  transform: scaleY(-1);
+}
+
+.viewport-vine-corner.br {
+  bottom: 0;
+  right: 0;
+  transform: scale(-1, -1);
+}
+
+@keyframes kaiserTattooBreath {
+  0%,
+  100% {
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 0.38;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kaiser-viewport-vines {
+    animation: kaiserTattooBreath 6s ease-in-out infinite;
+  }
 }
 
 @media (max-width: 1379px) {
@@ -5194,8 +5230,13 @@ dialog.tactical-dialog[open]::backdrop {
   .radar-mv-ring-outer,
   .radar-mv-ring-mid,
   .radar-mv-ring-inner,
-  #generate-ideal-squad-btn .kaiser-cta-ring {
+  #generate-ideal-squad-btn .kaiser-cta-ring,
+  .kaiser-viewport-vines {
     animation: none !important;
+  }
+
+  .kaiser-viewport-vines {
+    opacity: 0.28;
   }
 
   .fade-slide-up {
