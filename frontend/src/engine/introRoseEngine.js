@@ -594,3 +594,121 @@ export function initBlueRoseIntroEvents() {
     replayBtn.addEventListener('click', () => playBlueRoseIntroCinematic());
   }
 }
+
+/* ==========================================================================
+   Ambient Background Canvas: 20 Floating Kaiser Blue Rose Petals
+   Auto-pauses on reduced-motion, hidden tab, opening intro, or print.
+   ========================================================================== */
+let ambientRafId = null;
+let ambientPausedByContentVis = false;
+
+export function initAmbientBluePetalsCanvas() {
+  const canvas = document.getElementById('ambient-petals-canvas');
+  const ambientBgEl = canvas?.parentElement;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const PETAL_COUNT = 20;
+  let width = window.innerWidth || 1280;
+  let height = window.innerHeight || 720;
+
+  const resizeCanvas = () => {
+    width = window.innerWidth || 1280;
+    height = window.innerHeight || 720;
+    canvas.width = width;
+    canvas.height = height;
+  };
+  resizeCanvas();
+
+  const petals = Array.from({ length: PETAL_COUNT }, (_, i) => {
+    const depthScale = 0.55 + (i % 4) * 0.22;
+    return {
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: (8 + Math.random() * 7) * depthScale,
+      vx: -0.14 - depthScale * 0.16,
+      vy: 0.24 + depthScale * 0.34,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.012,
+      swayPhase: Math.random() * Math.PI * 2,
+      swayAmp: 0.25 + depthScale * 0.35,
+      alpha: 0.14 + depthScale * 0.14,
+      palette: PETAL_COLORS[i % PETAL_COLORS.length]
+    };
+  });
+
+  const stopAmbientLoop = () => {
+    if (ambientRafId) {
+      cancelAnimationFrame(ambientRafId);
+      ambientRafId = null;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const shouldPause = () =>
+    reducedMotionMq.matches ||
+    document.hidden ||
+    isIntroRunning ||
+    ambientPausedByContentVis;
+
+  const tick = (nowMs) => {
+    if (shouldPause()) {
+      ambientRafId = null;
+      return;
+    }
+    const tSec = nowMs * 0.001;
+    ctx.clearRect(0, 0, width, height);
+
+    for (const p of petals) {
+      p.x += p.vx + Math.sin(tSec * 0.7 + p.swayPhase) * p.swayAmp;
+      p.y += p.vy;
+      p.angle += p.spin;
+
+      if (p.y > height + 36) {
+        p.y = -28;
+        p.x = Math.random() * width;
+      }
+      if (p.x < -36) p.x = width + 24;
+      if (p.x > width + 36) p.x = -24;
+
+      drawPetalWithVein(ctx, p.x, p.y, p.size, p.angle, p.palette, p.alpha);
+    }
+
+    ambientRafId = requestAnimationFrame(tick);
+  };
+
+  const syncAmbientState = () => {
+    if (shouldPause()) {
+      stopAmbientLoop();
+      return;
+    }
+    if (!ambientRafId) {
+      ambientRafId = requestAnimationFrame(tick);
+    }
+  };
+
+  window.addEventListener('resize', resizeCanvas, { passive: true });
+  document.addEventListener('visibilitychange', syncAmbientState);
+  window.addEventListener('beforeprint', stopAmbientLoop);
+  window.addEventListener('afterprint', syncAmbientState);
+  reducedMotionMq.addEventListener?.('change', syncAmbientState);
+
+  if (ambientBgEl && 'contentVisibility' in document.documentElement.style) {
+    ambientBgEl.addEventListener('contentvisibilityautostatechange', (e) => {
+      ambientPausedByContentVis = Boolean(e.skipped);
+      syncAmbientState();
+    });
+  }
+
+  // Wake up once intro finishes or skips
+  const introOverlay = document.getElementById('intro-rose-overlay');
+  if (introOverlay) {
+    const obs = new MutationObserver(() => syncAmbientState());
+    obs.observe(introOverlay, { attributes: true, attributeFilter: ['class', 'style'] });
+  }
+
+  syncAmbientState();
+}

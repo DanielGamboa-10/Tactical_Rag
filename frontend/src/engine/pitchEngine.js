@@ -145,7 +145,7 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
   if (!dom.ballToken) return;
   if (!visible) {
     dom.ballToken.classList.add('hidden');
-    dom.ballToken.classList.remove('is-moving');
+    dom.ballToken.classList.remove('is-moving', 'kaiser-impact-active');
     return;
   }
   const pitchWidth = dom.pitchTokens.clientWidth || 720;
@@ -156,22 +156,27 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
   const tx = Math.round(x * scaleX);
   const ty = Math.round(y * scaleY);
   const billboardRotX = state.isTv25DView ? -28 : 0;
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  if (animateBlur) {
+  if (animateBlur && !reducedMotion) {
+    dom.ballToken.classList.add('kaiser-impact-active');
     triggerMotionBlurOnElements([dom.ballToken], 980);
+  } else {
+    dom.ballToken.classList.remove('kaiser-impact-active');
   }
 
   gsap.to(dom.ballToken, {
     x: tx,
     y: ty,
     rotateX: billboardRotX,
-    scale: animateBlur ? 1.12 : 1,
+    scale: animateBlur && !reducedMotion ? 1.15 : 1,
     transformOrigin: '50% 100%',
-    duration: animateBlur ? 0.95 : 0.45,
+    duration: reducedMotion ? 0.15 : animateBlur ? 0.92 : 0.45,
     ease: animateBlur ? 'power3.out' : 'back.out(1.5)',
     overwrite: 'auto',
     onComplete: () => {
-      if (animateBlur) {
+      dom.ballToken?.classList.remove('kaiser-impact-active');
+      if (animateBlur && !reducedMotion) {
         gsap.to(dom.ballToken, {
           scale: 1,
           rotateX: state.isTv25DView ? -28 : 0,
@@ -567,7 +572,8 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
     );
   });
 
-  // 2. Trayectorias curvas Bézier del balón (Pases elevados, centros y remates) + Motion Trail
+  // 2. Trayectorias curvas Bézier del balón + Kaiser Impact Trail (#00f0ff)
+  const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const bp = setPiece.ballPath || [];
   for (let i = 0; i < bp.length - 1; i++) {
     const from = bp[i];
@@ -580,35 +586,39 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
     ballCurve.setAttribute('fill', 'none');
 
     if (isShot) {
-      ballCurve.setAttribute('stroke', 'rgba(244, 63, 94, 0.88)');
+      ballCurve.setAttribute('stroke', 'rgba(244, 63, 94, 0.92)');
       ballCurve.setAttribute('stroke-width', '2.4');
-      ballCurve.setAttribute('marker-end', 'url(#arrow-shot)');
+      ballCurve.setAttribute('marker-end', 'url(#arrow-kaiser)');
     } else {
-      ballCurve.setAttribute('stroke', 'rgba(251, 191, 36, 0.88)');
+      ballCurve.setAttribute('stroke', 'rgba(56, 189, 248, 0.88)');
       ballCurve.setAttribute('stroke-width', '2.1');
-      ballCurve.setAttribute('marker-end', 'url(#arrow-pass)');
+      ballCurve.setAttribute('marker-end', 'url(#arrow-kaiser)');
     }
     dom.setpieceOverlay.appendChild(ballCurve);
 
-    const ballTrail = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    ballTrail.setAttribute('d', d);
-    ballTrail.setAttribute(
+    const kaiserTrail = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    kaiserTrail.setAttribute('d', d);
+    kaiserTrail.setAttribute(
       'class',
-      `bezier-motion-trail ${isShot ? 'shot-trail' : 'pass-trail'}`
+      `bezier-motion-trail kaiser-impact-trail ${isShot ? 'shot-trail' : 'pass-trail'}`
     );
-    dom.setpieceOverlay.appendChild(ballTrail);
+    dom.setpieceOverlay.appendChild(kaiserTrail);
 
-    gsap.fromTo(
-      ballTrail,
-      { strokeDasharray: '34 260', strokeDashoffset: 210, opacity: 1 },
-      {
-        strokeDashoffset: 0,
-        opacity: 0.2,
-        duration: 1.3,
-        delay: i * 0.15,
-        ease: 'power2.out'
-      }
-    );
+    if (!prefersReducedMotion) {
+      gsap.fromTo(
+        kaiserTrail,
+        { strokeDasharray: '42 260', strokeDashoffset: 220, opacity: 1 },
+        {
+          strokeDashoffset: 0,
+          opacity: 0.28,
+          duration: 1.25,
+          delay: i * 0.14,
+          ease: 'power2.out'
+        }
+      );
+    } else {
+      kaiserTrail.style.opacity = '0.65';
+    }
   }
 }
 

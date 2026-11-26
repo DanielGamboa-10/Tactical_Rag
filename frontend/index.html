@@ -37,12 +37,12 @@
       :root {
         color-scheme: dark;
         accent-color: #38bdf8;
-        --bg-deep: #050811;
-        --bg-surface: rgba(10, 15, 29, 0.82);
-        --bg-surface-solid: #0a0f1d;
+        --bg-deep: #04070f;
+        --bg-surface: rgba(9, 14, 28, 0.84);
+        --bg-surface-solid: #090e1c;
         --bg-surface-elevated: #0f172a;
-        --border-subtle: rgba(56, 189, 248, 0.16);
-        --border-default: rgba(56, 189, 248, 0.22);
+        --border-subtle: rgba(56, 189, 248, 0.18);
+        --border-default: rgba(56, 189, 248, 0.24);
         --border-accent-focus: rgba(56, 189, 248, 0.65);
         --accent-cobalt: #1d4ed8;
         --accent-cobalt-deep: #1e40af;
@@ -51,6 +51,8 @@
         --accent-cyan: #7dd3fc;
         --cyan-400: #38bdf8;
         --cyan-hud: #00f0ff;
+        --gold-imperial: #eab308;
+        --gold-bright: #fde047;
         --emerald-400: #10b981;
         --amber-400: #f59e0b;
         --rose-500: #f43f5e;
@@ -61,7 +63,7 @@
         --text-muted: #64748b;
         --scrollbar-thumb: #475569;
         --scrollbar-thumb-hover: #64748b;
-        --scrollbar-track: #050811;
+        --scrollbar-track: #04070f;
         --radius-lg: 12px;
         --radius-md: 8px;
         --radius-sm: 6px;
@@ -540,12 +542,13 @@
         </radialGradient>
       </defs>
     </svg>
-    <!-- Ambient Animated Background -->
+    <!-- Ambient Animated Background + Drifting Blue Petals Canvas -->
     <div class="ambient-bg" aria-hidden="true">
       <div class="glow-orb orb-1"></div>
       <div class="glow-orb orb-2"></div>
       <div class="glow-orb orb-3"></div>
       <div class="tactical-grid"></div>
+      <canvas id="ambient-petals-canvas" class="ambient-petals-canvas" aria-hidden="true"></canvas>
     </div>
 
     <!-- Toast Notifications Container -->
@@ -1078,6 +1081,9 @@
                   <marker id="arrow-shot" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
                     <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" />
                   </marker>
+                  <marker id="arrow-kaiser" viewBox="0 0 12 12" refX="8.5" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+                    <path d="M 0 1.2 L 11 6 L 0 10.8 L 3.4 6 z" fill="#00f0ff" />
+                  </marker>
                 </defs>
                 <!-- Surface Turf / Parquet Texture + Vignette -->
                 <rect class="pitch-surface-turf" x="10" y="10" width="340" height="200" rx="8" />
@@ -1485,8 +1491,8 @@
                 <div class="synergy-meter-box">
                   <span class="selector-label">Sinergia Global</span>
                   <div class="synergy-pill-wrap">
-                    <div class="synergy-score-pill" id="squad-global-synergy">92%</div>
-                    <span class="synergy-tier-badge synergy-high" id="squad-synergy-tier" aria-live="polite">Óptima</span>
+                    <div class="synergy-score-pill synergy-elite" id="squad-global-synergy">92%</div>
+                    <span class="synergy-tier-badge synergy-elite" id="squad-synergy-tier" aria-live="polite">Élite Imperial</span>
                   </div>
                 </div>
               </div>
@@ -1644,7 +1650,12 @@
                 <span class="section-kicker">BENCHMARK TOP 100 MUNDIAL &amp; HISTÓRICO</span>
                 <h2 class="card-title">Perfil Comparativo &amp; Sinergia</h2>
               </div>
-              <span class="coach-origin-badge" id="comp-mirror-badge">Top 100</span>
+              <span class="coach-origin-badge crown-badge-gold" id="comp-mirror-badge">
+                <svg class="ui-icon crown-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
+                </svg>
+                <span>Top 100</span>
+              </span>
             </div>
 
             <div id="crack-comparison-content" class="crack-comparison-content">
@@ -1668,7 +1679,12 @@
 
                   <!-- Right Column: Homologous Top 100 World / Historical Crack -->
                   <div class="duel-fighter-col crack-fighter">
-                    <span class="duel-role-kicker crack-kicker">REFERENTE TOP 100</span>
+                    <span class="duel-role-kicker crack-kicker">
+                      <svg class="ui-icon crown-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
+                      </svg>
+                      <span>REFERENTE TOP 100</span>
+                    </span>
                     <div class="duel-avatar-crack" id="comp-crack-avatar">
                       <span id="comp-crack-initials" class="duel-crack-initials">AB</span>
                     </div>

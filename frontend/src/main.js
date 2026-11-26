@@ -23,7 +23,8 @@ import {
 } from './ui/squadView.js';
 import {
   initBlueRoseIntroEvents,
-  playBlueRoseIntroCinematic
+  playBlueRoseIntroCinematic,
+  initAmbientBluePetalsCanvas
 } from './engine/introRoseEngine.js';
 
 const yieldToMain = () => {
@@ -191,6 +192,7 @@ appendWelcomeMessage({ animate: false });
 requestAnimationFrame(() => {
   loadDeferredStyles();
   initKineticHudInteractions();
+  initAmbientBluePetalsCanvas();
 });
 
 // Defer Tab 2 / Tab 3 wiring and backend health probe into small idle main-thread chunks

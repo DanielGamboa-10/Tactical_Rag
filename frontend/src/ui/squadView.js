@@ -316,7 +316,10 @@ function syncSynergyBadgeVisuals(scorePct) {
   const score = Number(scorePct) || 0;
   let tierClass = 'synergy-low';
   let tierText = 'Baja';
-  if (score >= 85) {
+  if (score >= 90) {
+    tierClass = 'synergy-elite';
+    tierText = 'Élite Imperial';
+  } else if (score >= 85) {
     tierClass = 'synergy-high';
     tierText = 'Óptima';
   } else if (score >= 70) {
@@ -326,7 +329,7 @@ function syncSynergyBadgeVisuals(scorePct) {
 
   [dom.squadGlobalSynergy, dom.squadSynergyTier].forEach((el) => {
     if (!el) return;
-    el.classList.remove('synergy-high', 'synergy-mid', 'synergy-low');
+    el.classList.remove('synergy-elite', 'synergy-high', 'synergy-mid', 'synergy-low');
     el.classList.add(tierClass);
   });
 
@@ -1223,8 +1226,11 @@ export function initSquadViewEvents() {
       if (dom.holoGlareLayer) {
         const glareX = Math.round(relX * 100);
         const glareY = Math.round(relY * 100);
+        const angleDeg = Math.round(112 + relX * 36);
         dom.holoGlareLayer.style.opacity = '1';
-        dom.holoGlareLayer.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(56, 189, 248, 0.32) 0%, rgba(56, 189, 248, 0.22) 38%, transparent 72%)`;
+        dom.holoGlareLayer.style.background =
+          `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(0, 240, 255, 0.34) 0%, rgba(234, 179, 8, 0.24) 36%, transparent 68%), ` +
+          `linear-gradient(${angleDeg}deg, rgba(29, 78, 216, 0.16) 0%, rgba(56, 189, 248, 0.26) 35%, rgba(234, 179, 8, 0.3) 54%, rgba(0, 240, 255, 0.18) 74%, transparent 90%)`;
       }
     });
 

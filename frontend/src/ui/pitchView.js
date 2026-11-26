@@ -251,8 +251,11 @@ export function initPitchViewEvents() {
       if (dom.coachHoloGlareLayer) {
         const glareX = Math.round(relX * 100);
         const glareY = Math.round(relY * 100);
+        const angleDeg = Math.round(108 + relX * 36);
         dom.coachHoloGlareLayer.style.opacity = '1';
-        dom.coachHoloGlareLayer.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(56, 189, 248, 0.34) 0%, rgba(56, 189, 248, 0.22) 40%, transparent 72%)`;
+        dom.coachHoloGlareLayer.style.background =
+          `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(0, 240, 255, 0.32) 0%, rgba(234, 179, 8, 0.22) 34%, transparent 68%), ` +
+          `linear-gradient(${angleDeg}deg, rgba(29, 78, 216, 0.14) 0%, rgba(56, 189, 248, 0.24) 36%, rgba(234, 179, 8, 0.26) 54%, transparent 82%)`;
       }
     });
 
