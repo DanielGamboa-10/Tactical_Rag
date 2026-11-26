@@ -1,0 +1,11 @@
+server:
+  port: ${SERVER_HTTPS_PORT:8443}
+  http2:
+    enabled: true
+  ssl:
+    enabled: true
+    key-store: ${SSL_KEYSTORE_PATH:deploy/certs/tacticalplay-dev.p12}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:tacticalplay}
+    key-store-type: PKCS12
+    key-alias: tacticalplay
+    enabled-protocols: TLSv1.3,TLSv1.2

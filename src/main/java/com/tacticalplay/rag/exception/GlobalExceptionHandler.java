@@ -82,8 +82,20 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
-        String reason = ex.getReason() != null ? ex.getReason() : ex.getMessage();
-        Map<String, Object> body = buildErrorBody(status, reason, request.getRequestURI());
+        String rawReason = ex.getReason() != null ? ex.getReason() : ex.getMessage();
+        String errorCode = null;
+        String detail = rawReason;
+        if (rawReason != null && rawReason.startsWith("DEMO_QUERIES_EXHAUSTED:")) {
+            errorCode = "DEMO_QUERIES_EXHAUSTED";
+            detail = rawReason.substring("DEMO_QUERIES_EXHAUSTED:".length()).trim();
+        } else if (rawReason != null && rawReason.startsWith("DEMO_LIMIT_REACHED:")) {
+            errorCode = "DEMO_LIMIT_REACHED";
+            detail = rawReason.substring("DEMO_LIMIT_REACHED:".length()).trim();
+        }
+        Map<String, Object> body = buildErrorBody(status, detail, request.getRequestURI());
+        if (errorCode != null) {
+            body.put("code", errorCode);
+        }
         return ResponseEntity.status(status).body(body);
     }
 
