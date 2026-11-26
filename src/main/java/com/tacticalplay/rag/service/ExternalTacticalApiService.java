@@ -144,13 +144,22 @@ public class ExternalTacticalApiService {
                         }
                     }
 
-                    chunksToSave.add(DocumentChunk.forInsert(
+                    int orderIndex = sectionIndex - 1;
+                    chunksToSave.add(new DocumentChunk(
+                            null,
                             EXTERNAL_NAMESPACE,
+                            null,
                             topic.modality(),
                             "Wikipedia: " + topic.title(),
                             sectionIndex++,
+                            topic.styleLabel(),
+                            orderIndex,
                             enrichedChunk,
-                            embeddingLiteral
+                            embeddingLiteral,
+                            embeddingLiteral != null ? embeddingService.getActiveModelName() : null,
+                            "PUBLIC",
+                            null,
+                            null
                     ));
                 }
             } catch (Exception ex) {

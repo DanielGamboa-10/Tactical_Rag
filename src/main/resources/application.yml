@@ -17,9 +17,61 @@ spring:
       max-request-size: 25MB
 
 ai:
+  embedding:
+    provider: ${AI_EMBEDDING_PROVIDER:auto}
+    dimensions: 768
+  chat:
+    provider: ${AI_CHAT_PROVIDER:auto}
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+    embedding-model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+    chat-model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
   gemini:
     api-key: ${GEMINI_API_KEY:}
     embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
     chat-model: ${GEMINI_CHAT_MODEL:gemini-3.1-flash-lite}
-  embedding:
-    dimensions: 768
+  local:
+    base-url: ${LOCAL_AI_BASE_URL:http://localhost:11434}
+    embedding-model: ${LOCAL_EMBEDDING_MODEL:nomic-embed-text}
+    chat-model: ${LOCAL_CHAT_MODEL:llama3.1}
+
+ocr:
+  tesseract:
+    enabled: ${OCR_TESSERACT_ENABLED:auto}
+    command: ${OCR_TESSERACT_PATH:tesseract}
+    language: ${OCR_LANGUAGE:spa+eng}
+  endpoint-url: ${OCR_ENDPOINT_URL:}
+  vision-fallback-enabled: ${OCR_VISION_FALLBACK:true}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:TacticalPlayRagDevSecretKeyHMAC256ForLocalJwtSigning2026!}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  demo-session:
+    enabled: ${SECURITY_DEMO_SESSION_ENABLED:true}
+  shutdown:
+    enabled: ${SECURITY_SHUTDOWN_ENABLED:true}
+  clamav:
+    enabled: ${SECURITY_CLAMAV_ENABLED:false}
+    host: ${CLAMAV_HOST:localhost}
+    port: ${CLAMAV_PORT:3310}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:*,https://localhost:*,http://127.0.0.1:*,https://127.0.0.1:*}
+
+rag:
+  chunk:
+    target-chars: ${RAG_CHUNK_TARGET_CHARS:2200}
+    overlap-chars: ${RAG_CHUNK_OVERLAP_CHARS:350}
+  cleanup:
+    policy: ${RAG_CLEANUP_POLICY:DELETE_ON_VERIFY}
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    persist-authorization: true
+    display-request-duration: true

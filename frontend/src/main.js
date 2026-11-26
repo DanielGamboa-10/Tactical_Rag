@@ -8,8 +8,20 @@ import { renderTacticalPitch, renderSquadPitch } from './engine/pitchEngine.js';
 import {
   checkBackendHealth,
   appendWelcomeMessage,
-  initChatViewEvents
+  initChatViewEvents,
+  refreshExpedientesList,
+  refreshChatSessionsList
 } from './ui/chatView.js';
+import {
+  initAuthView,
+  bootstrapAuthSession,
+  showAuthGate,
+  hideAuthGate,
+  syncAuthSessionHeader,
+  refreshDemoDeviceStatus,
+  isDemoSession
+} from './ui/authView.js';
+import { getStoredAuthSession, getOrCreatePersistentDemoDeviceId } from './services/api.js';
 import {
   populateFormationDropdown,
   populateSetPieceDropdown,
@@ -21,24 +33,19 @@ import {
   refreshSquadAndOptimize,
   initSquadViewEvents
 } from './ui/squadView.js';
+import './style.css';
 import {
   initBlueRoseIntroEvents,
   playBlueRoseIntroCinematic,
   initAmbientBluePetalsCanvas
 } from './engine/introRoseEngine.js';
+import { initLoginBackdropCanvas } from './engine/loginBackdropEngine.js';
 
 const yieldToMain = () => {
   if ('scheduler' in globalThis && typeof globalThis.scheduler.yield === 'function') {
     return globalThis.scheduler.yield();
   }
   return new Promise((resolve) => setTimeout(resolve, 0));
-};
-
-let fullStylesLoaded = false;
-const loadDeferredStyles = () => {
-  if (fullStylesLoaded) return;
-  fullStylesLoaded = true;
-  import('./style.css');
 };
 
 let boardInitialized = false;
@@ -83,58 +90,9 @@ function syncSlidingIndicator(container) {
   container.classList.add('indicator-ready');
 }
 
-function createKaiserVineCornerSvg(cornerClass) {
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(svgNS, 'svg');
-  svg.setAttribute('class', `kaiser-vine-corner ${cornerClass}`);
-  svg.setAttribute('viewBox', '0 0 180 180');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('aria-hidden', 'true');
-
-  // 4 trazos SVG compuestos (en lugar de 13 nodos por esquina) para mantener DOM ligero
-  svg.innerHTML =
-    `<path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10 M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#02050c" stroke-width="6.4" stroke-linecap="round"/>` +
-    `<path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10 M12 132 C16 86 38 48 82 28 C108 16 132 18 152 24" stroke="#1e3a8a" stroke-width="3.6" stroke-linecap="round"/>` +
-    `<path d="M10 116 L0 105 L14 108 Z M19 88 L8 76 L24 81 Z M35 58 L27 42 L44 51 Z M65 34 L62 18 L75 29 Z M102 18 L104 4 L112 16 Z M136 12 L144 2 L146 13 Z M26 98 L40 105 L31 90 Z M54 50 L68 57 L58 43 Z M30 8 L42 14 L47 26 L39 40 L21 40 L13 26 L18 14 Z" fill="#1e3a8a" stroke="#02050c" stroke-width="1.3" stroke-linejoin="round"/>` +
-    `<path d="M4 158 C8 114 20 74 52 44 C82 16 122 8 168 10 M20 18 L30 12 L40 18 L41 30 L30 38 L19 30 Z M27 27 L30 23 L33 27 L30 32 Z" stroke="#38bdf8" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" fill="none"/>` +
-    `<path d="M27 27 L30 23 L33 27 L30 32 Z" fill="#00f0ff"/>`;
-  return svg;
-}
-
-function initKaiserCardVineFrames(scopeEl = document) {
-  const cards = scopeEl.querySelectorAll('.tab-view.active-view .glass-card');
-  if (!cards.length) return;
-
-  const template = document.createElement('div');
-  template.className = 'kaiser-card-vines';
-  template.setAttribute('aria-hidden', 'true');
-  template.appendChild(createKaiserVineCornerSvg('tl'));
-  template.appendChild(createKaiserVineCornerSvg('br'));
-  const pulseSweep = document.createElement('span');
-  pulseSweep.className = 'kaiser-vine-pulse';
-  template.appendChild(pulseSweep);
-
-  cards.forEach((cardEl) => {
-    if (cardEl.querySelector('.kaiser-card-vines')) return;
-    cardEl.prepend(template.cloneNode(true));
-  });
-}
-
-function triggerVineNervePulseOnActiveTab(isTabSwitch = false) {
-  if (!isTabSwitch || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-  const activeCards = document.querySelectorAll('.tab-view.active-view .glass-card');
-  if (!activeCards.length) return;
-  activeCards.forEach((c) => c.classList.remove('vine-surge'));
-  requestAnimationFrame(() => {
-    activeCards.forEach((c) => c.classList.add('vine-surge'));
-  });
-}
-
 function initKineticHudInteractions() {
   const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   const hoverFineQuery = window.matchMedia?.('(hover: hover) and (pointer: fine)');
-
-  initKaiserCardVineFrames();
 
   // 1. Segmented sliding indicator fallback when CSS Anchor Positioning isn't supported
   if (!supportsAnchorSlidingPill) {
@@ -191,10 +149,10 @@ function initKineticHudInteractions() {
 }
 
 // Subscribe reactive view updates on tab navigation
+document.body.dataset.activeTab = state.activeTab || 'assistant';
+
 tacticalStore.subscribe('tab:changed', (tabName) => {
-  loadDeferredStyles();
-  initKaiserCardVineFrames();
-  triggerVineNervePulseOnActiveTab(true);
+  document.body.dataset.activeTab = tabName || 'assistant';
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     const activeViewEl = document.querySelector('.tab-view.active-view');
     if (activeViewEl) {
@@ -236,23 +194,74 @@ window.addEventListener('resize', () => {
   }
 });
 
-// Critical above-the-fold bootstrap: Blue Rose intro + Tab 1 shell
+// Critical above-the-fold bootstrap: Persistent Demo Device ID + Blue Rose intro + Auth Gate / App Shell
+getOrCreatePersistentDemoDeviceId();
+const cachedOnBoot = getStoredAuthSession();
+if (cachedOnBoot?.token) {
+  syncAuthSessionHeader(cachedOnBoot);
+  hideAuthGate();
+} else {
+  syncAuthSessionHeader(null);
+  showAuthGate({ mode: 'login', focusInput: false });
+}
+
 playBlueRoseIntroCinematic();
 initBlueRoseIntroEvents();
+initLoginBackdropCanvas();
+initAmbientBluePetalsCanvas();
 initChatViewEvents();
+initAuthView({
+  onSessionChanged: async (session) => {
+    state.activeChatSessionId = null;
+    state.squadPlayers = [];
+    state.indexedDocs = [];
+    state.chatSessions = [];
+    appendWelcomeMessage({ animate: false });
+    await Promise.all([refreshChatSessionsList(), refreshExpedientesList()]);
+    if (squadInitialized && session?.token && !isDemoSession(session)) {
+      refreshSquadAndOptimize();
+    }
+  }
+});
 appendWelcomeMessage({ animate: false });
 
-// Load remaining non-critical stylesheet outside the initial render-blocking path
+const isIntroOverlayVisible = () => {
+  const overlay = document.getElementById('intro-rose-overlay');
+  return Boolean(overlay && !overlay.classList.contains('hidden') && overlay.style.display !== 'none');
+};
+
+window.addEventListener('tactical:intro-finished', () => {
+  if (!getStoredAuthSession()) {
+    showAuthGate({ mode: 'login', focusInput: true });
+  }
+});
+
+window.addEventListener('tactical:auth-required', () => {
+  syncAuthSessionHeader(null);
+  state.activeChatSessionId = null;
+  state.chatSessions = [];
+  state.indexedDocs = [];
+  refreshChatSessionsList();
+  refreshExpedientesList();
+  showAuthGate({ mode: 'login', focusInput: !isIntroOverlayVisible() });
+});
+
 requestAnimationFrame(() => {
-  loadDeferredStyles();
   initKineticHudInteractions();
-  initAmbientBluePetalsCanvas();
 });
 
 // Defer Tab 2 / Tab 3 wiring and backend health probe into small idle main-thread chunks
 async function bootstrapDeferredModules() {
   await yieldToMain();
-  checkBackendHealth();
+  await checkBackendHealth();
+  const session = await bootstrapAuthSession();
+  if (session?.token) {
+    await Promise.all([refreshChatSessionsList(), refreshExpedientesList()]);
+  } else {
+    refreshChatSessionsList();
+    refreshExpedientesList();
+    await refreshDemoDeviceStatus();
+  }
 
   const scheduleIdle = window.requestIdleCallback
     ? (fn) => window.requestIdleCallback(fn, { timeout: 1200 })
@@ -261,7 +270,9 @@ async function bootstrapDeferredModules() {
   scheduleIdle(async () => {
     ensureBoardInitialized({ renderPitch: state.activeTab === 'board' });
     await yieldToMain();
-    ensureSquadInitialized({ refresh: state.activeTab === 'squad' });
+    ensureSquadInitialized({
+      refresh: Boolean(session?.token) && !isDemoSession(session) && state.activeTab === 'squad'
+    });
   });
 }
 

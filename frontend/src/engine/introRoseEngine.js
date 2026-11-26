@@ -77,8 +77,8 @@ function createBlueFlameParticles(count, width, height) {
 }
 
 /**
- * Dibuja un pétalo esculpido estilo anime/Blue Lock (gota curva con punta angular,
- * sombreado negro tinta en la base, borde iluminado en cian y nervadura central)
+ * Dibuja un pétalo geométrico facetado de Rosa Azul Abisal (planos poligonales,
+ * borde fino cian luminoso #7dd3fc/#e0f2fe y nervadura facetada interior)
  */
 function drawSculptedRosePetalOnCanvas(ctx, x, y, size, rotation, palette, alpha) {
   ctx.save();
@@ -87,48 +87,42 @@ function drawSculptedRosePetalOnCanvas(ctx, x, y, size, rotation, palette, alpha
   ctx.globalAlpha = alpha;
 
   const grad = ctx.createLinearGradient(0, size, 0, -size);
-  grad.addColorStop(0, palette.base);
-  grad.addColorStop(0.5, palette.mid);
-  grad.addColorStop(1, palette.rim);
+  grad.addColorStop(0, '#040b1a');
+  grad.addColorStop(0.38, palette.base || '#0f296e');
+  grad.addColorStop(0.75, palette.mid || '#1d4ed8');
+  grad.addColorStop(1, palette.rim || '#38bdf8');
 
   ctx.fillStyle = grad;
-  ctx.strokeStyle = 'rgba(56, 189, 248, 0.78)';
-  ctx.lineWidth = 1.45;
-  ctx.shadowColor = palette.glow;
-  ctx.shadowBlur = 10;
+  ctx.strokeStyle = 'rgba(125, 211, 252, 0.85)';
+  ctx.lineWidth = 1.1;
 
-  // Silueta esculpida de pétalo de rosa con pico superior angular y pliegue lateral
+  // Silueta poligonal facetada estilo Azul Abisal
   ctx.beginPath();
-  ctx.moveTo(0, -size * 1.08);
-  ctx.lineTo(size * 0.54, -size * 0.68);
-  ctx.quadraticCurveTo(size * 0.94, -size * 0.08, size * 0.54, size * 0.6);
-  ctx.lineTo(0, size * 1.0);
-  ctx.lineTo(-size * 0.54, size * 0.6);
-  ctx.quadraticCurveTo(-size * 0.94, -size * 0.08, -size * 0.54, -size * 0.68);
+  ctx.moveTo(0, -size * 1.04);
+  ctx.lineTo(size * 0.52, -size * 0.66);
+  ctx.lineTo(size * 0.76, -size * 0.08);
+  ctx.lineTo(size * 0.48, size * 0.62);
+  ctx.lineTo(0, size * 0.96);
+  ctx.lineTo(-size * 0.48, size * 0.62);
+  ctx.lineTo(-size * 0.76, -size * 0.08);
+  ctx.lineTo(-size * 0.52, -size * 0.66);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
 
-  // Filo interior translúcido cian eléctrico en el borde superior del pétalo
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = 'rgba(224, 242, 254, 0.44)';
+  // Faceta interna y filo superior cian luminoso (#e0f2fe)
+  ctx.strokeStyle = 'rgba(224, 242, 254, 0.56)';
   ctx.lineWidth = 0.85;
   ctx.beginPath();
-  ctx.moveTo(-size * 0.46, -size * 0.58);
-  ctx.lineTo(0, -size * 0.96);
-  ctx.lineTo(size * 0.46, -size * 0.58);
-  ctx.stroke();
-
-  // Nervadura central y pliegues laterales definidos
-  ctx.strokeStyle = 'rgba(186, 230, 253, 0.68)';
-  ctx.lineWidth = 0.9;
-  ctx.beginPath();
-  ctx.moveTo(0, -size * 0.82);
-  ctx.quadraticCurveTo(size * 0.12, 0, 0, size * 0.76);
-  ctx.moveTo(0, -size * 0.28);
+  ctx.moveTo(-size * 0.44, -size * 0.58);
+  ctx.lineTo(0, -size * 0.94);
+  ctx.lineTo(size * 0.44, -size * 0.58);
+  ctx.moveTo(0, -size * 0.92);
+  ctx.lineTo(0, size * 0.76);
+  ctx.moveTo(0, -size * 0.24);
   ctx.lineTo(size * 0.36, -size * 0.48);
-  ctx.moveTo(0, 0.04);
-  ctx.lineTo(-size * 0.36, -size * 0.22);
+  ctx.moveTo(0, 0.05);
+  ctx.lineTo(-size * 0.34, -size * 0.22);
   ctx.stroke();
 
   ctx.restore();
@@ -667,8 +661,11 @@ export function finishIntroAndRevealApp() {
       onComplete: () => {
         overlay.classList.add('hidden');
         overlay.style.display = 'none';
+        window.dispatchEvent(new CustomEvent('tactical:intro-finished'));
       }
     });
+  } else {
+    window.dispatchEvent(new CustomEvent('tactical:intro-finished'));
   }
 
   const visibleCards = document.querySelectorAll('.active-view .glass-card');
@@ -701,7 +698,7 @@ export function initBlueRoseIntroEvents() {
 }
 
 /* ==========================================================================
-   Ambient Background Canvas: 26 Floating Kaiser Blue Rose Petals (3D Tumble + DoF)
+   Ambient Background Canvas: 26 Floating Estética Azul Abisal Petals (3D Tumble + DoF)
    Auto-pauses on reduced-motion, hidden tab, opening intro, or print.
    ========================================================================== */
 let ambientRafId = null;
@@ -709,56 +706,106 @@ let ambientPausedByContentVis = false;
 
 export function initAmbientBluePetalsCanvas() {
   const canvas =
-    document.getElementById('kaiser-ambient-petals') ||
+    document.getElementById('abyssal-ambient-petals') ||
     document.getElementById('ambient-petals-canvas');
+  const fgCanvas = document.getElementById('abyssal-foreground-petals');
   const ambientBgEl = canvas?.parentElement;
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
+  const fgCtx = fgCanvas?.getContext('2d') || null;
   if (!ctx) return;
 
   const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const PETAL_COUNT = 26;
+  const PETAL_COUNT = 84;
   let width = window.innerWidth || 1280;
   let height = window.innerHeight || 720;
 
   const resizeCanvas = () => {
     width = window.innerWidth || 1280;
     height = window.innerHeight || 720;
-    canvas.width = width;
-    canvas.height = height;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (fgCanvas && fgCtx) {
+      fgCanvas.width = Math.round(width * dpr);
+      fgCanvas.height = Math.round(height * dpr);
+      fgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
   };
   resizeCanvas();
 
-  // 3 depth-of-field tiers: 0 = far/soft, 1 = mid-field, 2 = crisp foreground cobalt/cyan
+  // 84 curved organic petals across 3 depth layers + dual-axis 3D X/Y tumble + air turbulence
+  // 7 foreground hero petals (opacity 0.85), 42 mid (0.65), 35 background (0.25)
   const petals = Array.from({ length: PETAL_COUNT }, (_, i) => {
-    const depthTier = i % 3;
-    const depthScale = depthTier === 0 ? 0.54 : depthTier === 1 ? 0.9 : 1.26;
+    const depthTier = i < 7 ? 2 : i < 49 ? 1 : 0;
+    const depthScale = depthTier === 0 ? 0.54 : depthTier === 1 ? 0.92 : 1.48;
+    const baseSize = depthTier === 0 ? 9.5 : depthTier === 1 ? 12.5 : 15.5;
     return {
       x: Math.random() * width,
       y: Math.random() * height,
       depthTier,
       depthScale,
-      size: (9 + Math.random() * 6.5) * depthScale,
-      vx: -0.15 - depthScale * 0.17,
-      vy: 0.24 + depthScale * 0.34,
+      size: (baseSize + Math.random() * 4.5) * depthScale,
+      vx: depthTier === 2 ? -0.9 - Math.random() * 0.5 : -0.32 - depthScale * 0.25 - Math.random() * 0.18,
+      vy: depthTier === 2 ? 1.3 + Math.random() * 0.55 : 0.48 + depthScale * 0.42 + Math.random() * 0.22,
+      breezeVx: 0,
+      breezeVy: 0,
       angle: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.015,
-      tumble: Math.random() * Math.PI * 2,
-      tumbleSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.015 + depthScale * 0.012),
+      spin: (Math.random() - 0.5) * (depthTier === 2 ? 0.025 : 0.017),
+      tumbleX: Math.random() * Math.PI * 2,
+      tumbleY: Math.random() * Math.PI * 2,
+      tumbleXSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.016 + depthScale * 0.012),
+      tumbleYSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.011 + depthScale * 0.008),
       swayPhase: Math.random() * Math.PI * 2,
-      swayAmp: 0.26 + depthScale * 0.34,
-      alpha: depthTier === 0 ? 0.17 : depthTier === 1 ? 0.27 : 0.38,
+      turbFreq: 0.58 + Math.random() * 0.55,
+      turbFreq2: 1.15 + Math.random() * 0.75,
+      swayAmp: 0.32 + depthScale * 0.28,
+      swayAmp2: 0.18 + Math.random() * 0.2,
+      alpha: depthTier === 0 ? 0.25 : depthTier === 1 ? 0.65 : 0.85,
       palette: PETAL_COLORS[i % PETAL_COLORS.length]
     };
   });
+
+  // Gentle cursor breeze interaction without blocking clicks
+  window.addEventListener(
+    'pointermove',
+    (e) => {
+      if (reducedMotionMq.matches || isIntroRunning) return;
+      const mx = e.clientX;
+      const my = e.clientY;
+      for (const p of petals) {
+        const dx = p.x - mx;
+        const dy = p.y - my;
+        const distSq = dx * dx + dy * dy;
+        if (distSq > 0 && distSq < 20000) {
+          const factor = (1 - distSq / 20000) * 0.09 * (p.depthTier + 1);
+          p.breezeVx += (dx / Math.sqrt(distSq)) * factor;
+          p.breezeVy += (dy / Math.sqrt(distSq)) * factor * 0.45;
+        }
+      }
+    },
+    { passive: true }
+  );
+
+  // Low-opacity cyan "Telemetría" atmospheric diamond glints
+  const telemetrySparks = Array.from({ length: 22 }, (_, idx) => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    size: 2.5 + (idx % 3) * 1.4,
+    phase: Math.random() * Math.PI * 2,
+    speed: 1.1 + Math.random() * 1.3,
+    baseAlpha: 0.08 + Math.random() * 0.12
+  }));
 
   const stopAmbientLoop = () => {
     if (ambientRafId) {
       cancelAnimationFrame(ambientRafId);
       ambientRafId = null;
     }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, width, height);
+    if (fgCtx) fgCtx.clearRect(0, 0, width, height);
   };
 
   const shouldPause = () =>
@@ -773,36 +820,87 @@ export function initAmbientBluePetalsCanvas() {
       return;
     }
     const tSec = nowMs * 0.001;
+    const isAuthScreen = document.body.classList.contains('auth-locked');
     ctx.clearRect(0, 0, width, height);
+    if (fgCtx) fgCtx.clearRect(0, 0, width, height);
+
+    for (const s of telemetrySparks) {
+      const pulse = 0.35 + 0.65 * Math.abs(Math.sin(tSec * s.speed + s.phase));
+      const a = s.baseAlpha * pulse;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.globalAlpha = a;
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-s.size, 0);
+      ctx.lineTo(s.size, 0);
+      ctx.moveTo(0, -s.size);
+      ctx.lineTo(0, s.size);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     for (const p of petals) {
-      p.x += p.vx + Math.sin(tSec * 0.72 + p.swayPhase) * p.swayAmp;
-      p.y += p.vy;
+      p.breezeVx *= 0.94;
+      p.breezeVy *= 0.94;
+      const turbX =
+        Math.sin(tSec * p.turbFreq + p.swayPhase) * p.swayAmp +
+        Math.cos(tSec * p.turbFreq2 + p.spin * 90) * p.swayAmp2;
+      p.x += p.vx + p.breezeVx + turbX;
+      p.y += p.vy + p.breezeVy;
       p.angle += p.spin;
-      p.tumble += p.tumbleSpeed;
+      p.tumbleX += p.tumbleXSpeed;
+      p.tumbleY += p.tumbleYSpeed;
 
-      if (p.y > height + 36) {
-        p.y = -28;
-        p.x = Math.random() * width;
+      if (p.y > height + 44) {
+        p.y = -36;
+        p.x = Math.random() * (width + 180);
       }
-      if (p.x < -36) p.x = width + 24;
-      if (p.x > width + 36) p.x = -24;
+      if (p.x < -56) p.x = width + 44;
+      if (p.x > width + 200) p.x = -36;
 
-      // Simulated 3D perspective flip across horizontal axis + DoF glow hierarchy
-      const rawCos = Math.cos(p.tumble);
-      const scale3dX = (rawCos >= 0 ? 1 : -1) * (0.24 + Math.abs(rawCos) * 0.76);
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.scale(scale3dX, 1);
+      const bottomFade = Math.min(1, Math.max(0.16, (height + 28 - p.y) / (height * 0.22)));
+      const effectiveAlpha = p.alpha * bottomFade;
+      const targetCtx = p.depthTier === 2 && isAuthScreen && fgCtx ? fgCtx : ctx;
+
+      // Foreground layer: subtle aerodynamic cyan trail
       if (p.depthTier === 2) {
-        ctx.shadowColor = 'rgba(0, 240, 255, 0.38)';
-        ctx.shadowBlur = 7;
-      } else if (p.depthTier === 0) {
-        ctx.shadowColor = 'rgba(29, 78, 216, 0.28)';
-        ctx.shadowBlur = 10;
+        targetCtx.save();
+        const trailLen = 34;
+        const tx = p.x - p.vx * trailLen;
+        const ty = p.y - p.vy * trailLen;
+        const tGrad = targetCtx.createLinearGradient(p.x, p.y, tx, ty);
+        tGrad.addColorStop(0, `rgba(0, 240, 255, ${0.28 * bottomFade})`);
+        tGrad.addColorStop(1, 'rgba(29, 78, 216, 0)');
+        targetCtx.strokeStyle = tGrad;
+        targetCtx.lineWidth = 3.0;
+        targetCtx.lineCap = 'round';
+        targetCtx.beginPath();
+        targetCtx.moveTo(p.x, p.y);
+        targetCtx.lineTo(tx, ty);
+        targetCtx.stroke();
+        targetCtx.restore();
       }
-      drawSculptedRosePetalOnCanvas(ctx, 0, 0, p.size, p.angle, p.palette, p.alpha);
-      ctx.restore();
+
+      // Dual-axis continuous 3D rotation (X & Y axes)
+      const cosX = Math.cos(p.tumbleX);
+      const cosY = Math.cos(p.tumbleY);
+      const scale3dX = (cosX >= 0 ? 1 : -1) * (0.26 + Math.abs(cosX) * 0.74);
+      const scale3dY = (cosY >= 0 ? 1 : -1) * (0.42 + Math.abs(cosY) * 0.58);
+
+      targetCtx.save();
+      targetCtx.translate(p.x, p.y);
+      targetCtx.scale(scale3dX, scale3dY);
+      if (p.depthTier === 2) {
+        targetCtx.shadowColor = 'rgba(0, 240, 255, 0.38)';
+        targetCtx.shadowBlur = 9;
+      } else if (p.depthTier === 1) {
+        targetCtx.shadowColor = 'rgba(56, 189, 248, 0.24)';
+        targetCtx.shadowBlur = 5;
+      }
+      drawSculptedRosePetalOnCanvas(targetCtx, 0, 0, p.size, p.angle, p.palette, effectiveAlpha);
+      targetCtx.restore();
     }
 
     ambientRafId = requestAnimationFrame(tick);

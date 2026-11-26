@@ -10,8 +10,9 @@ import {
   escapeHtml,
   showToast,
   animateNumericCounter,
-  triggerKaiserImpactShockwave,
+  triggerTacticalShockwave,
   getPersonInitials,
+  formatFormationLabel,
   PLAY_STYLE_MODIFIERS,
   FUTSAL_ATTACK_PLAYS,
   FIELD_ATTACK_PLAYS,
@@ -62,6 +63,28 @@ function toggleStadium3DView(forceState = null, coords = []) {
 
 let currentBoardCoords = [];
 let currentSquadCoords = [];
+const manualBoardOverrides = new Map();
+let lastBoardTopologyKey = '';
+
+export function resetBoardManualPositions() {
+  manualBoardOverrides.clear();
+}
+
+function updateBoardSynergyLinksOnly(activeSetup, coords) {
+  if (!dom.synergyLinks || getActiveSetPiece()) return;
+  dom.synergyLinks.innerHTML = '';
+  (activeSetup?.links || []).forEach(([fromIdx, toIdx]) => {
+    const p1 = coords[fromIdx];
+    const p2 = coords[toIdx];
+    if (!p1 || !p2) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', p1.adjX ?? p1.x);
+    line.setAttribute('y1', p1.adjY ?? p1.y);
+    line.setAttribute('x2', p2.adjX ?? p2.x);
+    line.setAttribute('y2', p2.adjY ?? p2.y);
+    dom.synergyLinks.appendChild(line);
+  });
+}
 
 export function clearPlaybackTimers() {
   while (state.playbackTimers.length > 0) {
@@ -142,10 +165,10 @@ function buildQuadraticBezierD(x1, y1, x2, y2, curveIntensity = 0.2) {
   return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
 }
 
-function spawnKaiserImpactFlash2D(tx, ty) {
+function spawnTacticalImpactFlash2D(tx, ty) {
   if (!dom.tacticalPitch) return;
   const flashEl = document.createElement('div');
-  flashEl.className = 'kaiser-impact-shockwave';
+  flashEl.className = 'abyssal-impact-shockwave';
   flashEl.setAttribute('aria-hidden', 'true');
   dom.tacticalPitch.appendChild(flashEl);
 
@@ -168,7 +191,7 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
   if (!dom.ballToken) return;
   if (!visible) {
     dom.ballToken.classList.add('hidden');
-    dom.ballToken.classList.remove('is-moving', 'kaiser-impact-active');
+    dom.ballToken.classList.remove('is-moving', 'abyssal-impact-active');
     return;
   }
   const pitchWidth = dom.pitchTokens.clientWidth || 720;
@@ -182,10 +205,10 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   if (animateBlur && !reducedMotion) {
-    dom.ballToken.classList.add('kaiser-impact-active');
+    dom.ballToken.classList.add('abyssal-impact-active');
     triggerMotionBlurOnElements([dom.ballToken], 980);
   } else {
-    dom.ballToken.classList.remove('kaiser-impact-active');
+    dom.ballToken.classList.remove('abyssal-impact-active');
   }
 
   gsap.to(dom.ballToken, {
@@ -198,9 +221,9 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
     ease: animateBlur ? 'power3.out' : 'back.out(1.5)',
     overwrite: 'auto',
     onComplete: () => {
-      dom.ballToken?.classList.remove('kaiser-impact-active');
+      dom.ballToken?.classList.remove('abyssal-impact-active');
       if (animateBlur && !reducedMotion) {
-        spawnKaiserImpactFlash2D(tx, ty);
+        spawnTacticalImpactFlash2D(tx, ty);
         gsap.to(dom.ballToken, {
           scale: 1,
           rotateX: state.isTv25DView ? -28 : 0,
@@ -227,9 +250,6 @@ export function syncCameraSegmentedButtons() {
   if (dom.toggleStadium3dBtn) {
     dom.toggleStadium3dBtn.classList.toggle('active', is3d);
     dom.toggleStadium3dBtn.setAttribute('aria-pressed', String(is3d));
-  }
-  if (dom.sidebarCameraValue) {
-    dom.sidebarCameraValue.textContent = is3d ? 'Estadio 3D' : is25d ? 'TV 2.5D' : '2D Cenital';
   }
 }
 
@@ -290,6 +310,15 @@ export function toggleTv25DView(forceState = null) {
 }
 
 export function handleToggleStadium3D(forceState = null) {
+  if ((state.authSession?.isDemo || state.authSession?.username === 'demo') && forceState !== false) {
+    window.dispatchEvent(new CustomEvent('tactical:open-unlock-modal', { detail: { reason: 'stadium3d' } }));
+    showToast(
+      'Estadio 3D Exclusivo',
+      'El Estadio 3D no está disponible en Modo Demo. Regístrate gratis para desbloquearlo.',
+      'info'
+    );
+    return;
+  }
   if (state.isTv25DView && forceState !== false) {
     toggleTv25DView(false);
   }
@@ -596,7 +625,7 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
     );
   });
 
-  // 2. Trayectorias curvas Bézier del balón + Kaiser Impact Trail (#00f0ff)
+  // 2. Trayectorias curvas Bézier del balón + Impacto Táctico Trail (#00f0ff)
   const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const bp = setPiece.ballPath || [];
   for (let i = 0; i < bp.length - 1; i++) {
@@ -612,30 +641,30 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
     if (isShot) {
       ballCurve.setAttribute('stroke', 'rgba(244, 63, 94, 0.92)');
       ballCurve.setAttribute('stroke-width', '2.4');
-      ballCurve.setAttribute('marker-end', 'url(#arrow-kaiser)');
+      ballCurve.setAttribute('marker-end', 'url(#arrow-abyssal)');
     } else {
       ballCurve.setAttribute('stroke', 'rgba(56, 189, 248, 0.88)');
       ballCurve.setAttribute('stroke-width', '2.1');
-      ballCurve.setAttribute('marker-end', 'url(#arrow-kaiser)');
+      ballCurve.setAttribute('marker-end', 'url(#arrow-abyssal)');
     }
     dom.setpieceOverlay.appendChild(ballCurve);
 
-    const kaiserTrail = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    kaiserTrail.setAttribute('d', d);
-    kaiserTrail.setAttribute(
+    const impactTrail = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    impactTrail.setAttribute('d', d);
+    impactTrail.setAttribute(
       'class',
-      `bezier-motion-trail kaiser-impact-trail ${isShot ? 'shot-trail' : 'pass-trail'}`
+      `bezier-motion-trail abyssal-impact-trail ${isShot ? 'shot-trail' : 'pass-trail'}`
     );
-    dom.setpieceOverlay.appendChild(kaiserTrail);
+    dom.setpieceOverlay.appendChild(impactTrail);
 
-    const kaiserCore = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    kaiserCore.setAttribute('d', d);
-    kaiserCore.setAttribute('class', 'bezier-motion-trail kaiser-impact-core');
-    dom.setpieceOverlay.appendChild(kaiserCore);
+    const impactCore = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    impactCore.setAttribute('d', d);
+    impactCore.setAttribute('class', 'bezier-motion-trail abyssal-impact-core');
+    dom.setpieceOverlay.appendChild(impactCore);
 
     if (!prefersReducedMotion) {
       gsap.fromTo(
-        kaiserTrail,
+        impactTrail,
         { strokeDasharray: '42 260', strokeDashoffset: 220, opacity: 1 },
         {
           strokeDashoffset: 0,
@@ -646,7 +675,7 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
         }
       );
       gsap.fromTo(
-        kaiserCore,
+        impactCore,
         { strokeDasharray: '28 280', strokeDashoffset: 220, opacity: 0.96 },
         {
           strokeDashoffset: 0,
@@ -657,8 +686,8 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
         }
       );
     } else {
-      kaiserTrail.style.opacity = '0.72';
-      kaiserCore.style.opacity = '0.88';
+      impactTrail.style.opacity = '0.72';
+      impactCore.style.opacity = '0.88';
     }
   }
 }
@@ -700,7 +729,8 @@ export function playSetPieceAnimation() {
   const activeSetPiece = getActiveSetPiece();
   if (!activeSetPiece) return;
 
-  triggerKaiserImpactShockwave(dom.playSetpieceBtn, dom.tacticalPitch);
+  manualBoardOverrides.clear();
+  triggerTacticalShockwave(dom.playSetpieceBtn, dom.tacticalPitch);
 
   clearPlaybackTimers();
   const totalSteps = activeSetPiece.steps.length || 3;
@@ -762,6 +792,7 @@ export function advanceNextSetPieceStep() {
 
 export function resetSetPieceToStart() {
   clearPlaybackTimers();
+  manualBoardOverrides.clear();
   state.setPieceStep = 1;
   executeSetPieceStep(1);
 }
@@ -835,7 +866,7 @@ export function renderTacticalPitch(animateMotionBlur = false) {
     ? `Pizarra Táctica · ${state.modality} (Tu Plantilla en Cancha)`
     : `Pizarra Táctica · ${state.modality}`;
   dom.boardStyleBadge.textContent = state.playStyle;
-  dom.formationBadge.textContent = activeSetup.code;
+  dom.formationBadge.textContent = formatFormationLabel(activeSetup.code);
 
   const coachInfo = resolveReferenceCoach(state.modality, activeSetup.code, state.playStyle);
   if (dom.coachNameText) {
@@ -873,7 +904,18 @@ export function renderTacticalPitch(animateMotionBlur = false) {
     });
   }
 
+  const topologyKey = `${state.modality}|${state.formationIndex}|${state.playStyle}|${state.setPieceCategory}|${state.setPieceIndex}|${state.setPieceStep}`;
+  if (topologyKey !== lastBoardTopologyKey) {
+    manualBoardOverrides.clear();
+    lastBoardTopologyKey = topologyKey;
+  }
+
   const adjustedCoords = activeSetup.players.map((p, idx) => {
+    const manualPos = manualBoardOverrides.get(idx);
+    if (manualPos) {
+      return { ...p, adjX: manualPos.x, adjY: manualPos.y, isActor: Boolean(actorMovementMap.get(idx)) };
+    }
+
     const actorMv = actorMovementMap.get(idx);
     if (actorMv) {
       let progress = 0;
@@ -919,6 +961,7 @@ export function renderTacticalPitch(animateMotionBlur = false) {
 
       // Eventos Hover para proyectar Zona de Influencia y Triángulos de Pase Dinámicos
       tokenEl.addEventListener('mouseenter', () => {
+        if (tokenEl.classList.contains('is-dragging')) return;
         const hoverIdx = Number(tokenEl.dataset.slotIndex || 0);
         const visionVal = Number(tokenEl.dataset.vision || 86);
         renderHoverInfluenceOnPitch(
@@ -932,8 +975,101 @@ export function renderTacticalPitch(animateMotionBlur = false) {
       tokenEl.addEventListener('mouseleave', () => {
         clearHoverInfluenceOnPitch(dom.hoverInfluenceLayer, dom.pitchTokens);
       });
-      // Clic en ficha dentro de #tactical-pitch para fijar el aura Metavision giratoria en Juego Libre
+
+      // Arrastre manual en vivo para recalcular Mapa de Calor y líneas de sinergia
+      let tokenDragState = null;
+      tokenEl.addEventListener('pointerdown', (e) => {
+        if (state.isDrawModeActive || state.isStadium3DView) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        tokenDragState = {
+          pointerId: e.pointerId,
+          startClientX: e.clientX,
+          startClientY: e.clientY,
+          isDragging: false
+        };
+        try {
+          tokenEl.setPointerCapture(e.pointerId);
+        } catch {}
+      });
+
+      tokenEl.addEventListener('pointermove', (e) => {
+        if (!tokenDragState || e.pointerId !== tokenDragState.pointerId) return;
+        const distPx = Math.hypot(e.clientX - tokenDragState.startClientX, e.clientY - tokenDragState.startClientY);
+        if (!tokenDragState.isDragging) {
+          if (distPx < 4.5) return;
+          tokenDragState.isDragging = true;
+          tokenEl.dataset.suppressNextClick = '1';
+          tokenEl.classList.add('is-dragging');
+          clearHoverInfluenceOnPitch(dom.hoverInfluenceLayer, dom.pitchTokens);
+        }
+
+        const slotIdx = Number(tokenEl.dataset.slotIndex || 0);
+        const pt = clientToSvgCoords(dom.pitchTokens, e.clientX, e.clientY, 16, 344, 16, 204);
+        manualBoardOverrides.set(slotIdx, { x: pt.x, y: pt.y });
+        if (currentBoardCoords[slotIdx]) {
+          currentBoardCoords[slotIdx].adjX = pt.x;
+          currentBoardCoords[slotIdx].adjY = pt.y;
+        }
+
+        const liveW = dom.pitchTokens.clientWidth || 720;
+        const liveH = dom.pitchTokens.clientHeight || 430;
+        const txLive = Math.round((pt.x / 360) * liveW);
+        const tyLive = Math.round((pt.y / 220) * liveH);
+        tokenEl.dataset.tx = String(txLive);
+        tokenEl.dataset.ty = String(tyLive);
+        gsap.set(tokenEl, {
+          x: txLive,
+          y: tyLive,
+          rotateX: state.isTv25DView ? -28 : 0,
+          overwrite: 'auto'
+        });
+
+        const liveSetup = getActiveFormationSetup();
+        const liveStyleMod =
+          PLAY_STYLE_MODIFIERS[state.playStyle] || PLAY_STYLE_MODIFIERS['Posesión & Juego de Posición'];
+        updateBoardSynergyLinksOnly(liveSetup, currentBoardCoords);
+        if (state.isHeatmapActive) {
+          renderTacticalHeatmap(currentBoardCoords, liveSetup.links || [], liveStyleMod, { animate: false });
+        }
+      });
+
+      const finishTokenDrag = (e) => {
+        if (!tokenDragState || (e?.pointerId !== undefined && e.pointerId !== tokenDragState.pointerId)) {
+          return;
+        }
+        const wasDragging = tokenDragState.isDragging;
+        tokenDragState = null;
+        tokenEl.classList.remove('is-dragging');
+        if (e?.pointerId !== undefined && tokenEl.hasPointerCapture(e.pointerId)) {
+          try {
+            tokenEl.releasePointerCapture(e.pointerId);
+          } catch {}
+        }
+        if (wasDragging) {
+          setTimeout(() => {
+            delete tokenEl.dataset.suppressNextClick;
+          }, 60);
+          const liveSetup = getActiveFormationSetup();
+          const liveStyleMod =
+            PLAY_STYLE_MODIFIERS[state.playStyle] || PLAY_STYLE_MODIFIERS['Posesión & Juego de Posición'];
+          if (state.isHeatmapActive) {
+            renderTacticalHeatmap(currentBoardCoords, liveSetup.links || [], liveStyleMod, { animate: false });
+          }
+          if (state.isStadium3DView) {
+            syncStadium3DScene(currentBoardCoords, getActiveSetPiece());
+          }
+        }
+      };
+
+      tokenEl.addEventListener('pointerup', finishTokenDrag);
+      tokenEl.addEventListener('pointercancel', finishTokenDrag);
+
+      // Clic en ficha dentro de #tactical-pitch para fijar el aura Telemetría giratoria en Juego Libre
       tokenEl.addEventListener('click', () => {
+        if (tokenEl.dataset.suppressNextClick === '1') {
+          delete tokenEl.dataset.suppressNextClick;
+          return;
+        }
         if (getActiveSetPiece()) return;
         const clickedIdx = Number(tokenEl.dataset.slotIndex || 0);
         dom.pitchTokens.dataset.focusedSlot = String(clickedIdx);
@@ -963,7 +1099,7 @@ export function renderTacticalPitch(animateMotionBlur = false) {
       : null;
     const visionStat = matchedCustomPlayer?.vision || (p.gk ? 84 : 88);
 
-    let isMetavisionFocused = Boolean(p.isActor);
+    let isTelemetryFocused = Boolean(p.isActor);
     if (!activeSetPiece) {
       let focusedSlot = Number.parseInt(dom.pitchTokens.dataset.focusedSlot || '', 10);
       if (Number.isNaN(focusedSlot) || focusedSlot >= adjustedCoords.length) {
@@ -973,11 +1109,11 @@ export function renderTacticalPitch(animateMotionBlur = false) {
         focusedSlot = defaultIdx >= 0 ? defaultIdx : Math.max(0, Math.floor(adjustedCoords.length / 2));
         dom.pitchTokens.dataset.focusedSlot = String(focusedSlot);
       }
-      isMetavisionFocused = idx === focusedSlot;
-      adjustedCoords[idx].isActor = isMetavisionFocused;
+      isTelemetryFocused = idx === focusedSlot;
+      adjustedCoords[idx].isActor = isTelemetryFocused;
     }
 
-    tokenEl.className = `player-token ${p.gk ? 'gk' : ''} ${isMetavisionFocused ? 'active-actor' : ''}`.trim();
+    tokenEl.className = `player-token ${p.gk ? 'gk' : ''} ${isTelemetryFocused ? 'active-actor' : ''}`.trim();
     tokenEl.textContent = tokenNum;
     tokenEl.setAttribute('data-role', tokenRoleLabel);
     tokenEl.dataset.slotIndex = String(idx);
@@ -1201,70 +1337,282 @@ export function renderSquadPitch() {
 }
 
 /**
- * 1. Mapa de Calor Táctico Dinámico (SVG Thermal Layer)
- * Calcula zonas térmicas difuminadas a partir de las posiciones activas y el estilo de juego.
+ * 1. Mapa de Calor Táctico Dinámico (Densidad Gaussiana + Telemetría Zonal en Vivo)
  */
-export function renderTacticalHeatmap(adjustedCoords = [], links = [], styleMod = {}) {
+function allocateRoundedPercentages(counts = []) {
+  const total = counts.reduce((acc, n) => acc + Math.max(0, n), 0);
+  if (total <= 0) {
+    return counts.map((_, idx) => (idx === 1 ? 34 : 33));
+  }
+  const exact = counts.map((c) => (Math.max(0, c) / total) * 100);
+  const floored = exact.map((v) => Math.floor(v));
+  let remainder = 100 - floored.reduce((acc, n) => acc + n, 0);
+  const order = exact
+    .map((v, idx) => ({ idx, frac: v - floored[idx] }))
+    .sort((a, b) => b.frac - a.frac);
+  for (let i = 0; i < remainder && i < order.length; i++) {
+    floored[order[i].idx] += 1;
+  }
+  return floored;
+}
+
+function detectThermalVulnerability(lanes, thirds) {
+  const { leftPct, centerPct, rightPct } = lanes;
+  const { exitPct, buildPct, finishPct } = thirds;
+  const flankDiff = Math.abs(leftPct - rightPct);
+
+  if (centerPct >= 52 && leftPct <= 26 && rightPct <= 26) {
+    return {
+      level: centerPct >= 62 ? 'critical' : 'warning',
+      badgeLabel: 'Congestión Central',
+      headline: `Alta densidad en carril central (${centerPct}%) — Bandas exteriores expuestas ante amplitud rival.`
+    };
+  }
+  if (rightPct <= 15 && (centerPct >= 38 || leftPct >= 35)) {
+    const domZone = centerPct >= leftPct ? 'carril central' : 'carril izquierdo';
+    const domVal = Math.max(centerPct, leftPct);
+    return {
+      level: rightPct === 0 ? 'critical' : 'warning',
+      badgeLabel: 'Banda Der. Expuesta',
+      headline: `Alta densidad en ${domZone} (${domVal}%) — Banda derecha (${rightPct}%) expuesta a transición rival.`
+    };
+  }
+  if (leftPct <= 15 && (centerPct >= 38 || rightPct >= 35)) {
+    const domZone = centerPct >= rightPct ? 'carril central' : 'carril derecho';
+    const domVal = Math.max(centerPct, rightPct);
+    return {
+      level: leftPct === 0 ? 'critical' : 'warning',
+      badgeLabel: 'Banda Izq. Expuesta',
+      headline: `Alta densidad en ${domZone} (${domVal}%) — Banda izquierda (${leftPct}%) expuesta a transición rival.`
+    };
+  }
+  if (flankDiff >= 24) {
+    const weakFlank = leftPct < rightPct ? 'izquierda' : 'derecha';
+    const weakPct = Math.min(leftPct, rightPct);
+    const strongFlank = leftPct < rightPct ? 'derecho' : 'izquierdo';
+    const strongPct = Math.max(leftPct, rightPct);
+    return {
+      level: 'warning',
+      badgeLabel: 'Descompensación Lateral',
+      headline: `Sobrecarga en carril ${strongFlank} (${strongPct}%) — Banda ${weakFlank} (${weakPct}%) vulnerable a cambio de orientación.`
+    };
+  }
+  if (exitPct >= 54 && finishPct <= 16) {
+    return {
+      level: 'warning',
+      badgeLabel: 'Bloque Hundido',
+      headline: `Alta concentración en tercio de salida (${exitPct}%) — Poca presencia ofensiva en finalización (${finishPct}%).`
+    };
+  }
+  if (finishPct >= 50 && exitPct <= 22) {
+    return {
+      level: 'warning',
+      badgeLabel: 'Espalda Vulnerable',
+      headline: `Bloque volcado en finalización (${finishPct}%) — Tercio de salida (${exitPct}%) expuesto a balón largo rival.`
+    };
+  }
+  if (buildPct <= 15 && exitPct >= 28 && finishPct >= 28) {
+    return {
+      level: 'warning',
+      badgeLabel: 'Equipo Partido',
+      headline: `Baja ocupación en creación (${buildPct}%) — Riesgo de desconexión entre bloque defensivo y ataque.`
+    };
+  }
+  return {
+    level: 'balanced',
+    badgeLabel: 'Equilibrio Zonal',
+    headline: `Distribución espacial equilibrada (${leftPct}% Izq · ${centerPct}% Cen · ${rightPct}% Der) con coberturas escalonadas.`
+  };
+}
+
+export function computeThermalTelemetry(adjustedCoords = currentBoardCoords) {
+  const activeCoords = Array.isArray(adjustedCoords) && adjustedCoords.length > 0
+    ? adjustedCoords
+    : getActiveFormationSetup().players.map((p) => ({ ...p, adjX: p.x, adjY: p.y }));
+
+  const outfield = activeCoords.filter((p) => !p.gk);
+  const laneSample = outfield.length >= 2 ? outfield : activeCoords;
+
+  let leftCount = 0;
+  let centerCount = 0;
+  let rightCount = 0;
+  laneSample.forEach((p) => {
+    const py = p.adjY ?? p.y;
+    if (py < 80) leftCount += 1;
+    else if (py <= 140) centerCount += 1;
+    else rightCount += 1;
+  });
+
+  let exitCount = 0;
+  let buildCount = 0;
+  let finishCount = 0;
+  activeCoords.forEach((p) => {
+    const px = p.adjX ?? p.x;
+    if (px < 123) exitCount += 1;
+    else if (px < 236) buildCount += 1;
+    else finishCount += 1;
+  });
+
+  const [leftPct, centerPct, rightPct] = allocateRoundedPercentages([leftCount, centerCount, rightCount]);
+  const [exitPct, buildPct, finishPct] = allocateRoundedPercentages([exitCount, buildCount, finishCount]);
+  const lanes = { leftPct, centerPct, rightPct };
+  const thirds = { exitPct, buildPct, finishPct };
+  const alert = detectThermalVulnerability(lanes, thirds);
+
+  return {
+    lanes,
+    thirds,
+    alert,
+    totalPlayers: activeCoords.length,
+    outfieldPlayers: laneSample.length
+  };
+}
+
+function renderThermalTelemetryPanel(telemetry, visible) {
+  if (!dom.heatmapTelemetryPanel) return;
+  dom.heatmapTelemetryPanel.classList.toggle('hidden', !visible);
+  if (!visible || !telemetry) return;
+
+  state.lastThermalTelemetry = telemetry;
+  const { lanes, thirds, alert } = telemetry;
+
+  if (dom.heatLaneLeftPct) dom.heatLaneLeftPct.textContent = `${lanes.leftPct}%`;
+  if (dom.heatLaneCenterPct) dom.heatLaneCenterPct.textContent = `${lanes.centerPct}%`;
+  if (dom.heatLaneRightPct) dom.heatLaneRightPct.textContent = `${lanes.rightPct}%`;
+  if (dom.heatLaneLeftBar) dom.heatLaneLeftBar.style.width = `${lanes.leftPct}%`;
+  if (dom.heatLaneCenterBar) dom.heatLaneCenterBar.style.width = `${lanes.centerPct}%`;
+  if (dom.heatLaneRightBar) dom.heatLaneRightBar.style.width = `${lanes.rightPct}%`;
+
+  if (dom.heatThirdExitPct) dom.heatThirdExitPct.textContent = `${thirds.exitPct}%`;
+  if (dom.heatThirdBuildPct) dom.heatThirdBuildPct.textContent = `${thirds.buildPct}%`;
+  if (dom.heatThirdFinishPct) dom.heatThirdFinishPct.textContent = `${thirds.finishPct}%`;
+  if (dom.heatThirdExitBar) dom.heatThirdExitBar.style.width = `${thirds.exitPct}%`;
+  if (dom.heatThirdBuildBar) dom.heatThirdBuildBar.style.width = `${thirds.buildPct}%`;
+  if (dom.heatThirdFinishBar) dom.heatThirdFinishBar.style.width = `${thirds.finishPct}%`;
+
+  if (dom.heatmapVulnerabilityBadge) {
+    dom.heatmapVulnerabilityBadge.className = `heat-alert-badge ${alert.level}`;
+    dom.heatmapVulnerabilityBadge.textContent = alert.badgeLabel;
+  }
+  if (dom.heatmapVulnerabilityText) {
+    dom.heatmapVulnerabilityText.textContent = alert.headline;
+  }
+}
+
+export function getHeatmapRagPrompt() {
+  const setup = getActiveFormationSetup();
+  const telemetry = state.lastThermalTelemetry || computeThermalTelemetry(currentBoardCoords);
+  const { lanes, thirds, alert } = telemetry;
+  return (
+    `Diagnóstico térmico actual en ${state.modality} (sistema ${formatFormationLabel(setup.code)}, modelo "${state.playStyle}"):\n` +
+    `• Ocupación por carriles (jugadores de campo): Izquierdo ${lanes.leftPct}%, Central ${lanes.centerPct}%, Derecho ${lanes.rightPct}%.\n` +
+    `• Ocupación por tercios: Salida ${thirds.exitPct}%, Creación ${thirds.buildPct}%, Finalización ${thirds.finishPct}%.\n` +
+    `• Alerta detectada: ${alert.headline}\n` +
+    `Con base en tu conocimiento táctico en pgvector, sugiere correcciones posicionales concretas, basculaciones y ajustes de altura/amplitud para equilibrar las zonas vulnerables sin perder eficacia ofensiva.`
+  );
+}
+
+export function renderTacticalHeatmap(adjustedCoords = [], links = [], styleMod = {}, { animate = true } = {}) {
   if (!dom.heatmapOverlayLayer) return;
   dom.heatmapOverlayLayer.innerHTML = '';
 
   if (!state.isHeatmapActive) {
     dom.heatmapOverlayLayer.classList.add('hidden');
+    renderThermalTelemetryPanel(null, false);
     return;
   }
 
   dom.heatmapOverlayLayer.classList.remove('hidden');
 
-  const isHighPress = state.playStyle.includes('Presión Alta') || state.playStyle.includes('Directo');
-  const isPossession = state.playStyle.includes('Posesión') || state.playStyle.includes('Rotación');
-  const isLowBlock = state.playStyle.includes('Bloque Bajo');
+  const activeCoords = Array.isArray(adjustedCoords) && adjustedCoords.length > 0
+    ? adjustedCoords
+    : getActiveFormationSetup().players.map((p) => ({ ...p, adjX: p.x, adjY: p.y }));
 
-  const thermalShiftX = isHighPress ? 14 : isLowBlock ? -12 : 4;
-  const rxBase = isHighPress ? 42 : isPossession ? 38 : 34;
-  const ryBase = isPossession ? 36 : 30;
-
-  // Puentes térmicos en las zonas de asociación entre socios conectados
+  // Puentes térmicos en las zonas de asociación directa entre socios conectados
   links.forEach(([fromIdx, toIdx]) => {
-    const p1 = adjustedCoords[fromIdx];
-    const p2 = adjustedCoords[toIdx];
+    const p1 = activeCoords[fromIdx];
+    const p2 = activeCoords[toIdx];
     if (!p1 || !p2) return;
-    const midX = Math.max(22, Math.min(338, (p1.adjX + p2.adjX) / 2 + thermalShiftX * 0.6));
-    const midY = (p1.adjY + p2.adjY) / 2;
+    const x1 = p1.adjX ?? p1.x;
+    const y1 = p1.adjY ?? p1.y;
+    const x2 = p2.adjX ?? p2.x;
+    const y2 = p2.adjY ?? p2.y;
+    const dist = Math.hypot(x2 - x1, y2 - y1);
+    const proximityBoost = Math.max(0.4, Math.min(1.15, 95 / Math.max(40, dist)));
+    const midX = Math.max(22, Math.min(338, (x1 + x2) / 2));
+    const midY = Math.max(20, Math.min(200, (y1 + y2) / 2));
 
     const bridgeBlob = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
     bridgeBlob.setAttribute('cx', String(Math.round(midX)));
     bridgeBlob.setAttribute('cy', String(Math.round(midY)));
-    bridgeBlob.setAttribute('rx', String(Math.round(rxBase * 0.85)));
-    bridgeBlob.setAttribute('ry', String(Math.round(ryBase * 0.78)));
+    bridgeBlob.setAttribute('rx', String(Math.round(28 * proximityBoost)));
+    bridgeBlob.setAttribute('ry', String(Math.round(24 * proximityBoost)));
     bridgeBlob.setAttribute('fill', 'url(#heat-grad-bridge)');
+    bridgeBlob.setAttribute('opacity', String(Math.round(Math.min(0.88, 0.45 * proximityBoost) * 100) / 100));
     dom.heatmapOverlayLayer.appendChild(bridgeBlob);
   });
 
-  // Focos térmicos principales por jugador según su línea y estilo
-  adjustedCoords.forEach((p) => {
-    const shift = p.gk ? thermalShiftX * 0.2 : thermalShiftX;
-    const cx = Math.max(20, Math.min(340, p.adjX + shift));
-    const cy = p.adjY;
-    const rx = p.gk ? 26 : rxBase;
-    const ry = p.gk ? 24 : ryBase;
+  // Densidad Gaussiana local calculada sobre las posiciones reales (x, y) de las fichas
+  const sigmaXSq2 = 2 * 46 * 46;
+  const sigmaYSq2 = 2 * 36 * 36;
+  activeCoords.forEach((p, idx) => {
+    const cx = Math.max(18, Math.min(342, p.adjX ?? p.x));
+    const cy = Math.max(18, Math.min(202, p.adjY ?? p.y));
+
+    let gaussianDensity = 0;
+    activeCoords.forEach((other, oIdx) => {
+      if (other.gk && oIdx !== idx) return;
+      const ox = other.adjX ?? other.x;
+      const oy = other.adjY ?? other.y;
+      const dx = cx - ox;
+      const dy = cy - oy;
+      gaussianDensity += Math.exp(-(dx * dx) / sigmaXSq2 - (dy * dy) / sigmaYSq2);
+    });
+
+    const gradRef = p.gk
+      ? 'url(#heat-grad-low)'
+      : gaussianDensity >= 1.95
+        ? 'url(#heat-grad-hotspot)'
+        : gaussianDensity >= 1.3
+          ? 'url(#heat-grad-core)'
+          : 'url(#heat-grad-low)';
+    const scaleFactor = p.gk ? 0.78 : Math.min(1.42, 0.88 + (gaussianDensity - 1) * 0.28);
+    const rx = Math.round(35 * scaleFactor);
+    const ry = Math.round(29 * scaleFactor);
 
     const coreBlob = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
     coreBlob.setAttribute('cx', String(Math.round(cx)));
     coreBlob.setAttribute('cy', String(Math.round(cy)));
     coreBlob.setAttribute('rx', String(rx));
     coreBlob.setAttribute('ry', String(ry));
-    coreBlob.setAttribute('fill', 'url(#heat-grad-core)');
+    coreBlob.setAttribute('fill', gradRef);
     dom.heatmapOverlayLayer.appendChild(coreBlob);
   });
 
-  gsap.fromTo(
-    dom.heatmapOverlayLayer,
-    { opacity: 0.15 },
-    { opacity: 0.9, duration: 0.42, ease: 'power2.out', overwrite: 'auto' }
-  );
+  const telemetry = computeThermalTelemetry(activeCoords);
+  renderThermalTelemetryPanel(telemetry, true);
+
+  if (animate) {
+    gsap.fromTo(
+      dom.heatmapOverlayLayer,
+      { opacity: 0.2 },
+      { opacity: 0.92, duration: 0.38, ease: 'power2.out', overwrite: 'auto' }
+    );
+  } else {
+    dom.heatmapOverlayLayer.style.opacity = '0.92';
+  }
 }
 
 export function toggleHeatmapView(forceState = null) {
+  if ((state.authSession?.isDemo || state.authSession?.username === 'demo') && forceState !== false) {
+    window.dispatchEvent(new CustomEvent('tactical:open-unlock-modal', { detail: { reason: 'heatmap' } }));
+    showToast(
+      'Mapa de Calor Exclusivo',
+      'El Mapa de Calor y su telemetría zonal no están disponibles en Modo Demo. Regístrate gratis para desbloquearlos.',
+      'info'
+    );
+    return;
+  }
   if (state.isStadium3DView && forceState !== false) {
     showToast(
       'Mapa de Calor solo en 2D / 2.5D',
@@ -1288,22 +1636,21 @@ export function toggleHeatmapView(forceState = null) {
 }
 
 /**
- * 2. Lápiz Táctico Libre sobre la Cancha (SVG Pointer Drawing)
+ * 2. Trazado Táctico Vectorial Interactivo (Pase / Desmarque / Zona Presión + Serialización RAG)
  */
 let isDrawingStroke = false;
 let activeStrokePoints = [];
 let activeStrokePathEl = null;
-let strokeColorIndex = 0;
 
-function clientToSvgCoords(svgEl, clientX, clientY) {
-  const rect = svgEl.getBoundingClientRect();
+function clientToSvgCoords(containerEl, clientX, clientY, minX = 8, maxX = 352, minY = 8, maxY = 212) {
+  const rect = containerEl.getBoundingClientRect();
   if (!rect.width || !rect.height) return { x: 180, y: 110 };
-  const x = Math.max(8, Math.min(352, ((clientX - rect.left) / rect.width) * 360));
-  const y = Math.max(8, Math.min(212, ((clientY - rect.top) / rect.height) * 220));
+  const x = Math.max(minX, Math.min(maxX, ((clientX - rect.left) / rect.width) * 360));
+  const y = Math.max(minY, Math.min(maxY, ((clientY - rect.top) / rect.height) * 220));
   return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
 }
 
-function buildSmoothFreehandPathD(pts) {
+function buildSmoothFreehandPathD(pts, closeLoop = false) {
   if (pts.length === 0) return '';
   if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
   let d = `M ${pts[0].x} ${pts[0].y}`;
@@ -1314,20 +1661,28 @@ function buildSmoothFreehandPathD(pts) {
   }
   const last = pts[pts.length - 1];
   d += ` L ${last.x} ${last.y}`;
+  if (closeLoop) d += ' Z';
   return d;
 }
 
-export function setFreehandColor(color = 'cyan') {
-  const validColors = new Set(['cyan', 'amber', 'red']);
-  state.drawColor = validColors.has(color) ? color : 'cyan';
+export function setFreehandMode(mode = 'pass') {
+  const legacyMap = { cyan: 'pass', amber: 'run', red: 'zone' };
+  const normalized = legacyMap[mode] || mode;
+  const validModes = new Set(['pass', 'run', 'zone']);
+  state.drawMode = validModes.has(normalized) ? normalized : 'pass';
+  state.drawColor = state.drawMode === 'run' ? 'amber' : state.drawMode === 'zone' ? 'red' : 'cyan';
+
   if (dom.freehandToolbar) {
     dom.freehandToolbar.querySelectorAll('.freehand-color-btn').forEach((btn) => {
-      const isMatch = btn.dataset.drawColor === state.drawColor;
+      const btnMode = btn.dataset.drawMode || legacyMap[btn.dataset.drawColor];
+      const isMatch = btnMode === state.drawMode;
       btn.classList.toggle('active', isMatch);
       btn.setAttribute('aria-pressed', String(isMatch));
     });
   }
 }
+
+export const setFreehandColor = setFreehandMode;
 
 export function syncDrawToolbarButtons() {
   const strokeCount = dom.freehandPathsGroup ? dom.freehandPathsGroup.children.length : 0;
@@ -1337,6 +1692,12 @@ export function syncDrawToolbarButtons() {
   }
   if (dom.undoDrawBtn) {
     dom.undoDrawBtn.disabled = !hasStrokes;
+  }
+  if (dom.clearToolbarDrawBtn) {
+    dom.clearToolbarDrawBtn.disabled = !hasStrokes;
+  }
+  if (dom.analyzeDrawAiBtn) {
+    dom.analyzeDrawAiBtn.disabled = !hasStrokes;
   }
   if (dom.freehandToolbar) {
     dom.freehandToolbar.classList.toggle('hidden', !state.isDrawModeActive);
@@ -1353,6 +1714,15 @@ export function undoLastFreehandStroke() {
 }
 
 export function toggleFreehandDrawMode(forceState = null) {
+  if ((state.authSession?.isDemo || state.authSession?.username === 'demo') && forceState !== false) {
+    window.dispatchEvent(new CustomEvent('tactical:open-unlock-modal', { detail: { reason: 'draw' } }));
+    showToast(
+      'Trazar Rutas Tácticas Exclusivo',
+      'El dibujo de pases, desmarques y zonas de presión requiere una cuenta registrada gratuita.',
+      'info'
+    );
+    return;
+  }
   if (state.isStadium3DView && forceState !== false) {
     showToast(
       'Trazado manual no disponible en 3D',
@@ -1382,6 +1752,108 @@ export function clearFreehandDrawings() {
   syncDrawToolbarButtons();
 }
 
+function describeFieldLocation(x, y) {
+  const lane =
+    y < 52
+      ? 'banda izquierda'
+      : y < 84
+        ? 'carril interior izquierdo'
+        : y <= 136
+          ? 'carril central'
+          : y <= 168
+            ? 'carril interior derecho'
+            : 'banda derecha';
+
+  let zone;
+  if (x < 123) {
+    zone = x < 64 && y >= 52 && y <= 168 ? 'área propia' : 'tercio de salida';
+  } else if (x < 236) {
+    zone = 'tercio de creación';
+  } else {
+    zone = x >= 292 && y >= 52 && y <= 168 ? 'área rival' : 'tercio de finalización';
+  }
+  return `${lane} en ${zone}`;
+}
+
+function findNearestBoardPlayer(x, y) {
+  if (!Array.isArray(currentBoardCoords) || currentBoardCoords.length === 0) return '';
+  let best = null;
+  let bestDist = Infinity;
+  currentBoardCoords.forEach((p, idx) => {
+    const px = p.adjX ?? p.x;
+    const py = p.adjY ?? p.y;
+    const d = Math.hypot(px - x, py - y);
+    if (d < bestDist) {
+      bestDist = d;
+      best = { p, idx };
+    }
+  });
+  if (!best || bestDist > 38) return '';
+  const hasExported =
+    state.exportedBoardLineup &&
+    state.exportedBoardLineup.modality === state.modality &&
+    state.exportedBoardLineup.formationIndex === state.formationIndex;
+  const slot = hasExported ? state.exportedBoardLineup.starters?.[best.idx] : null;
+  if (slot?.assigned && slot?.name) {
+    return `cerca de ${slot.name.split(' ')[0]} (#${slot.jerseyNumber} ${best.p.role})`;
+  }
+  return `cerca de #${best.p.num} (${best.p.role})`;
+}
+
+export function serializeTacticalDrawingsForRag() {
+  const children = dom.freehandPathsGroup ? Array.from(dom.freehandPathsGroup.children) : [];
+  if (children.length === 0) {
+    showToast(
+      'Sin trazos en la pizarra',
+      'Dibuja al menos un pase, desmarque o zona de presión para analizarlo con IA.',
+      'info'
+    );
+    return '';
+  }
+
+  const activeSetup = getActiveFormationSetup();
+  const descriptions = children.map((el, index) => {
+    const kind = el.dataset.strokeKind || 'pass';
+    if (kind === 'zone') {
+      const cx = Number(el.dataset.centerX ?? 180);
+      const cy = Number(el.dataset.centerY ?? 110);
+      const radius = Number(el.dataset.radius ?? 26);
+      const loc = describeFieldLocation(cx, cy);
+      const near = findNearestBoardPlayer(cx, cy);
+      const scaleNote = radius >= 44 ? 'amplia' : radius >= 28 ? 'media' : 'compacta';
+      return `${index + 1}. Zona de Presión / Cobertura ${scaleNote} centrada en ${loc}${near ? ` (${near})` : ''}.`;
+    }
+
+    const sx = Number(el.dataset.startX ?? 180);
+    const sy = Number(el.dataset.startY ?? 110);
+    const ex = Number(el.dataset.endX ?? 180);
+    const ey = Number(el.dataset.endY ?? 110);
+    const startLoc = describeFieldLocation(sx, sy);
+    const endLoc = describeFieldLocation(ex, ey);
+    const startNear = findNearestBoardPlayer(sx, sy);
+    const endNear = findNearestBoardPlayer(ex, ey);
+    const dx = ex - sx;
+    const direction =
+      dx > 32 ? 'progresivo vertical' : dx < -32 ? 'de seguridad/atrás' : 'de orientación lateral';
+
+    if (kind === 'run') {
+      return `${index + 1}. Desmarque / Ruptura ${direction} (flecha dorada discontinua): desde ${startLoc}${startNear ? ` (${startNear})` : ''} hacia ${endLoc}${endNear ? ` (${endNear})` : ''}.`;
+    }
+    return `${index + 1}. Pase / Circulación ${direction} (flecha cian continua): desde ${startLoc}${startNear ? ` (${startNear})` : ''} hasta ${endLoc}${endNear ? ` (${endNear})` : ''}.`;
+  });
+
+  const thermalNote =
+    state.isHeatmapActive && state.lastThermalTelemetry
+      ? `\nContexto térmico activo: Carriles ${state.lastThermalTelemetry.lanes.leftPct}% Izq / ${state.lastThermalTelemetry.lanes.centerPct}% Cen / ${state.lastThermalTelemetry.lanes.rightPct}% Der (${state.lastThermalTelemetry.alert.headline}).`
+      : '';
+
+  return (
+    `Analiza tácticamente la jugada que acabo de trazar en la Pizarra para ${state.modality} con el sistema ${formatFormationLabel(activeSetup.code)} y estilo "${state.playStyle}":\n` +
+    `${descriptions.join('\n')}${thermalNote}\n` +
+    `Evalúa en detalle con base en pgvector: 1) Viabilidad táctica y ventajas posicionales que genera la secuencia, 2) Riesgos defensivos / espacios expuestos en caso de pérdida tras este trazo, y 3) Alternativa o cobertura de respaldo recomendada.`
+  );
+}
+
 export function initFreehandDrawingEvents() {
   const svgEl = dom.freehandDrawSvg;
   const groupEl = dom.freehandPathsGroup;
@@ -1390,26 +1862,44 @@ export function initFreehandDrawingEvents() {
   svgEl.addEventListener('pointerdown', (e) => {
     if (!state.isDrawModeActive) return;
     e.preventDefault();
-    svgEl.setPointerCapture(e.pointerId);
+    try {
+      svgEl.setPointerCapture(e.pointerId);
+    } catch {}
     isDrawingStroke = true;
 
     const startPt = clientToSvgCoords(svgEl, e.clientX, e.clientY);
     activeStrokePoints = [startPt];
 
-    // Shift + arrastrar alterna rápido a Ámbar manteniendo color seleccionado para uso normal
-    const activeColor = e.shiftKey ? 'amber' : (state.drawColor || 'cyan');
-    const markerId =
-      activeColor === 'amber'
-        ? 'url(#arrow-freehand-amber)'
-        : activeColor === 'red'
-          ? 'url(#arrow-freehand-red)'
-          : 'url(#arrow-freehand-cyan)';
+    const activeMode = e.shiftKey ? 'run' : (state.drawMode || 'pass');
+    if (activeMode === 'zone') {
+      const circleEl = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circleEl.setAttribute('class', 'freehand-stroke zone');
+      circleEl.setAttribute('cx', String(startPt.x));
+      circleEl.setAttribute('cy', String(startPt.y));
+      circleEl.setAttribute('r', '16');
+      circleEl.dataset.strokeKind = 'zone';
+      circleEl.dataset.shapeType = 'circle';
+      circleEl.dataset.centerX = String(startPt.x);
+      circleEl.dataset.centerY = String(startPt.y);
+      circleEl.dataset.radius = '16';
+      groupEl.appendChild(circleEl);
+      activeStrokePathEl = circleEl;
+      return;
+    }
 
-    activeStrokePathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    activeStrokePathEl.setAttribute('class', `freehand-stroke ${activeColor}`);
-    activeStrokePathEl.setAttribute('d', `M ${startPt.x} ${startPt.y}`);
-    activeStrokePathEl.setAttribute('marker-end', markerId);
-    groupEl.appendChild(activeStrokePathEl);
+    const markerId =
+      activeMode === 'run' ? 'url(#arrow-freehand-gold)' : 'url(#arrow-freehand-cyan)';
+    const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    pathEl.setAttribute('class', `freehand-stroke ${activeMode}`);
+    pathEl.setAttribute('d', `M ${startPt.x} ${startPt.y}`);
+    pathEl.setAttribute('marker-end', markerId);
+    pathEl.dataset.strokeKind = activeMode;
+    pathEl.dataset.startX = String(startPt.x);
+    pathEl.dataset.startY = String(startPt.y);
+    pathEl.dataset.endX = String(startPt.x);
+    pathEl.dataset.endY = String(startPt.y);
+    groupEl.appendChild(pathEl);
+    activeStrokePathEl = pathEl;
   });
 
   svgEl.addEventListener('pointermove', (e) => {
@@ -1418,14 +1908,72 @@ export function initFreehandDrawingEvents() {
     const prev = activeStrokePoints[activeStrokePoints.length - 1];
     if (Math.hypot(pt.x - prev.x, pt.y - prev.y) < 3.2) return;
     activeStrokePoints.push(pt);
+
+    const kind = activeStrokePathEl.dataset.strokeKind || 'pass';
+    if (kind === 'zone') {
+      const xs = activeStrokePoints.map((p) => p.x);
+      const ys = activeStrokePoints.map((p) => p.y);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const bboxW = maxX - minX;
+      const bboxH = maxY - minY;
+      const p0 = activeStrokePoints[0];
+      const cxPoly = Math.round(((minX + maxX) / 2) * 10) / 10;
+      const cyPoly = Math.round(((minY + maxY) / 2) * 10) / 10;
+
+      // Si el entrenador encierra un área 2D amplia, renderiza polígono sombreado; si arrastra en línea/radio, círculo
+      if (activeStrokePoints.length >= 7 && bboxW >= 26 && bboxH >= 24) {
+        if (activeStrokePathEl.tagName.toLowerCase() !== 'path') {
+          const polyEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          polyEl.setAttribute('class', 'freehand-stroke zone');
+          polyEl.dataset.strokeKind = 'zone';
+          polyEl.dataset.shapeType = 'polygon';
+          activeStrokePathEl.replaceWith(polyEl);
+          activeStrokePathEl = polyEl;
+        }
+        activeStrokePathEl.setAttribute('d', buildSmoothFreehandPathD(activeStrokePoints, true));
+        activeStrokePathEl.dataset.centerX = String(cxPoly);
+        activeStrokePathEl.dataset.centerY = String(cyPoly);
+        activeStrokePathEl.dataset.radius = String(Math.round(Math.max(bboxW, bboxH) / 2));
+      } else {
+        const cx = Math.round(((p0.x + pt.x) / 2) * 10) / 10;
+        const cy = Math.round(((p0.y + pt.y) / 2) * 10) / 10;
+        const r = Math.max(16, Math.min(82, Math.round((Math.hypot(pt.x - p0.x, pt.y - p0.y) / 2) * 10) / 10));
+        if (activeStrokePathEl.tagName.toLowerCase() === 'circle') {
+          activeStrokePathEl.setAttribute('cx', String(cx));
+          activeStrokePathEl.setAttribute('cy', String(cy));
+          activeStrokePathEl.setAttribute('r', String(r));
+          activeStrokePathEl.dataset.centerX = String(cx);
+          activeStrokePathEl.dataset.centerY = String(cy);
+          activeStrokePathEl.dataset.radius = String(r);
+        } else {
+          activeStrokePathEl.setAttribute('d', buildSmoothFreehandPathD(activeStrokePoints, true));
+          activeStrokePathEl.dataset.centerX = String(cxPoly);
+          activeStrokePathEl.dataset.centerY = String(cyPoly);
+          activeStrokePathEl.dataset.radius = String(Math.round(Math.max(bboxW, bboxH) / 2));
+        }
+      }
+      return;
+    }
+
     activeStrokePathEl.setAttribute('d', buildSmoothFreehandPathD(activeStrokePoints));
+    activeStrokePathEl.dataset.endX = String(pt.x);
+    activeStrokePathEl.dataset.endY = String(pt.y);
   });
 
   const finishStroke = (e) => {
     if (!isDrawingStroke) return;
     isDrawingStroke = false;
     if (e?.pointerId !== undefined && svgEl.hasPointerCapture(e.pointerId)) {
-      svgEl.releasePointerCapture(e.pointerId);
+      try {
+        svgEl.releasePointerCapture(e.pointerId);
+      } catch {}
+    }
+    // Si fue un solo toque en zona de presión, conserva un círculo táctico compacto útil
+    if (activeStrokePathEl && activeStrokePoints.length === 1 && activeStrokePathEl.dataset.strokeKind !== 'zone') {
+      activeStrokePathEl.remove();
     }
     syncDrawToolbarButtons();
     activeStrokePathEl = null;
@@ -1535,7 +2083,7 @@ export function exportPitchAsPng(sourceTab = 'board') {
 
   ctx.fillStyle = '#f1f5f9';
   ctx.font = 'bold 26px "Plus Jakarta Sans", "Inter", sans-serif';
-  ctx.fillText(`TacticalPlay RAG · ${activeModality} · Sistema ${activeSetup.code}`, 64, 58);
+  ctx.fillText(`TacticalPlay RAG · ${activeModality} · Sistema ${formatFormationLabel(activeSetup.code)}`, 64, 58);
 
   ctx.fillStyle = '#38bdf8';
   ctx.font = '600 17px "Inter", sans-serif';
@@ -1672,19 +2220,52 @@ export function exportPitchAsPng(sourceTab = 'board') {
 
   // 7. Trazos manuales dibujados con el lápiz táctico
   if (!isFromSquad && dom.freehandPathsGroup && dom.freehandPathsGroup.children.length > 0) {
-    Array.from(dom.freehandPathsGroup.children).forEach((pathEl) => {
-      const dAttr = pathEl.getAttribute('d');
-      if (!dAttr) return;
-      const isAmber = pathEl.classList.contains('amber');
-      const isRed = pathEl.classList.contains('red');
+    Array.from(dom.freehandPathsGroup.children).forEach((el) => {
+      const kind = el.dataset.strokeKind || 'pass';
       ctx.save();
       ctx.translate(pitchX, pitchY);
       ctx.scale(pitchW / 360, pitchH / 220);
-      ctx.strokeStyle = isRed ? '#f43f5e' : isAmber ? '#fbbf24' : '#38bdf8';
-      ctx.lineWidth = 2.6;
+
+      if (el.tagName.toLowerCase() === 'circle') {
+        const cx = Number(el.getAttribute('cx') || 180);
+        const cy = Number(el.getAttribute('cy') || 110);
+        const r = Number(el.getAttribute('r') || 18);
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(244, 63, 94, 0.24)';
+        ctx.fill();
+        ctx.setLineDash([4, 3]);
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      const dAttr = el.getAttribute('d');
+      if (!dAttr) {
+        ctx.restore();
+        return;
+      }
+      const isRun = kind === 'run' || el.classList.contains('amber');
+      const isZone = kind === 'zone' || el.classList.contains('red');
+      const path2d = new Path2D(dAttr);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      const path2d = new Path2D(dAttr);
+      if (isZone) {
+        ctx.fillStyle = 'rgba(139, 92, 246, 0.24)';
+        ctx.fill(path2d);
+        ctx.setLineDash([4, 3]);
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 2;
+      } else if (isRun) {
+        ctx.setLineDash([7, 5]);
+        ctx.strokeStyle = '#eab308';
+        ctx.lineWidth = 2.6;
+      } else {
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.6;
+      }
       ctx.stroke(path2d);
       ctx.restore();
     });
@@ -1848,7 +2429,7 @@ export function handleExportPrintableMatchPlan(sourceTab = 'board') {
     <div class="print-summary-grid">
       <div class="print-summary-item">
         <span class="print-summary-label">Modalidad &amp; Sistema</span>
-        <span class="print-summary-value">${escapeHtml(activeModality)} · ${escapeHtml(activeSetup.code)}</span>
+        <span class="print-summary-value">${escapeHtml(activeModality)} · ${escapeHtml(formatFormationLabel(activeSetup.code))}</span>
       </div>
       <div class="print-summary-item">
         <span class="print-summary-label">Estilo de Juego</span>

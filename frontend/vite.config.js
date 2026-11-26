@@ -5,7 +5,8 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     host: true,
-    open: false
+    open: false,
+    https: process.env.VITE_HTTPS === 'true'
   },
   build: {
     // three.module.js supera 500 kB sin splitting interno posible, pero se carga en chunk aislado

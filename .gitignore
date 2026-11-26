@@ -39,3 +39,9 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
+
+# Local dev TLS certs
+deploy/certs/
+
+# Private local operational documentation
+README_PRIVADO.md

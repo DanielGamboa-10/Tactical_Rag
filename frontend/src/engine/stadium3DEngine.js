@@ -424,7 +424,7 @@ function buildHoloFootAura3D(isFeatured = false) {
   const auraGroup = new THREE.Group();
   auraGroup.position.y = 0.06;
 
-  // Doble anillo interior fino de Metavision
+  // Doble anillo interior fino de Telemetría
   const innerGeo = new THREE.RingGeometry(1.26, 1.35, 40);
   innerGeo.rotateX(-Math.PI / 2);
   const innerMat = new THREE.MeshBasicMaterial({
@@ -502,7 +502,7 @@ function createPlayerPawn3D(dorsal, roleText, isGk, isActor) {
   ringMesh.position.y = 0.04;
   group.add(ringMesh);
 
-  // Anillo holográfico Metavision giratorio bajo los pies del jugador destacado
+  // Anillo holográfico Telemetría giratorio bajo los pies del jugador destacado
   const holoAuraGroup = buildHoloFootAura3D(isActor);
   group.add(holoAuraGroup);
 
@@ -781,11 +781,11 @@ function initStadium3DScene() {
   scene.add(buildPerimeterLedBoards());
   scene.add(buildCornerFloodlightTowers());
 
-  // Partículas azules flotantes de energía Metavision sobre el césped nocturno
+  // Partículas azules flotantes de energía Telemetría sobre el césped nocturno
   ambientEnergyPoints = buildAmbientEnergyParticles3D();
   scene.add(ambientEnergyPoints);
 
-  // Grupos dinámicos de peones, marcadores fantasma, estelas Kaiser Impact y ondas de impacto
+  // Grupos dinámicos de peones, marcadores fantasma, estelas Impacto Táctico y ondas de impacto
   pawnsGroup = new THREE.Group();
   linksGroup = new THREE.Group();
   ghostMarkersGroup = new THREE.Group();
@@ -793,7 +793,7 @@ function initStadium3DScene() {
   impactShockwavesGroup = new THREE.Group();
   scene.add(linksGroup, ghostMarkersGroup, trailGroup, impactShockwavesGroup, pawnsGroup);
 
-  // Balón 3D + Anillo de aura Kaiser Impact + Sombra proyectada en el suelo
+  // Balón 3D + Anillo de aura Impacto Táctico + Sombra proyectada en el suelo
   const ballGeo = new THREE.SphereGeometry(0.56, 24, 24);
   const ballMat = new THREE.MeshStandardMaterial({
     color: 0xfacc15,
@@ -1095,7 +1095,7 @@ export function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
 }
 
 /**
- * Destello radial cian eléctrico en el punto de llegada del balón (Kaiser Impact 3D)
+ * Destello radial cian eléctrico en el punto de llegada del balón (Impacto Táctico 3D)
  */
 function spawnImpactFlash3D(x, z, isShot = false) {
   if (!impactShockwavesGroup) return;
@@ -1166,7 +1166,7 @@ function spawnImpactFlash3D(x, z, isShot = false) {
 /**
  * Secuencia coreografiada en 3 tiempos con GSAP Timeline por cada paso de jugada preparada:
  * 1) Desmarque previo del receptor con anillo fantasma en origen (0.0s -> 0.24s)
- * 2) Salida del pase/remate Kaiser Impact (estela cian eléctrico 3D + núcleo blanco + destello radial al llegar)
+ * 2) Salida del pase/remate Impacto Táctico (estela cian eléctrico 3D + núcleo blanco + destello radial al llegar)
  * 3) Encuadre Follow-Cam suave y continuo sin tirones bruscos
  */
 export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, isShot = false) {
@@ -1213,7 +1213,7 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
       ? Math.min(6.6, 2.3 + dist * 0.18)
       : 1.15;
 
-  // Estela parabólica 3D luminosa "Kaiser Impact" (#00f0ff + núcleo blanco plasma)
+  // Estela parabólica 3D luminosa "Impacto Táctico" (#00f0ff + núcleo blanco plasma)
   if (trailGroup) {
     trailGroup.clear();
   }
@@ -1252,7 +1252,7 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
   const flightProxy = { t: 0 };
   activeStepTimeline = gsap.timeline();
 
-  // Tiempo 2 (t = 0.22s): El balón sale con rastro afilado Kaiser Impact cian-blanco y destello radial en recepción
+  // Tiempo 2 (t = 0.22s): El balón sale con rastro afilado Impacto Táctico cian-blanco y destello radial en recepción
   activeStepTimeline.to(
     [outerMat, coreMat],
     {

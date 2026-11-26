@@ -8,6 +8,7 @@ import {
   dom,
   escapeHtml,
   switchTab,
+  formatFormationLabel,
   FORMATIONS_BY_MODALITY,
   getSetPiecesForCurrentSelection,
   getActiveFormationSetup,
@@ -25,10 +26,12 @@ import {
   handleToggleStadium3D,
   toggleHeatmapView,
   toggleFreehandDrawMode,
-  setFreehandColor,
+  setFreehandMode,
   undoLastFreehandStroke,
   clearFreehandDrawings,
   initFreehandDrawingEvents,
+  serializeTacticalDrawingsForRag,
+  getHeatmapRagPrompt,
   toggleExpandBoard,
   handleExportPrintableMatchPlan,
   exportPitchAsPng
@@ -44,11 +47,40 @@ function syncSelectTitle(selectEl) {
 export function populateFormationDropdown() {
   const list = FORMATIONS_BY_MODALITY[state.modality] || FORMATIONS_BY_MODALITY['Futsal'];
   dom.formationSelect.innerHTML = list
-    .map((item, idx) => `<option value="${idx}" ${idx === state.formationIndex ? 'selected' : ''}>${escapeHtml(item.code)}</option>`)
+    .map((item, idx) => `<option value="${idx}" ${idx === state.formationIndex ? 'selected' : ''}>${escapeHtml(formatFormationLabel(item.code))}</option>`)
     .join('');
   syncSelectTitle(dom.formationSelect);
   syncSelectTitle(dom.styleSelect);
   syncSelectTitle(dom.setpieceCategorySelect);
+}
+
+export function syncFormationByCode(systemCode, { animate = true } = {}) {
+  const list = FORMATIONS_BY_MODALITY[state.modality] || [];
+  if (!systemCode || list.length === 0) return false;
+
+  const targetRaw = String(systemCode).toLowerCase().trim();
+  const targetDisplay = formatFormationLabel(systemCode).toLowerCase().trim();
+  const targetShort = targetDisplay.split(' ')[0].trim();
+
+  let foundIdx = list.findIndex(
+    (f) =>
+      f.code.toLowerCase() === targetRaw ||
+      formatFormationLabel(f.code).toLowerCase() === targetDisplay
+  );
+
+  if (foundIdx === -1 && targetShort) {
+    foundIdx = list.findIndex((f) => {
+      const display = formatFormationLabel(f.code).toLowerCase().trim();
+      return display.split(' ')[0].trim() === targetShort;
+    });
+  }
+
+  if (foundIdx === -1) return false;
+
+  state.formationIndex = foundIdx;
+  populateFormationDropdown();
+  renderTacticalPitch(animate);
+  return true;
 }
 
 export function populateSetPieceDropdown() {
@@ -156,7 +188,7 @@ export function initPitchViewEvents() {
       ? ` y cómo ejecutar la jugada de ${state.setPieceCategory === 'attack' ? 'ataque' : 'defensa'} "${activeSetPiece.name}"`
       : '';
 
-    const prompt = `Míster, ¿cómo debemos jugar en ${state.modality} usando la formación ${activeSetup.code} con un estilo de ${state.playStyle} (tomando como referencia a ${coachInfo.name})${setPieceClause}? Dame 3 claves prácticas de cancha.`;
+    const prompt = `Míster, ¿cómo debemos jugar en ${state.modality} usando la formación ${formatFormationLabel(activeSetup.code)} con un estilo de ${state.playStyle} (tomando como referencia a ${coachInfo.name})${setPieceClause}? Dame 3 claves prácticas de cancha.`;
     sendChatMessage(prompt);
   });
 
@@ -190,24 +222,47 @@ export function initPitchViewEvents() {
     dom.toggleHeatmapBtn.addEventListener('click', () => toggleHeatmapView());
   }
 
-  // Toggle Freehand Tactical Drawing Pencil, Palette & Undo (Ctrl+Z)
+  // Toggle Freehand Tactical Drawing Pencil, Vector Mode Selector, Clear, Undo & RAG Analysis
   initFreehandDrawingEvents();
   if (dom.toggleDrawBtn) {
     dom.toggleDrawBtn.addEventListener('click', () => toggleFreehandDrawMode());
   }
   if (dom.freehandToolbar) {
     dom.freehandToolbar.addEventListener('click', (e) => {
-      const colorBtn = e.target.closest('.freehand-color-btn');
-      if (colorBtn && colorBtn.dataset.drawColor) {
-        setFreehandColor(colorBtn.dataset.drawColor);
+      const modeBtn = e.target.closest('.freehand-color-btn[data-draw-mode]');
+      if (modeBtn && modeBtn.dataset.drawMode) {
+        setFreehandMode(modeBtn.dataset.drawMode);
       }
     });
   }
   if (dom.undoDrawBtn) {
     dom.undoDrawBtn.addEventListener('click', () => undoLastFreehandStroke());
   }
+  if (dom.clearToolbarDrawBtn) {
+    dom.clearToolbarDrawBtn.addEventListener('click', () => clearFreehandDrawings());
+  }
   if (dom.clearDrawBtn) {
     dom.clearDrawBtn.addEventListener('click', () => clearFreehandDrawings());
+  }
+  if (dom.analyzeDrawAiBtn) {
+    dom.analyzeDrawAiBtn.addEventListener('click', () => {
+      const analysisPayload = serializeTacticalDrawingsForRag();
+      if (!analysisPayload) {
+        return;
+      }
+      switchTab('assistant');
+      sendChatMessage(analysisPayload);
+    });
+  }
+  if (dom.askHeatmapRagBtn) {
+    dom.askHeatmapRagBtn.addEventListener('click', () => {
+      const thermalPrompt = getHeatmapRagPrompt();
+      if (!thermalPrompt) {
+        return;
+      }
+      switchTab('assistant');
+      sendChatMessage(thermalPrompt);
+    });
   }
   document.addEventListener('keydown', (e) => {
     if (
