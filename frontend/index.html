@@ -21,85 +21,42 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=optional"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap"
+      rel="stylesheet"
     />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=optional"
-        rel="stylesheet"
-      />
-    </noscript>
     <link rel="stylesheet" href="/print.css" media="print" />
     <style>
       :root {
         color-scheme: dark;
         accent-color: #38bdf8;
-        --bg-deep: #04070f;
-        --bg-surface: rgba(9, 14, 28, 0.84);
-        --bg-surface-solid: #090e1c;
-        --bg-surface-elevated: #0f172a;
-        --border-subtle: rgba(56, 189, 248, 0.18);
-        --border-default: rgba(56, 189, 248, 0.24);
-        --border-accent-focus: rgba(56, 189, 248, 0.65);
-        --accent-cobalt: #1d4ed8;
-        --accent-cobalt-deep: #1e40af;
-        --accent-cobalt-dark: #1e3a8a;
-        --accent-sky: #0ea5e9;
-        --accent-cyan: #7dd3fc;
-        --cyan-400: #38bdf8;
-        --cyan-hud: #00f0ff;
-        --gold-imperial: #eab308;
-        --gold-bright: #fde047;
-        --emerald-400: #10b981;
-        --amber-400: #f59e0b;
-        --rose-500: #f43f5e;
-        --text-primary: #f1f5f9;
-        --text-chat: #cbd5e1;
-        --text-secondary: #94a3b8;
-        --text-kicker: #7c8ba1;
-        --text-muted: #64748b;
-        --scrollbar-thumb: #475569;
-        --scrollbar-thumb-hover: #64748b;
-        --scrollbar-track: #04070f;
-        --radius-lg: 12px;
-        --radius-md: 8px;
-        --radius-sm: 6px;
-        --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+        --bg-canvas: #050912;
+        --text-primary: #f8fafc;
       }
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       html, body {
         min-height: 100vh;
-        background-color: var(--bg-deep);
+        background-color: var(--bg-canvas);
         color: var(--text-primary);
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        font-size-adjust: from-font;
         line-height: 1.5;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
       }
       .svg-shared-defs { position: absolute; inline-size: 0; block-size: 0; overflow: hidden; pointer-events: none; }
       .printable-match-plan { display: none; }
-      .hidden-view { display: none !important; }
-      .active-view { display: block; }
-      .fade-slide-up { opacity: 1; transform: none; }
-      .toast-container { position: fixed; top: 18px; right: 18px; z-index: 9000; }
-      .ambient-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse 80% 55% at 50% 0%, rgba(29, 78, 216, 0.14), transparent 72%); }
-      .glow-orb { position: absolute; border-radius: 50%; filter: blur(150px); opacity: 0.1; }
-      .orb-1 { width: 520px; height: 520px; background: radial-gradient(circle, #1d4ed8 0%, transparent 70%); top: -160px; left: -120px; }
-      .orb-2 { width: 480px; height: 480px; background: radial-gradient(circle, #0ea5e9 0%, transparent 70%); bottom: -150px; right: -100px; }
-      .orb-3 { width: 360px; height: 360px; background: radial-gradient(circle, #00f0ff 0%, transparent 72%); top: 38%; left: 44%; opacity: 0.05; }
-      .tactical-grid {
-        position: absolute; inset: 0;
-        background-image:
-          radial-gradient(rgba(56, 189, 248, 0.2) 1px, transparent 1px),
-          linear-gradient(to right, rgba(56, 189, 248, 0.035) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
-        background-size: 28px 28px, 112px 112px, 112px 112px;
-        mask-image: radial-gradient(circle at 50% 42%, black 32%, transparent 88%);
+      .hidden-view, [hidden] { display: none !important; }
+      .visually-hidden:where(:not(:focus-within, :active)) {
+        position: absolute !important;
+        clip-path: inset(50%) !important;
+        overflow: hidden !important;
+        width: 1px !important;
+        height: 1px !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        white-space: nowrap !important;
       }
+      /* Critical above-the-fold styles for Blue Rose Opening Cinematic (unchanged) */
       .intro-rose-overlay {
         position: fixed; inset: 0; z-index: 10000;
         background: radial-gradient(circle at 50% 45%, #04091a 0%, #020409 80%);
@@ -118,7 +75,7 @@
       .intro-rose-dome-svg { width: 320px; max-width: 82vw; height: auto; aspect-ratio: 360 / 440; overflow: visible; filter: drop-shadow(0 0 24px rgba(2, 132, 199, 0.45)); }
       .intro-rose-quote {
         margin-top: -10px; min-block-size: 46px;
-        font-family: 'Cormorant Garamond', Georgia, serif; font-size-adjust: from-font;
+        font-family: 'Cormorant Garamond', Georgia, serif;
         font-style: italic; font-size: clamp(1.45rem, 2.6vw, 2.05rem); font-weight: 700; line-height: 1.25; letter-spacing: 0.04em;
         color: #e0f2fe; text-shadow: 0 0 14px rgba(56, 189, 248, 0.9), 0 0 28px rgba(29, 78, 216, 0.75); text-align: center;
       }
@@ -127,163 +84,11 @@
         position: absolute; bottom: 26px; right: 28px; z-index: 6;
         display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;
         background: rgba(10, 15, 29, 0.9); border: 1px solid rgba(56, 189, 248, 0.45);
-        color: #e0f2fe; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer;
-      }
-      .ui-icon { flex-shrink: 0; vertical-align: middle; }
-      .app-shell { position: relative; z-index: 2; }
-      .kaiser-viewport-vines { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; opacity: 0.28; }
-      .viewport-vine-corner { position: absolute; width: clamp(140px, 13vw, 220px); max-width: 220px; max-height: 260px; height: auto; aspect-ratio: 220 / 260; pointer-events: none; }
-      .viewport-vine-corner.tl { top: 0; left: 0; }
-      .viewport-vine-corner.tr { top: 0; right: 0; transform: scaleX(-1); }
-      .viewport-vine-corner.bl { bottom: 0; left: 0; transform: scaleY(-1); }
-      .viewport-vine-corner.br { bottom: 0; right: 0; transform: scale(-1, -1); }
-      @media (max-width: 1379px) { .kaiser-viewport-vines { display: none !important; } }
-      .topbar {
-        position: relative; z-index: 2;
-        max-width: 1440px; margin: 16px auto 0; padding: 14px 24px;
-        display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-        background-color: var(--bg-surface);
-        background-image:
-          linear-gradient(90deg, transparent 8%, rgba(0, 240, 255, 0.72) 50%, transparent 92%),
-          linear-gradient(180deg, rgba(14, 165, 233, 0.08), transparent 45%);
-        background-size: 100% 2px, 100% 100%;
-        background-position: 0 0, 0 0;
-        background-repeat: no-repeat;
-        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-        border: 1px solid rgba(56, 189, 248, 0.24); border-radius: 12px;
-        box-shadow: inset 0 1px 0 rgba(0, 240, 255, 0.16), 0 18px 40px -16px rgba(2, 6, 23, 0.9);
-      }
-      .brand { display: flex; align-items: center; gap: 14px; }
-      .brand-logo {
-        position: relative; width: 44px; height: 44px; display: grid; place-items: center; overflow: visible;
-        border-radius: 10px; background: radial-gradient(circle, rgba(14, 165, 233, 0.22), #030712);
-        border: 1px solid rgba(0, 240, 255, 0.36); box-shadow: 0 0 18px rgba(0, 240, 255, 0.18);
-      }
-      .brand-logo svg { width: 34px; height: 34px; }
-      .brand-logo svg.brand-imperial-crown { position: absolute; top: -10px; right: -8px; width: 18px; height: 14px; transform: rotate(14deg); pointer-events: none; z-index: 3; }
-      .brand-title { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size-adjust: from-font; font-size: 1.24rem; font-weight: 700; letter-spacing: -0.03em; }
-      .accent-gradient { background: linear-gradient(135deg, #e0f2fe 0%, #00f0ff 55%, #1d4ed8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-      .brand-subtitle { font-size: 0.75rem; color: var(--text-kicker); letter-spacing: 0.01em; }
-      .view-tabs-nav { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 9px; background: #030712; border: 1px solid rgba(56, 189, 248, 0.24); }
-      .view-tab-btn {
-        position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 7px 15px;
-        border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--text-secondary);
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size-adjust: from-font; font-size: 0.83rem; font-weight: 600; cursor: pointer;
-      }
-      .view-tab-btn.active { background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%); color: #fff; border-color: rgba(125, 211, 252, 0.45); border-block-end: 2px solid #00f0ff; }
-      .header-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-      .active-modality-pill, .status-badge, .shutdown-btn {
-        padding: 6px 12px; border-radius: 8px; background: #030712; border: 1px solid rgba(56, 189, 248, 0.24);
-        font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: var(--text-primary);
-      }
-      .status-badge { min-width: 194px; justify-content: center; cursor: pointer; }
-      .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber-400); flex-shrink: 0; }
-      .shutdown-btn { color: #fda4af; background: #111827; border-color: rgba(244, 63, 94, 0.24); cursor: pointer; }
-      .topbar-imperial-emblem { display: inline-flex; align-items: center; gap: 3px; padding-inline-end: 4px; border-inline-end: 1px solid rgba(234, 179, 8, 0.35); }
-      .active-modality-pill strong { font-family: 'JetBrains Mono', monospace; font-size-adjust: from-font; font-variant-numeric: tabular-nums; font-size: 0.76rem; color: #00f0ff; }
-      .pill-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7c8ba1; }
-      .replay-rose-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: #030712; border: 1px solid rgba(56, 189, 248, 0.28); color: #38bdf8; cursor: pointer; }
-      .tab-view { position: relative; z-index: 2; max-width: 1440px; margin: 18px auto 28px; padding: 0 16px; }
-      .assistant-layout { display: grid; grid-template-columns: 410px 1fr; gap: 20px; align-items: start; }
-      .assistant-sidebar { display: flex; flex-direction: column; gap: 20px; }
-      .glass-card {
-        position: relative; background-color: var(--bg-surface);
-        background-image:
-          linear-gradient(to right, rgba(0, 240, 255, 0.78), rgba(0, 240, 255, 0.78)),
-          linear-gradient(to bottom, rgba(0, 240, 255, 0.78), rgba(0, 240, 255, 0.78)),
-          linear-gradient(to left, rgba(0, 240, 255, 0.78), rgba(0, 240, 255, 0.78)),
-          linear-gradient(to bottom, rgba(0, 240, 255, 0.78), rgba(0, 240, 255, 0.78)),
-          linear-gradient(to right, rgba(56, 189, 248, 0.48), rgba(56, 189, 248, 0.48)),
-          linear-gradient(to top, rgba(56, 189, 248, 0.48), rgba(56, 189, 248, 0.48)),
-          linear-gradient(to left, rgba(56, 189, 248, 0.48), rgba(56, 189, 248, 0.48)),
-          linear-gradient(to top, rgba(56, 189, 248, 0.48), rgba(56, 189, 248, 0.48));
-        background-position: 0 0, 0 0, 100% 0, 100% 0, 0 100%, 0 100%, 100% 100%, 100% 100%;
-        background-size: 18px 2px, 2px 18px, 18px 2px, 2px 18px, 14px 1.5px, 1.5px 14px, 14px 1.5px, 1.5px 14px;
-        background-repeat: no-repeat;
-        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 12px; padding: 20px 22px;
-        box-shadow: inset 0 1px 0 rgba(125, 211, 252, 0.16), 0 18px 40px -18px rgba(2, 6, 23, 0.85);
-      }
-      .glass-card > :not(.kaiser-card-vines) { position: relative; z-index: 2; }
-      .kaiser-card-vines { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 1; }
-      .kaiser-vine-corner { position: absolute; width: 156px; height: 156px; opacity: 0.72; }
-      .kaiser-vine-corner.tl { top: -2px; left: -2px; }
-      .kaiser-vine-corner.br { right: -2px; bottom: -2px; transform: rotate(180deg); }
-      .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 2px 0 12px; margin-bottom: 16px; gap: 12px; line-height: 1.35; border-bottom: 1px solid rgba(56, 189, 248, 0.14); }
-      .card-header.compact { margin-bottom: 10px; }
-      .card-header > div:first-child { border-left: 3px solid #00f0ff; padding-left: 11px; }
-      .section-kicker { display: block; padding-top: 2px; margin-bottom: 3px; line-height: 1.4; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; color: #7c8ba1; text-transform: uppercase; }
-      .section-kicker::before { content: '// '; color: #00f0ff; }
-      .card-title { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size-adjust: from-font; font-size: 1.06rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.3; color: #f1f5f9; }
-      .badge-tag { font-family: 'JetBrains Mono', monospace; font-size-adjust: from-font; font-variant-numeric: tabular-nums; padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; background: #030712; border: 1px solid rgba(0, 240, 255, 0.32); color: #00f0ff; }
-      .modality-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .modality-btn { position: relative; display: flex; flex-direction: column; align-items: flex-start; padding: 12px 13px; border-radius: 8px; background: linear-gradient(160deg, rgba(15, 23, 42, 0.9) 0%, #050a16 100%); border: 1px solid rgba(56, 189, 248, 0.18); border-left: 3px solid rgba(56, 189, 248, 0.25); color: var(--text-primary); cursor: pointer; text-align: left; }
-      .modality-btn.active { background: linear-gradient(135deg, rgba(29, 78, 216, 0.28) 0%, rgba(5, 10, 24, 0.96) 100%); border-color: rgba(0, 240, 255, 0.55); border-left: 3px solid #00f0ff; }
-      .mod-icon { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; font-size: 0.72rem; font-weight: 700; color: #38bdf8; padding: 2px 6px; border-radius: 5px; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.24); margin-bottom: 6px; }
-      .mod-name { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 0.9rem; font-weight: 700; letter-spacing: -0.02em; }
-      .mod-meta { font-size: 0.72rem; color: #7c8ba1; }
-      .active-context-strip { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(148, 163, 184, 0.11); display: flex; flex-direction: column; gap: 8px; }
-      .context-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; }
-      .ctx-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7c8ba1; }
-      .context-item strong { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; font-size: 0.76rem; color: var(--text-primary); }
-      .btn-secondary { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border-default); background: var(--bg-surface-elevated); color: var(--text-primary); font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 600; font-size: 0.78rem; letter-spacing: -0.01em; cursor: pointer; }
-      .full-width-btn { width: 100%; margin-top: 4px; text-align: center; padding: 8px 12px; }
-      .sidebar-active-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
-      .sidebar-metric-row { display: flex; flex-direction: column; gap: 3px; padding: 8px 9px; border-radius: 8px; background: #101728; border: 1px solid rgba(148, 163, 184, 0.12); min-width: 0; }
-      .sidebar-metric-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #7c8ba1; }
-      .sidebar-metric-value { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; font-size: 0.76rem; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .sidebar-scenarios-label { display: block; margin-bottom: 8px; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #7c8ba1; }
-      .sidebar-scenarios-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
-      .scenario-mini-btn { padding: 8px 10px; border-radius: 7px; background: #111827; border: 1px solid rgba(148, 163, 184, 0.16); color: #cbd5e1; font-size: 0.74rem; font-weight: 600; text-align: left; cursor: pointer; }
-      .chat-card { display: flex; flex-direction: column; height: calc(100dvh - 135px); min-height: 540px; }
-      .chat-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid rgba(148, 163, 184, 0.11); }
-      .assistant-identity { display: flex; align-items: center; gap: 12px; }
-      .assistant-avatar { position: relative; width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #1d4ed8, #0284c7); display: grid; place-items: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.88rem; color: #fff; }
-      .avatar-ring { position: absolute; inset: -2px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.18); }
-      .chat-subtitle { font-size: 0.75rem; color: #7c8ba1; }
-      .chat-subtitle code { font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan); background: var(--bg-surface-elevated); border: 1px solid var(--border-default); padding: 2px 6px; border-radius: 5px; font-size: 0.71rem; }
-      .ghost-mini-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 11px; border-radius: 8px; background: #101728; border: 1px solid rgba(148, 163, 184, 0.16); color: #cbd5e1; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
-      .quick-chips-bar { display: flex; gap: 8px; padding: 12px 4px; overflow-x: auto; border-bottom: 1px solid rgba(148, 163, 184, 0.11); scrollbar-width: thin; mask-image: linear-gradient(to right, black 94%, transparent 100%); }
-      .prompt-chip { white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 7px; background: #060b18; border: 1px solid rgba(56, 189, 248, 0.22); color: #cbd5e1; font-size: 0.75rem; font-weight: 500; cursor: pointer; }
-      .prompt-chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #00f0ff; flex-shrink: 0; }
-      .chat-messages-stage { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-      .chat-metavision-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0.06; z-index: 0; }
-      .chat-metavision-watermark svg { width: min(310px, 72%); height: auto; }
-      .chat-messages { position: relative; z-index: 2; flex: 1; overflow-y: auto; padding: 18px 6px; display: flex; flex-direction: column; gap: 16px; background: transparent; }
-      .message-row { display: flex; flex-direction: column; max-width: 88%; }
-      .message-row.assistant { align-self: flex-start; align-items: flex-start; }
-      .message-row.user { align-self: flex-end; align-items: flex-end; }
-      .message-meta { display: flex; align-items: center; gap: 8px; font-size: 0.71rem; color: var(--text-secondary); margin-bottom: 5px; padding: 0 4px; }
-      .message-bubble { padding: 13px 16px; border-radius: 12px; font-size: 0.87rem; line-height: 1.58; }
-      .message-row.assistant .message-bubble { background: linear-gradient(160deg, rgba(15, 23, 42, 0.92) 0%, #060b18 100%); border: 1px solid rgba(56, 189, 248, 0.22); border-left: 3px solid #00f0ff; color: #cbd5e1; border-radius: 4px 14px 14px 14px; }
-      .chat-formatted-content { display: flex; flex-direction: column; gap: 8px; color: #cbd5e1; }
-      .chat-paragraph { margin: 0; line-height: 1.58; color: #cbd5e1; }
-      .chat-list { margin: 2px 0 4px 20px; display: flex; flex-direction: column; gap: 6px; }
-      .chat-list li { line-height: 1.52; padding-left: 2px; }
-      .message-footer-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 7px; }
-      .formation-tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: rgba(29, 78, 216, 0.24); border: 1px solid rgba(125, 211, 252, 0.4); color: #e0f2fe; font-size: 0.73rem; font-weight: 600; }
-      .source-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.32); color: var(--emerald-400); font-size: 0.72rem; font-weight: 500; }
-      .play-on-board-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 6px; background: linear-gradient(135deg, #1d4ed8 0%, #0284c7 100%); border: 1px solid rgba(125, 211, 252, 0.42); color: #fff; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 0.73rem; font-weight: 600; cursor: pointer; }
-      .copy-msg-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 6px; background: #0b1220; border: 1px solid rgba(148, 163, 184, 0.2); color: #cbd5e1; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
-      .chat-input-bar { display: flex; gap: 10px; padding-top: 12px; border-top: 1px solid rgba(148, 163, 184, 0.11); }
-      .input-wrapper { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 5px 8px 5px 14px; border-radius: 9px; background: #030712; border: 1px solid rgba(56, 189, 248, 0.24); }
-      .input-wrapper input { flex: 1; min-width: 0; width: 100%; padding: 8px 4px; border: none; background: transparent; color: var(--text-primary); font-size: 0.86rem; }
-      .input-modality-indicator { padding: 4px 9px; border-radius: 6px; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.28); color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.71rem; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
-      .btn-primary { position: relative; flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(125, 211, 252, 0.32); background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%); color: #fff; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 600; font-size: 0.83rem; letter-spacing: -0.015em; cursor: pointer; overflow: hidden; }
-      .send-btn { flex: 0 0 auto; padding: 0 20px; border-radius: 8px; }
-      @media (max-width: 1024px) {
-        .assistant-layout { grid-template-columns: 1fr; }
-        .chat-card { height: clamp(480px, 72dvh, 640px); min-height: 0; }
-      }
-      @media (max-width: 768px) {
-        .app-shell { padding: 0 12px; }
-        .topbar { padding: 10px 12px; gap: 10px; }
-        .view-tabs-nav { max-width: 100%; overflow-x: auto; }
-        .view-tab-btn { white-space: nowrap; padding: 6px 11px; font-size: 0.78rem; }
+        color: #e0f2fe; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer;
       }
     </style>
   </head>
-  <body>
+  <body class="auth-locked">
     <!-- ========================================================================
          BLUE ROSE OPENING CINEMATIC OVERLAY (4.2s 60FPS Canvas + SVG + GSAP)
          ======================================================================== -->
@@ -308,7 +113,7 @@
               <stop offset="82%" stop-color="#38bdf8" />
               <stop offset="100%" stop-color="#bae6fd" />
             </linearGradient>
-            <symbol id="kaiser-hd-rose" viewBox="-72 -72 144 144">
+            <symbol id="abyssal-hd-rose" viewBox="-72 -72 144 144">
               <circle r="66" fill="none" stroke="#38bdf8" stroke-width="0.9" stroke-opacity="0.32" stroke-dasharray="4 4" />
               <path d="M -10 44 L -32 62 L -18 36 Z M 10 44 L 32 62 L 18 36 Z" fill="#03060f" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
               <path d="M 0 -60 L 20 -48 L 28 -28 L 12 -12 L -12 -12 L -28 -28 L -20 -48 Z" fill="url(#vineRosePetalGrad)" stroke="#7dd3fc" stroke-width="1.4" stroke-linejoin="round" />
@@ -322,7 +127,7 @@
               <path d="M 0 -28 L 18 -18 L 20 0 L 6 14 L -6 14 L -20 0 L -18 -18 Z" fill="url(#vineRosePetalGrad)" stroke="#e0f2fe" stroke-width="1.4" stroke-linejoin="round" />
               <path d="M -11 -7 L 0 -15 L 11 -7 L 7 5 L 0 9 L -7 5 Z" fill="#03060f" stroke="#e0f2fe" stroke-width="1.4" stroke-linejoin="round" />
             </symbol>
-            <symbol id="kaiser-mini-crown" viewBox="-28 -22 56 42">
+            <symbol id="abyssal-mini-crown" viewBox="-28 -22 56 42">
               <path d="M -22 10 L -25 -10 L -11 -1 L 0 -18 L 11 -1 L 25 -10 L 22 10 Z" fill="url(#vineInkCobaltGrad)" stroke="#e0f2fe" stroke-width="1.4" stroke-linejoin="round" />
               <rect x="-21" y="12" width="42" height="5" rx="1.5" fill="#03060f" stroke="#7dd3fc" stroke-width="1.4" />
               <polygon points="0,-7 4,-1 0,5 -4,-1" fill="#38bdf8" stroke="#e0f2fe" stroke-width="1" />
@@ -360,26 +165,26 @@
             <path class="intro-vine-thorn" d="M 142 642 L 112 630 L 134 662 Z" />
             <path class="intro-vine-thorn" d="M 52 772 L 22 762 L 42 792 Z" />
           </g>
-          <!-- Stylized Kaiser Mini-Crowns (2 on left vines) -->
+          <!-- Stylized Táctico Mini-Crowns (2 on left vines) -->
           <g transform="translate(226 112) rotate(-18) scale(0.95)">
             <g class="intro-mini-crown">
-              <use href="#kaiser-mini-crown" x="-28" y="-22" width="56" height="42" />
+              <use href="#abyssal-mini-crown" x="-28" y="-22" width="56" height="42" />
             </g>
           </g>
           <g transform="translate(174 686) rotate(14) scale(0.88)">
             <g class="intro-mini-crown">
-              <use href="#kaiser-mini-crown" x="-28" y="-22" width="56" height="42" />
+              <use href="#abyssal-mini-crown" x="-28" y="-22" width="56" height="42" />
             </g>
           </g>
           <!-- High-Def Sculpted Side Rose Blooms -->
           <g class="intro-side-bloom" data-target-opacity="0.42">
-            <use href="#kaiser-hd-rose" x="-14" y="138" width="146" height="146" transform="rotate(-16 59 211)" />
+            <use href="#abyssal-hd-rose" x="-14" y="138" width="146" height="146" transform="rotate(-16 59 211)" />
           </g>
           <g class="intro-side-bloom" data-target-opacity="0.34">
-            <use href="#kaiser-hd-rose" x="158" y="346" width="112" height="112" transform="rotate(22 214 402)" />
+            <use href="#abyssal-hd-rose" x="158" y="346" width="112" height="112" transform="rotate(22 214 402)" />
           </g>
           <g class="intro-side-bloom" data-target-opacity="0.40">
-            <use href="#kaiser-hd-rose" x="34" y="654" width="136" height="136" transform="rotate(-24 102 722)" />
+            <use href="#abyssal-hd-rose" x="34" y="654" width="136" height="136" transform="rotate(-24 102 722)" />
           </g>
         </svg>
 
@@ -410,21 +215,21 @@
               <path class="intro-vine-thorn" d="M 152 622 L 122 610 L 144 642 Z" />
               <path class="intro-vine-thorn" d="M 68 748 L 38 738 L 58 768 Z" />
             </g>
-            <!-- Stylized Kaiser Mini-Crown (3rd crown overall, nestled right upper) -->
+            <!-- Stylized Táctico Mini-Crown (3rd crown overall, nestled right upper) -->
             <g transform="translate(248 258) rotate(15) scale(0.92)">
               <g class="intro-mini-crown">
-                <use href="#kaiser-mini-crown" x="-28" y="-22" width="56" height="42" />
+                <use href="#abyssal-mini-crown" x="-28" y="-22" width="56" height="42" />
               </g>
             </g>
             <!-- High-Def Sculpted Side Rose Blooms -->
             <g class="intro-side-bloom" data-target-opacity="0.38">
-              <use href="#kaiser-hd-rose" x="148" y="88" width="124" height="124" transform="rotate(18 210 150)" />
+              <use href="#abyssal-hd-rose" x="148" y="88" width="124" height="124" transform="rotate(18 210 150)" />
             </g>
             <g class="intro-side-bloom" data-target-opacity="0.44">
-              <use href="#kaiser-hd-rose" x="12" y="404" width="152" height="152" transform="rotate(-18 88 480)" />
+              <use href="#abyssal-hd-rose" x="12" y="404" width="152" height="152" transform="rotate(-18 88 480)" />
             </g>
             <g class="intro-side-bloom" data-target-opacity="0.32">
-              <use href="#kaiser-hd-rose" x="128" y="704" width="118" height="118" transform="rotate(24 187 763)" />
+              <use href="#abyssal-hd-rose" x="128" y="704" width="118" height="118" transform="rotate(24 187 763)" />
             </g>
           </g>
         </svg>
@@ -740,100 +545,178 @@
         </radialGradient>
         <!-- Tactical Heatmap Blur Filter & Thermal Gradients -->
         <filter id="heatmap-blur-filter" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="13" />
+          <feGaussianBlur stdDeviation="12" />
         </filter>
+        <radialGradient id="heat-grad-hotspot" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.94" />
+          <stop offset="38%" stop-color="#f97316" stop-opacity="0.72" />
+          <stop offset="74%" stop-color="#facc15" stop-opacity="0.34" />
+          <stop offset="100%" stop-color="#facc15" stop-opacity="0" />
+        </radialGradient>
         <radialGradient id="heat-grad-core" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.82" />
-          <stop offset="42%" stop-color="#f59e0b" stop-opacity="0.58" />
-          <stop offset="78%" stop-color="#10b981" stop-opacity="0.26" />
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.76" />
+          <stop offset="44%" stop-color="#f59e0b" stop-opacity="0.52" />
+          <stop offset="80%" stop-color="#10b981" stop-opacity="0.22" />
           <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="heat-grad-low" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#10b981" stop-opacity="0.46" />
+          <stop offset="56%" stop-color="#38bdf8" stop-opacity="0.2" />
+          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
         </radialGradient>
         <radialGradient id="heat-grad-bridge" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.52" />
-          <stop offset="55%" stop-color="#10b981" stop-opacity="0.24" />
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.48" />
+          <stop offset="55%" stop-color="#10b981" stop-opacity="0.22" />
           <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
         </radialGradient>
+        <!-- Faceted Estética Azul Abisal Gradients for Dashboard Viewport Corners -->
+        <linearGradient id="dashRoseFacetOuter" x1="0%" y1="100%" x2="80%" y2="0%">
+          <stop offset="0%" stop-color="#040b1a" />
+          <stop offset="42%" stop-color="#0f296e" />
+          <stop offset="82%" stop-color="#1d4ed8" />
+          <stop offset="100%" stop-color="#38bdf8" />
+        </linearGradient>
+        <linearGradient id="dashRoseFacetMid" x1="0%" y1="100%" x2="75%" y2="0%">
+          <stop offset="0%" stop-color="#0f296e" />
+          <stop offset="52%" stop-color="#1d4ed8" />
+          <stop offset="88%" stop-color="#38bdf8" />
+          <stop offset="100%" stop-color="#bae6fd" />
+        </linearGradient>
+        <linearGradient id="dashRoseFacetCore" x1="50%" y1="100%" x2="50%" y2="0%">
+          <stop offset="0%" stop-color="#020617" />
+          <stop offset="48%" stop-color="#1d4ed8" />
+          <stop offset="86%" stop-color="#38bdf8" />
+          <stop offset="100%" stop-color="#e0f2fe" />
+        </linearGradient>
       </defs>
     </svg>
-    <!-- Ambient Animated Background + Drifting Blue Petals Canvas -->
+    <!-- Studio Ambient Backdrop -->
     <div class="ambient-bg" aria-hidden="true">
       <div class="glow-orb orb-1"></div>
       <div class="glow-orb orb-2"></div>
-      <div class="glow-orb orb-3"></div>
       <div class="tactical-grid"></div>
-      <canvas id="kaiser-ambient-petals" class="ambient-petals-canvas" aria-hidden="true"></canvas>
+    </div>
+    <canvas id="abyssal-ambient-petals" class="abyssal-ambient-petals-canvas" aria-hidden="true"></canvas>
+    <canvas id="abyssal-foreground-petals" class="abyssal-foreground-petals-canvas" aria-hidden="true"></canvas>
+
+    <!-- Estética Azul Abisal & Telemetría Viewport Corner Frame (opacity 0.32, z-index 0) -->
+    <div id="abyssal-dashboard-vines" class="abyssal-dashboard-vines" aria-hidden="true">
+      <!-- Top-Left Corner: Double-line Cyan Vines, Hollow Thorns & Faceted Blue Rose -->
+      <svg class="dash-vine tl" viewBox="0 0 260 260" fill="none">
+        <path d="M-8 28 C58 34 102 72 138 134 C158 168 194 190 242 198" stroke="#1d4ed8" stroke-width="2.2" stroke-opacity="0.7" />
+        <path d="M-8 25 C58 31 103 69 140 132 C160 166 196 188 244 196" stroke="#38bdf8" stroke-width="1.35" />
+        <path d="M-8 32 C54 38 97 75 133 137 C154 172 190 194 240 202" stroke="#7dd3fc" stroke-width="0.9" stroke-opacity="0.85" />
+        <path d="M30 -8 C40 58 26 112 10 184" stroke="#38bdf8" stroke-width="1.25" />
+        <path d="M36 -8 C46 58 32 114 16 186" stroke="#7dd3fc" stroke-width="0.85" stroke-opacity="0.8" />
+        <polygon points="56,37 72,22 66,45" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="104,80 122,71 112,92" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="154,158 168,144 165,168" fill="#03060f" stroke="#38bdf8" stroke-width="1.1" />
+        <polygon points="28,98 44,106 24,116" fill="#03060f" stroke="#7dd3fc" stroke-width="1.1" />
+        <g transform="translate(46, 46) rotate(135)">
+          <path d="M-8 26 L-24 44 L-12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M8 26 L24 44 L12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M0 30 L-10 48 L10 48 Z" fill="#040b1a" stroke="#7dd3fc" stroke-width="1.1" />
+          <path d="M0 -42 L15 -34 L22 -18 L10 -6 L-10 -6 L-22 -18 L-15 -34 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-16 -30 L-34 -26 L-42 -8 L-34 12 L-16 14 L-10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M16 -30 L34 -26 L42 -8 L34 12 L16 14 L10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-24 -8 L-28 12 L-14 26 L2 20 L-6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M24 -8 L28 12 L14 26 L-2 20 L6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M0 -20 L13 -12 L15 2 L0 12 L-15 2 L-13 -12 Z" fill="url(#dashRoseFacetCore)" stroke="#bae6fd" stroke-width="1.4" stroke-linejoin="round" />
+          <polygon points="0,-10 7,-2 4,7 -4,7 -7,-2" fill="#03060f" stroke="#00f0ff" stroke-width="1.2" />
+        </g>
+      </svg>
+
+      <!-- Top-Right Corner: Double-line Cyan Vines, Hollow Thorns & Faceted Blue Rose -->
+      <svg class="dash-vine tr" viewBox="0 0 260 260" fill="none">
+        <path d="M268 28 C202 34 158 72 122 134 C102 168 66 190 18 198" stroke="#1d4ed8" stroke-width="2.2" stroke-opacity="0.7" />
+        <path d="M268 25 C202 31 157 69 120 132 C100 166 64 188 16 196" stroke="#38bdf8" stroke-width="1.35" />
+        <path d="M268 32 C206 38 163 75 127 137 C106 172 70 194 20 202" stroke="#7dd3fc" stroke-width="0.9" stroke-opacity="0.85" />
+        <path d="M230 -8 C220 58 234 112 250 184" stroke="#38bdf8" stroke-width="1.25" />
+        <path d="M224 -8 C214 58 228 114 244 186" stroke="#7dd3fc" stroke-width="0.85" stroke-opacity="0.8" />
+        <polygon points="204,37 188,22 194,45" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="156,80 138,71 148,92" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="106,158 92,144 95,168" fill="#03060f" stroke="#38bdf8" stroke-width="1.1" />
+        <polygon points="232,98 216,106 236,116" fill="#03060f" stroke="#7dd3fc" stroke-width="1.1" />
+        <g transform="translate(214, 46) rotate(-135)">
+          <path d="M-8 26 L-24 44 L-12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M8 26 L24 44 L12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M0 30 L-10 48 L10 48 Z" fill="#040b1a" stroke="#7dd3fc" stroke-width="1.1" />
+          <path d="M0 -42 L15 -34 L22 -18 L10 -6 L-10 -6 L-22 -18 L-15 -34 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-16 -30 L-34 -26 L-42 -8 L-34 12 L-16 14 L-10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M16 -30 L34 -26 L42 -8 L34 12 L16 14 L10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-24 -8 L-28 12 L-14 26 L2 20 L-6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M24 -8 L28 12 L14 26 L-2 20 L6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M0 -20 L13 -12 L15 2 L0 12 L-15 2 L-13 -12 Z" fill="url(#dashRoseFacetCore)" stroke="#bae6fd" stroke-width="1.4" stroke-linejoin="round" />
+          <polygon points="0,-10 7,-2 4,7 -4,7 -7,-2" fill="#03060f" stroke="#00f0ff" stroke-width="1.2" />
+        </g>
+      </svg>
+
+      <!-- Bottom-Left Corner: Double-line Cyan Vines, Hollow Thorns & Faceted Blue Rose -->
+      <svg class="dash-vine bl" viewBox="0 0 260 260" fill="none">
+        <path d="M-8 232 C58 226 102 188 138 126 C158 92 194 70 242 62" stroke="#1d4ed8" stroke-width="2.2" stroke-opacity="0.7" />
+        <path d="M-8 235 C58 229 103 191 140 128 C160 94 196 72 244 64" stroke="#38bdf8" stroke-width="1.35" />
+        <path d="M-8 228 C54 222 97 185 133 123 C154 88 190 66 240 58" stroke="#7dd3fc" stroke-width="0.9" stroke-opacity="0.85" />
+        <path d="M30 268 C40 202 26 148 10 76" stroke="#38bdf8" stroke-width="1.25" />
+        <path d="M36 268 C46 202 32 146 16 74" stroke="#7dd3fc" stroke-width="0.85" stroke-opacity="0.8" />
+        <polygon points="56,223 72,238 66,215" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="104,180 122,189 112,168" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="154,102 168,116 165,92" fill="#03060f" stroke="#38bdf8" stroke-width="1.1" />
+        <polygon points="28,162 44,154 24,144" fill="#03060f" stroke="#7dd3fc" stroke-width="1.1" />
+        <g transform="translate(46, 214) rotate(45)">
+          <path d="M-8 26 L-24 44 L-12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M8 26 L24 44 L12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M0 30 L-10 48 L10 48 Z" fill="#040b1a" stroke="#7dd3fc" stroke-width="1.1" />
+          <path d="M0 -42 L15 -34 L22 -18 L10 -6 L-10 -6 L-22 -18 L-15 -34 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-16 -30 L-34 -26 L-42 -8 L-34 12 L-16 14 L-10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M16 -30 L34 -26 L42 -8 L34 12 L16 14 L10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-24 -8 L-28 12 L-14 26 L2 20 L-6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M24 -8 L28 12 L14 26 L-2 20 L6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M0 -20 L13 -12 L15 2 L0 12 L-15 2 L-13 -12 Z" fill="url(#dashRoseFacetCore)" stroke="#bae6fd" stroke-width="1.4" stroke-linejoin="round" />
+          <polygon points="0,-10 7,-2 4,7 -4,7 -7,-2" fill="#03060f" stroke="#00f0ff" stroke-width="1.2" />
+        </g>
+      </svg>
+
+      <!-- Bottom-Right Corner: Double-line Cyan Vines, Hollow Thorns & Faceted Blue Rose -->
+      <svg class="dash-vine br" viewBox="0 0 260 260" fill="none">
+        <path d="M268 232 C202 226 158 188 122 126 C102 92 66 70 18 62" stroke="#1d4ed8" stroke-width="2.2" stroke-opacity="0.7" />
+        <path d="M268 235 C202 229 157 191 120 128 C100 94 64 72 16 64" stroke="#38bdf8" stroke-width="1.35" />
+        <path d="M268 228 C206 222 163 185 127 123 C106 88 70 66 20 58" stroke="#7dd3fc" stroke-width="0.9" stroke-opacity="0.85" />
+        <path d="M230 268 C220 202 234 148 250 76" stroke="#38bdf8" stroke-width="1.25" />
+        <path d="M224 268 C214 202 228 146 244 74" stroke="#7dd3fc" stroke-width="0.85" stroke-opacity="0.8" />
+        <polygon points="204,223 188,238 194,215" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="156,180 138,189 148,168" fill="#03060f" stroke="#7dd3fc" stroke-width="1.15" />
+        <polygon points="106,102 92,116 95,92" fill="#03060f" stroke="#38bdf8" stroke-width="1.1" />
+        <polygon points="232,162 216,154 236,144" fill="#03060f" stroke="#7dd3fc" stroke-width="1.1" />
+        <g transform="translate(214, 214) rotate(-45)">
+          <path d="M-8 26 L-24 44 L-12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M8 26 L24 44 L12 22 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" />
+          <path d="M0 30 L-10 48 L10 48 Z" fill="#040b1a" stroke="#7dd3fc" stroke-width="1.1" />
+          <path d="M0 -42 L15 -34 L22 -18 L10 -6 L-10 -6 L-22 -18 L-15 -34 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-16 -30 L-34 -26 L-42 -8 L-34 12 L-16 14 L-10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M16 -30 L34 -26 L42 -8 L34 12 L16 14 L10 -8 Z" fill="url(#dashRoseFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M-24 -8 L-28 12 L-14 26 L2 20 L-6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M24 -8 L28 12 L14 26 L-2 20 L6 0 Z" fill="url(#dashRoseFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M0 -20 L13 -12 L15 2 L0 12 L-15 2 L-13 -12 Z" fill="url(#dashRoseFacetCore)" stroke="#bae6fd" stroke-width="1.4" stroke-linejoin="round" />
+          <polygon points="0,-10 7,-2 4,7 -4,7 -7,-2" fill="#03060f" stroke="#00f0ff" stroke-width="1.2" />
+        </g>
+      </svg>
     </div>
 
-    <!-- Enredaderas de Esquina Estilo Grabado / Tatuaje Lineal Michael Kaiser (máx. 220x260, z-index 0, >= 1380px) -->
-    <div id="kaiser-viewport-vines" class="kaiser-viewport-vines" aria-hidden="true">
-      <svg class="svg-shared-defs" aria-hidden="true" focusable="false">
-        <defs>
-          <linearGradient id="viewportTattooGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#1d4ed8" />
-            <stop offset="58%" stop-color="#0ea5e9" />
-            <stop offset="100%" stop-color="#38bdf8" />
-          </linearGradient>
-          <symbol id="kaiser-tattoo-corner" viewBox="0 0 220 260">
-            <!-- Tallos entrelazados estilo tatuaje fino (stroke-width 1.4px + relleno sutil) -->
-            <path
-              d="M2 246 C10 176 24 108 64 62 C102 20 156 12 212 6 C158 18 106 30 68 68 C32 108 16 174 8 246 Z"
-              fill="rgba(15, 23, 42, 0.45)"
-              stroke="url(#viewportTattooGrad)"
-              stroke-width="1.4"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M16 218 C22 148 48 88 94 48 C130 18 168 20 202 26"
-              fill="none"
-              stroke="url(#viewportTattooGrad)"
-              stroke-width="1.35"
-              stroke-linecap="round"
-            />
-            <path
-              d="M84 56 C104 68 122 58 112 42 C104 30 88 38 96 48 M28 142 C46 154 62 140 50 124 C42 114 28 124 36 134"
-              fill="none"
-              stroke="url(#viewportTattooGrad)"
-              stroke-width="1.15"
-              stroke-linecap="round"
-            />
-            <!-- Espinas triangulares finas y afiladas -->
-            <path
-              d="M14 196 L3 184 L18 189 Z M24 156 L10 143 L28 148 Z M38 114 L26 98 L45 106 Z M62 72 L54 54 L70 65 Z M98 38 L94 20 L108 32 Z M142 18 L145 3 L152 15 Z M178 11 L186 1 L186 11 Z M42 132 L59 138 L47 122 Z M76 74 L94 82 L83 66 Z M124 30 L138 40 L130 24 Z"
-              fill="rgba(15, 23, 42, 0.45)"
-              stroke="url(#viewportTattooGrad)"
-              stroke-width="1.15"
-              stroke-linejoin="round"
-            />
-            <!-- 1 Rosa Azul geométrica en trazo fino por esquina (sin rellenos pesados) -->
-            <g transform="translate(46, 48)">
-              <path d="M0 -30 L18 -19 L21 -2 L9 15 L-9 15 L-21 -2 L-18 -19 Z" fill="rgba(15, 23, 42, 0.45)" stroke="url(#viewportTattooGrad)" stroke-width="1.4" stroke-linejoin="round" />
-              <path d="M-21 -10 L-32 4 L-18 18 L-7 9 M21 -10 L32 4 L18 18 L7 9 M-10 15 L0 29 L10 15" fill="rgba(15, 23, 42, 0.45)" stroke="url(#viewportTattooGrad)" stroke-width="1.3" stroke-linejoin="round" />
-              <path d="M0 -19 L12 -11 L13 3 L0 11 L-13 3 L-12 -11 Z" fill="rgba(15, 23, 42, 0.45)" stroke="url(#viewportTattooGrad)" stroke-width="1.35" stroke-linejoin="round" />
-              <path d="M0 -10 L6 -4 L4 4 L0 7 L-4 4 L-6 -4 Z" fill="none" stroke="#38bdf8" stroke-width="1.25" stroke-linejoin="round" />
-              <path d="M0 -30 L0 -19 M18 -19 L12 -11 M-18 -19 L-12 -11 M9 15 L13 3 M-9 15 L-13 3" fill="none" stroke="url(#viewportTattooGrad)" stroke-width="0.95" stroke-opacity="0.7" />
-            </g>
-          </symbol>
-        </defs>
-      </svg>
-      <svg class="viewport-vine-corner tl" width="220" height="260" aria-hidden="true"><use href="#kaiser-tattoo-corner" /></svg>
-      <svg class="viewport-vine-corner tr" width="220" height="260" aria-hidden="true"><use href="#kaiser-tattoo-corner" /></svg>
-      <svg class="viewport-vine-corner bl" width="220" height="260" aria-hidden="true"><use href="#kaiser-tattoo-corner" /></svg>
-      <svg class="viewport-vine-corner br" width="220" height="260" aria-hidden="true"><use href="#kaiser-tattoo-corner" /></svg>
-    </div>
+    <a href="#app-main-content" class="skip-link visually-hidden">Saltar al contenido principal</a>
 
     <!-- Toast Notifications Container -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-    <!-- Top Header with 2 Dedicated View Tabs -->
-    <header class="topbar fade-slide-up" style="--delay: 0.05s">
+    <!-- Top Command Header (Hidden until authenticated) -->
+    <header class="topbar" hidden>
       <div class="brand">
-        <div class="brand-logo" title="Emblema Oficial: La Rosa Azul & Corona Imperial de TacticalPlay RAG">
-          <svg class="brand-imperial-crown" viewBox="0 0 28 22" width="18" height="14" fill="none" aria-hidden="true">
+        <div class="brand-logo" title="TacticalPlay RAG — Emblema Oficial: Rosa Azul &amp; Corona Táctica">
+          <svg class="brand-elite-crown" viewBox="0 0 28 22" width="18" height="14" fill="none" aria-hidden="true">
             <path d="M3 16 L1 4 L9 10 L14 2 L19 10 L27 4 L25 16 Z" fill="#eab308" fill-opacity="0.92" stroke="#fde047" stroke-width="1.6" stroke-linejoin="round" />
             <rect x="4" y="17.5" width="20" height="2.8" rx="1.2" fill="#eab308" stroke="#fef08a" stroke-width="0.9" />
             <polygon points="14,7.5 16.2,11 14,14.5 11.8,11" fill="#00f0ff" />
           </svg>
-          <svg viewBox="-64 -64 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="-64 -64 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <defs>
               <linearGradient id="logoPetalOuter" x1="0%" y1="100%" x2="15%" y2="0%">
                 <stop offset="0%" stop-color="#020617" />
@@ -854,7 +737,6 @@
                 <stop offset="100%" stop-color="#e0f2fe" />
               </linearGradient>
             </defs>
-            <!-- Outer Angular Petals & Sepals -->
             <path d="M -8 42 L -28 58 L -16 36 Z" fill="#002b80" stroke="#38bdf8" stroke-width="1.4" />
             <path d="M 8 42 L 28 58 L 16 36 Z" fill="#002b80" stroke="#38bdf8" stroke-width="1.4" />
             <path d="M 0 -58 L 19 -48 L 28 -30 L 14 -14 L -14 -14 L -28 -30 L -19 -48 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
@@ -863,30 +745,27 @@
             <path d="M -52 2 L -56 22 L -40 42 L -16 46 L -8 24 L -28 6 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M 52 2 L 56 22 L 40 42 L 16 46 L 8 24 L 28 6 Z" fill="url(#logoPetalOuter)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M -24 36 L 0 54 L 24 36 L 16 16 L -16 16 Z" fill="url(#logoPetalOuter)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
-            <!-- Middle Enveloping Petals + Ink Fold Shadows -->
             <path d="M -4 -42 L -26 -36 L -38 -16 L -24 6 L -2 -6 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M 4 -42 L 26 -36 L 38 -16 L 24 6 L 2 -6 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M -36 -14 L -42 8 L -28 28 L -6 22 L -14 -2 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M 36 -14 L 42 8 L 28 28 L 6 22 L 14 -2 Z" fill="url(#logoPetalMid)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M -26 18 L -14 36 L 6 32 L 4 12 L -14 8 Z" fill="url(#logoPetalMid)" stroke="#bae6fd" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M 26 18 L 14 36 L -6 32 L -4 12 L 14 8 Z" fill="url(#logoPetalMid)" stroke="#bae6fd" stroke-width="1.8" stroke-linejoin="round" />
-            <!-- Core Bud Cupped Petals -->
             <path d="M 0 -28 L 18 -20 L 22 -2 L 8 14 L -8 14 L -22 -2 L -18 -20 Z" fill="url(#logoPetalCore)" stroke="#bae6fd" stroke-width="2" stroke-linejoin="round" />
             <path d="M -18 -14 L -22 4 L -8 18 L 4 8 L -6 -6 Z" fill="url(#logoPetalCore)" stroke="#e0f2fe" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M 18 -14 L 22 4 L 8 18 L -4 8 L 6 -6 Z" fill="url(#logoPetalCore)" stroke="#e0f2fe" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M -12 -8 L 0 -16 L 12 -8 L 8 4 L 0 8 L -8 4 Z" fill="#020617" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M -7 -5 L 0 -10 L 7 -5 L 3 2 L -4 1 Z" fill="#0284c7" stroke="#e0f2fe" stroke-width="1.8" stroke-linejoin="round" />
           </svg>
-          <span class="logo-pulse"></span>
         </div>
         <div>
           <h1 class="brand-title">TacticalPlay <span class="accent-gradient">RAG</span></h1>
-          <p class="brand-subtitle">Entrenador IA Vectorial &amp; Pizarra Táctica</p>
+          <p class="brand-subtitle">Estudio Táctico Vectorial &amp; Pizarra 3D</p>
         </div>
       </div>
 
-      <!-- Main Navigation Pills (3 Tabs) -->
-      <nav class="view-tabs-nav" role="tablist" aria-label="Vistas principales">
+      <!-- Main Navigation Tabs -->
+      <nav class="view-tabs-nav" role="tablist" aria-label="Módulos principales">
         <button
           type="button"
           id="tab-btn-assistant"
@@ -894,10 +773,9 @@
           data-tab="assistant"
           role="tab"
           aria-selected="true"
-          aria-controls="view-assistant"
           tabindex="0"
         >
-          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             <path d="M8 9h8M8 13h5" />
           </svg>
@@ -910,10 +788,9 @@
           data-tab="board"
           role="tab"
           aria-selected="false"
-          aria-controls="view-board"
           tabindex="-1"
         >
-          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="4" width="20" height="16" rx="2" />
             <line x1="12" y1="4" x2="12" y2="20" />
             <circle cx="12" cy="12" r="3" />
@@ -927,22 +804,22 @@
           data-tab="squad"
           role="tab"
           aria-selected="false"
-          aria-controls="view-squad"
           tabindex="-1"
         >
-          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
           <span>Gestión de Plantilla</span>
+          <span id="squad-lock-badge" class="tab-lock-badge" title="Exclusivo para usuarios registrados" hidden>🔒</span>
         </button>
       </nav>
 
       <div class="header-meta">
         <div class="active-modality-pill">
-          <span class="topbar-imperial-emblem" aria-hidden="true">
+          <span class="topbar-elite-emblem" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true">
               <path d="M12 4.5C15 5.4 17 8 16.2 11.2C15.2 13.8 12.6 14.8 12 14.8C11.4 14.8 8.8 13.8 7.8 11.2C7 8 9 5.4 12 4.5Z" fill="#1d4ed8" stroke="#38bdf8" stroke-width="1.4" />
               <path d="M12 7.2C13.3 8 13.7 9.6 12 11C10.3 9.6 10.7 8 12 7.2Z" fill="#00f0ff" />
@@ -952,15 +829,15 @@
               <path d="m2 5 3.2 11.5h13.6L22 5l-5.8 6.4L12 4.5 7.8 11.4 2 5zm3.2 15h13.6" fill="rgba(234, 179, 8, 0.22)" />
             </svg>
           </span>
-          <span class="pill-label">Sistema activo:</span>
-          <strong id="header-modality-badge">Futsal · 1-3-1 (Rombo)</strong>
+          <span class="pill-label">Sistema</span>
+          <strong id="header-modality-badge">Futsal · 3-1 (Rombo)</strong>
         </div>
 
         <button
           id="replay-intro-rose-btn"
           type="button"
           class="replay-rose-btn"
-          title="Reproducir cinemática de marca (Rosa Azul)"
+          title="Reproducir cinemática de apertura"
           aria-label="Reproducir cinemática de apertura"
         >
           <svg viewBox="-64 -64 128 128" width="18" height="18" fill="none" aria-hidden="true">
@@ -972,8 +849,43 @@
           </svg>
         </button>
 
-        <button id="backend-status-btn" class="status-badge checking" title="Verificar estado del servicio Spring Boot (:8000)">
-          <span class="status-dot"></span>
+        <button
+          type="button"
+          id="auth-session-btn"
+          class="auth-session-pill"
+          title="Cuenta activa"
+        >
+          <span class="auth-dot" aria-hidden="true"></span>
+          <span id="auth-session-label">Iniciar sesión</span>
+        </button>
+
+        <button
+          type="button"
+          id="demo-upgrade-btn"
+          class="demo-upgrade-pill"
+          title="Crea tu cuenta gratuita para desbloquear Mapa de Calor, Trazar Rutas, Estadio 3D y Gestor de Plantilla"
+          hidden
+        >
+          <span>Desbloquear Cuenta</span>
+        </button>
+
+        <button
+          type="button"
+          id="logout-session-btn"
+          class="logout-session-btn"
+          title="Cerrar sesión actual sin borrar tus conversaciones"
+          hidden
+        >
+          <svg class="ui-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Cerrar Sesión</span>
+        </button>
+
+        <button type="button" id="backend-status-btn" class="status-badge checking" title="Verificar estado del servicio Spring Boot (:8000)">
+          <span class="status-dot" aria-hidden="true"></span>
           <span id="backend-status-text">Verificando API (8000)...</span>
         </button>
 
@@ -987,41 +899,40 @@
       </div>
     </header>
 
-    <main id="app-main-content" class="app-main-content">
+    <main id="app-main-content" class="app-main-content" tabindex="-1" hidden>
     <!-- ========================================================================
          TAB 1: ASISTENTE TÁCTICO RAG (Chat + Contexto Táctico Activo)
          ======================================================================== -->
     <section id="view-assistant" class="tab-view active-view" role="tabpanel" aria-labelledby="tab-btn-assistant">
       <div class="assistant-layout">
-        <!-- Left Sidebar: Quick Modality & Active Tactic Context -->
-        <aside class="assistant-sidebar">
-          <!-- Quick Modality & Active Tactic Card -->
-          <article class="glass-card fade-slide-up" style="--delay: 0.1s">
+        <!-- Left Sidebar: Modality & Session Telemetry -->
+        <aside class="assistant-sidebar assistant-sidebar-left">
+          <article class="glass-card studio-panel">
             <div class="card-header">
               <div>
-                <span class="section-kicker">FORMATO &amp; CONTEXTO ACTIVO</span>
+                <span class="section-kicker">Formato &amp; Contexto</span>
                 <h2 class="card-title">Modalidad en Consulta</h2>
               </div>
               <span class="badge-tag" id="players-count-tag">5 vs 5</span>
             </div>
 
             <div class="modality-grid" id="modality-selector" role="radiogroup" aria-label="Selector rápido de modalidad">
-              <button type="button" class="modality-btn active" data-modality="Futsal" data-players="5 vs 5">
+              <button type="button" class="modality-btn active" role="radio" aria-checked="true" data-modality="Futsal" data-players="5 vs 5">
                 <span class="mod-icon">5v5</span>
                 <span class="mod-name">Futsal</span>
                 <span class="mod-meta">40×20m · Pista</span>
               </button>
-              <button type="button" class="modality-btn" data-modality="Fútbol 7" data-players="7 vs 7">
+              <button type="button" class="modality-btn" role="radio" aria-checked="false" data-modality="Fútbol 7" data-players="7 vs 7">
                 <span class="mod-icon">7v7</span>
                 <span class="mod-name">Fútbol 7</span>
                 <span class="mod-meta">Carrileros · Sintético</span>
               </button>
-              <button type="button" class="modality-btn" data-modality="Fútbol 9" data-players="9 vs 9">
+              <button type="button" class="modality-btn" role="radio" aria-checked="false" data-modality="Fútbol 9" data-players="9 vs 9">
                 <span class="mod-icon">9v9</span>
                 <span class="mod-name">Fútbol 9</span>
                 <span class="mod-meta">Transición · Formativo</span>
               </button>
-              <button type="button" class="modality-btn" data-modality="Fútbol 11" data-players="11 vs 11">
+              <button type="button" class="modality-btn" role="radio" aria-checked="false" data-modality="Fútbol 11" data-players="11 vs 11">
                 <span class="mod-icon">11v11</span>
                 <span class="mod-name">Fútbol 11</span>
                 <span class="mod-meta">Campo reglamentario</span>
@@ -1030,49 +941,37 @@
 
             <div class="active-context-strip">
               <div class="context-item">
-                <span class="ctx-label">Sistema activo:</span>
-                <strong id="sidebar-formation-label">1-3-1 (Rombo)</strong>
+                <span class="ctx-label">Sistema activo</span>
+                <strong id="sidebar-formation-label">3-1 (Rombo)</strong>
               </div>
               <div class="context-item">
-                <span class="ctx-label">Modelo de juego:</span>
+                <span class="ctx-label">Modelo de juego</span>
                 <strong id="sidebar-style-label">Posesión &amp; Juego de Posición</strong>
               </div>
-              <div class="context-item">
-                <span class="ctx-label">Base de plantilla:</span>
-                <strong id="sidebar-squad-label">PostgreSQL + Top 100</strong>
-              </div>
-              <button type="button" id="go-to-board-btn" class="ghost-mini-btn full-width-btn">
-                <span>Abrir Pizarra Táctica</span>
-                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            </div>
+
+            <div class="sidebar-actions-grid">
+              <button type="button" id="go-to-board-btn" class="ghost-mini-btn">
+                <span>Pizarra</span>
+                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 5l7 7-7 7" />
                 </svg>
               </button>
-              <button type="button" id="go-to-squad-btn" class="ghost-mini-btn full-width-btn">
-                <span>Abrir Gestión de Plantilla</span>
-                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <button type="button" id="go-to-squad-btn" class="ghost-mini-btn">
+                <span>Plantilla</span>
+                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 5l7 7-7 7" />
                 </svg>
-              </button>
-              <button
-                type="button"
-                id="sync-wiki-btn"
-                class="ghost-mini-btn full-width-btn"
-                title="Indexar conceptos tácticos desde Wikipedia en pgvector"
-              >
-                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                  <path d="M3 3v5h5" />
-                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-                  <path d="M16 16h5v5" />
-                </svg>
-                <span>Sincronizar Base Vectorial</span>
               </button>
             </div>
           </article>
 
-          <article class="glass-card sidebar-card sidebar-summary-card" aria-label="Resumen táctico activo">
+          <article class="glass-card studio-panel sidebar-card sidebar-summary-card" aria-label="Resumen táctico activo">
             <div class="card-header compact">
-              <span class="section-kicker">TELEMETRÍA DE SESIÓN</span>
+              <div>
+                <span class="section-kicker">Telemetría</span>
+                <h2 class="card-title">Estado de Sesión</h2>
+              </div>
             </div>
             <div class="sidebar-active-metrics">
               <div class="sidebar-metric-row">
@@ -1083,42 +982,42 @@
                 <span class="sidebar-metric-label">Fase pizarra</span>
                 <strong class="sidebar-metric-value" id="sidebar-setpiece-value">Juego libre</strong>
               </div>
-              <div class="sidebar-metric-row">
-                <span class="sidebar-metric-label">Cámara</span>
-                <strong class="sidebar-metric-value" id="sidebar-camera-value">2D Cenital</strong>
-              </div>
-            </div>
-            <div class="sidebar-quick-scenarios">
-              <span class="sidebar-scenarios-label">Escenarios rápidos</span>
-              <div class="sidebar-scenarios-grid">
-                <button type="button" class="scenario-mini-btn" data-scenario-prompt="¿Cómo romper una defensa cerrada 2-2 en media cancha con mi sistema actual?">Romper bloque bajo</button>
-                <button type="button" class="scenario-mini-btn" data-scenario-prompt="Diseña la salida de presión alta 3+1 desde portero contra marca individual.">Salida de presión</button>
-                <button type="button" class="scenario-mini-btn" data-scenario-prompt="Plantea una jugada ensayada de córner con bloqueo indirecto y finalización en segundo palo.">Córner ensayado</button>
-                <button type="button" class="scenario-mini-btn" data-scenario-prompt="¿Qué ajustes defensivos recomiendas para proteger transiciones cuando perdemos el balón en zona 3?">Transición defensiva</button>
-              </div>
             </div>
           </article>
         </aside>
 
-        <!-- Main Chat Area -->
-        <section class="assistant-chat-main fade-slide-up" style="--delay: 0.14s">
-          <article class="glass-card chat-card">
+        <!-- Center Main Chat Area -->
+        <section class="assistant-chat-main">
+          <article class="glass-card studio-panel chat-card">
             <div class="chat-header">
               <div class="assistant-identity">
-                <div class="assistant-avatar">
+                <div class="assistant-avatar" aria-hidden="true">
                   <span>DT</span>
-                  <span class="avatar-ring"></span>
                 </div>
                 <div>
-                  <h2 class="card-title">Asistente Táctico RAG</h2>
+                  <div class="abyssal-title-with-crown">
+                    <h2 class="card-title">Asistente Táctico RAG</h2>
+                    <svg class="abyssal-section-crown" viewBox="0 0 28 22" width="17" height="14" fill="none" aria-hidden="true">
+                      <path d="M3 16 L1 4 L9 10 L14 2 L19 10 L27 4 L25 16 Z" fill="#eab308" fill-opacity="0.88" stroke="#fde047" stroke-width="1.5" stroke-linejoin="round" />
+                      <rect x="4" y="17.5" width="20" height="2.6" rx="1.1" fill="#eab308" stroke="#fef08a" stroke-width="0.9" />
+                      <polygon points="14,7.5 16.2,11 14,14.5 11.8,11" fill="#00f0ff" />
+                    </svg>
+                  </div>
                   <p class="chat-subtitle">
-                    Análisis posicional conectado a <code>Pizarra</code>, <code>Plantilla</code> y motor vectorial <code>pgvector</code>
+                    Análisis conectado a <code>Pizarra</code>, <code>Plantilla</code> y motor vectorial <code>pgvector</code>
                   </p>
                 </div>
               </div>
-              <button type="button" id="clear-chat-btn" class="ghost-mini-btn" title="Reiniciar historial de sesión">
-                Limpiar sesión
-              </button>
+              <div class="chat-header-actions">
+                <span id="demo-quota-pill" class="demo-quota-pill" hidden>Modo Demo · 15 / 15 consultas</span>
+                <button type="button" id="clear-chat-btn" class="ghost-mini-btn" title="Iniciar nueva consulta sin borrar historial">
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                  <span>Limpiar</span>
+                </button>
+              </div>
             </div>
 
             <!-- Quick Prompt Chips -->
@@ -1137,11 +1036,11 @@
               </button>
             </div>
 
-            <!-- Chat Messages Stream Stage with Fixed Metavision + Blue Rose Watermark -->
+            <!-- Chat Messages Stream Stage -->
             <div id="chat-messages-stage" class="chat-messages-stage">
-              <div class="chat-metavision-watermark" aria-hidden="true">
+              <div class="chat-telemetry-watermark" aria-hidden="true">
                 <svg viewBox="0 0 340 340" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Metavision Geometric Eye & Targeting Reticles -->
+                  <!-- Telemetría Geometric Eye & Targeting Reticles -->
                   <circle cx="170" cy="176" r="144" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="14 8 4 8" />
                   <circle cx="170" cy="176" r="118" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="28 12" />
                   <circle cx="170" cy="176" r="88" stroke="#00f0ff" stroke-width="1.1" stroke-dasharray="6 6" />
@@ -1149,14 +1048,14 @@
                   <polygon points="170,64 267,120 267,232 170,288 73,232 73,120" stroke="#1d4ed8" stroke-width="1.2" />
                   <path d="M170 16 V46 M170 306 V336 M16 176 H46 M294 176 H324 M62 68 L84 90 M278 68 L256 90 M62 284 L84 262 M278 284 L256 262" stroke="#00f0ff" stroke-width="1.4" stroke-linecap="round" />
 
-                  <!-- Imperial Kaiser Crown crowning the Blue Rose -->
+                  <!-- Táctica Táctico Crown crowning the Blue Rose -->
                   <g transform="translate(170, 86)">
                     <path d="M-38 22 L-46 -12 L-18 6 L0 -22 L18 6 L46 -12 L38 22 Z" fill="#eab308" fill-opacity="0.32" stroke="#eab308" stroke-width="2.2" stroke-linejoin="round" />
                     <rect x="-36" y="26" width="72" height="8" rx="3" fill="#eab308" fill-opacity="0.48" stroke="#fde047" stroke-width="1.4" />
                     <polygon points="0,-6 6,5 0,15 -6,5" fill="#00f0ff" />
                   </g>
 
-                  <!-- Sculpted Kaiser Blue Rose -->
+                  <!-- Sculpted Estética Azul Abisal -->
                   <g transform="translate(170, 194)">
                     <path d="M0 -68 L24 -54 L36 -32 L18 -14 L-18 -14 L-36 -32 L-24 -54 Z" fill="#1e3a8a" fill-opacity="0.55" stroke="#38bdf8" stroke-width="2.2" stroke-linejoin="round" />
                     <path d="M-26 -50 L-56 -44 L-72 -18 L-60 12 L-28 18 L-16 -16 Z" fill="#1d4ed8" fill-opacity="0.48" stroke="#38bdf8" stroke-width="2.2" stroke-linejoin="round" />
@@ -1173,18 +1072,29 @@
               <div id="chat-messages" class="chat-messages" role="log" aria-live="polite"></div>
             </div>
 
+            <!-- Demo Quota Limit Banner -->
+            <div id="demo-limit-banner" class="demo-limit-banner" role="status" aria-live="polite" hidden>
+              <div>
+                <strong>Límite de 15 consultas del Modo Demo alcanzado.</strong>
+                <span>Crea una cuenta gratuita para continuar sin límites y desbloquear Mapa de Calor, Trazar Rutas, Estadio 3D y Gestor de Plantilla.</span>
+              </div>
+              <button type="button" id="demo-limit-register-btn" class="btn-primary shimmer-btn">Crear Cuenta Gratis</button>
+            </div>
+
             <!-- Chat Input Form -->
-            <form id="chat-form" class="chat-input-bar">
+            <form id="chat-form" class="chat-input-bar" novalidate>
               <div class="input-wrapper">
                 <input
                   type="text"
                   id="chat-input"
+                  name="chatMessage"
                   aria-label="Consulta táctica para el asistente RAG"
-                  placeholder="Consulta ajustes de sistema, superioridades, balón parado o variantes de plantilla..."
+                  placeholder="Consulta ajustes de sistema, superioridades, balón parado o variantes..."
                   autocomplete="off"
+                  enterkeyhint="send"
                   required
                 />
-                <span class="input-modality-indicator" id="input-modality-tag" aria-live="polite">Futsal · 1-3-1</span>
+                <span class="input-modality-indicator" id="input-modality-tag" aria-live="polite">Futsal · 3-1</span>
               </div>
               <button type="submit" id="send-chat-btn" class="btn-primary shimmer-btn send-btn">
                 <span>Consultar</span>
@@ -1195,13 +1105,102 @@
             </form>
           </article>
         </section>
+
+        <!-- Right Sidebar: Conversation History & Private PDF Ingestion -->
+        <aside class="assistant-sidebar assistant-sidebar-right">
+          <article class="glass-card studio-panel sidebar-card chat-history-panel" aria-label="Historial de conversaciones guardadas">
+            <div class="card-header compact">
+              <div>
+                <span class="section-kicker">Perfil &amp; Memoria</span>
+                <h2 class="card-title">Mis Conversaciones</h2>
+              </div>
+              <span class="badge-tag" id="chat-sessions-count-badge">0 chats</span>
+            </div>
+
+            <button type="button" id="new-chat-session-btn" class="abyssal-new-chat-btn">
+              <span>+ Nueva Consulta</span>
+            </button>
+
+            <div id="chat-sessions-list" class="chat-sessions-list" aria-label="Conversaciones guardadas del entrenador">
+              <p class="expedientes-empty">Inicia sesión para consultar tus conversaciones guardadas.</p>
+            </div>
+          </article>
+
+          <article class="glass-card studio-panel sidebar-card expedientes-panel" aria-label="Carga y gestión de expedientes PDF privados">
+            <div class="card-header compact">
+              <div>
+                <span class="section-kicker">OCR &amp; Privado</span>
+                <h2 class="card-title">Expedientes PDF</h2>
+              </div>
+              <span class="badge-tag" id="expedientes-count-badge">0 docs</span>
+            </div>
+
+            <form id="pdf-upload-form" class="pdf-upload-form">
+              <div class="pdf-field-group">
+                <label for="pdf-file-input" class="pdf-dropzone-label">
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="12" y1="18" x2="12" y2="12" />
+                    <line x1="9" y1="15" x2="12" y2="12" />
+                    <line x1="15" y1="15" x2="12" y2="12" />
+                  </svg>
+                  <span id="pdf-file-name">Seleccionar PDF táctico (.pdf, máx 25MB)</span>
+                </label>
+                <input
+                  type="file"
+                  id="pdf-file-input"
+                  name="file"
+                  accept="application/pdf,.pdf"
+                  class="visually-hidden"
+                  data-error="pdf-file-error"
+                  required
+                />
+                <div id="pdf-file-error" class="field-error-msg">
+                  <span role="img" aria-label="Error">❌</span> Selecciona un archivo PDF válido.
+                </div>
+              </div>
+
+              <div class="pdf-field-group pdf-title-full">
+                <label for="pdf-title-input" class="pdf-input-label">Título (opcional)</label>
+                <input
+                  type="text"
+                  id="pdf-title-input"
+                  name="title"
+                  class="tactical-mini-input"
+                  placeholder="Ej. Manual Presión Alta"
+                  maxlength="120"
+                  autocomplete="off"
+                />
+              </div>
+
+              <button type="submit" id="upload-pdf-btn" class="btn-primary shimmer-btn pdf-submit-btn">
+                <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span>Indexar PDF (Async + OCR)</span>
+              </button>
+
+              <progress id="pdf-upload-progress" class="pdf-progress-bar" max="100" hidden aria-labelledby="pdf-upload-status-text"></progress>
+              <p id="pdf-upload-status-text" class="pdf-status-text" role="status" aria-live="polite">
+                Tu PDF original permanece en tu equipo; solo fragmentos y vectores privados se guardan en pgvector.
+              </p>
+            </form>
+
+            <div id="expedientes-list" class="expedientes-list" aria-label="Documentos PDF privados indexados">
+              <p class="expedientes-empty">Cargando expedientes privados...</p>
+            </div>
+          </article>
+        </aside>
       </div>
     </section>
 
     <!-- ========================================================================
          TAB 2: PIZARRA TÁCTICA (Cancha interactiva + Sistemas + Modelos)
          ======================================================================== -->
-    <section id="view-board" class="tab-view hidden-view" role="tabpanel" aria-labelledby="tab-btn-board">
+    <section id="view-board" class="tab-view hidden-view" role="tabpanel" aria-labelledby="tab-btn-board" hidden>
       <div class="board-layout">
         <!-- Left/Center: Controls + Large Interactive Tactical Pitch -->
         <section class="board-main-section">
@@ -1209,12 +1208,12 @@
             <div class="board-selectors-grid">
               <!-- 1. Modality Selector -->
               <div class="selector-group">
-                <label class="selector-label">01 · Modalidad</label>
-                <div class="board-modality-pills" id="board-modality-pills">
-                  <button type="button" class="board-mod-pill active" data-modality="Futsal">Futsal · 5v5</button>
-                  <button type="button" class="board-mod-pill" data-modality="Fútbol 7">Fútbol 7 · 7v7</button>
-                  <button type="button" class="board-mod-pill" data-modality="Fútbol 9">Fútbol 9 · 9v9</button>
-                  <button type="button" class="board-mod-pill" data-modality="Fútbol 11">Fútbol 11 · 11v11</button>
+                <span class="selector-label" id="board-mod-label">01 · Modalidad</span>
+                <div class="board-modality-pills" id="board-modality-pills" role="group" aria-labelledby="board-mod-label">
+                  <button type="button" class="board-mod-pill active" data-modality="Futsal" aria-pressed="true">Futsal · 5v5</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 7" aria-pressed="false">Fútbol 7 · 7v7</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 9" aria-pressed="false">Fútbol 9 · 9v9</button>
+                  <button type="button" class="board-mod-pill" data-modality="Fútbol 11" aria-pressed="false">Fútbol 11 · 11v11</button>
                 </div>
               </div>
 
@@ -1261,7 +1260,14 @@
             <div class="card-header">
               <div>
                 <span class="section-kicker">SIMULADOR POSICIONAL EN VIVO</span>
-                <h2 class="card-title" id="board-pitch-title">Pizarra Táctica · Futsal</h2>
+                <div class="abyssal-title-with-crown">
+                  <h2 class="card-title" id="board-pitch-title">Pizarra Táctica · Futsal</h2>
+                  <svg class="abyssal-section-crown" viewBox="0 0 28 22" width="17" height="14" fill="none" aria-hidden="true">
+                    <path d="M3 16 L1 4 L9 10 L14 2 L19 10 L27 4 L25 16 Z" fill="#eab308" fill-opacity="0.88" stroke="#fde047" stroke-width="1.5" stroke-linejoin="round" />
+                    <rect x="4" y="17.5" width="20" height="2.6" rx="1.1" fill="#eab308" stroke="#fef08a" stroke-width="0.9" />
+                    <polygon points="14,7.5 16.2,11 14,14.5 11.8,11" fill="#00f0ff" />
+                  </svg>
+                </div>
               </div>
               <div class="pitch-header-badges">
                 <!-- Grupo 1: Modo de Cámara (2D / 2.5D / 3D) -->
@@ -1355,35 +1361,52 @@
                 <!-- Grupo 3: Estado Táctico -->
                 <div class="pitch-status-badges">
                   <span class="badge-tag" id="board-style-badge">Posesión &amp; Juego de Posición</span>
-                  <div class="formation-pill" id="formation-badge">1-3-1 (Rombo)</div>
+                  <div class="formation-pill" id="formation-badge">3-1 (Rombo)</div>
                 </div>
               </div>
             </div>
 
-            <!-- Palette & Undo Toolbar (Visible when Trazar Libre is active) -->
-            <div id="freehand-toolbar" class="freehand-toolbar hidden" role="toolbar" aria-label="Color y deshacer en trazado libre">
-              <span class="freehand-toolbar-label">Tinta táctica:</span>
-              <div class="freehand-color-group" role="group" aria-label="Color de flecha">
-                <button type="button" class="freehand-color-btn active" data-draw-color="cyan" aria-pressed="true">
-                  <span class="draw-swatch cyan" aria-hidden="true"></span>
-                  <span>Cian</span>
+            <!-- Tactical Vector Draw Toolbar (Visible when Trazar is active) -->
+            <div id="freehand-toolbar" class="freehand-toolbar hidden" role="toolbar" aria-label="Selector de trazos tácticos, limpieza y análisis con IA">
+              <div class="freehand-toolbar-group">
+                <span class="freehand-toolbar-label">Trazo táctico:</span>
+                <div class="freehand-color-group" role="group" aria-label="Tipo de vector táctico">
+                  <button type="button" class="freehand-color-btn active" data-draw-mode="pass" aria-pressed="true" title="Línea continua cian con flecha (Pase / Circulación)">
+                    <span class="draw-swatch pass-line" aria-hidden="true"></span>
+                    <span>Pase / Circulación</span>
+                  </button>
+                  <button type="button" class="freehand-color-btn" data-draw-mode="run" aria-pressed="false" title="Línea discontinua dorada con flecha (Desmarque / Ruptura)">
+                    <span class="draw-swatch run-line" aria-hidden="true"></span>
+                    <span>Desmarque / Ruptura</span>
+                  </button>
+                  <button type="button" class="freehand-color-btn" data-draw-mode="zone" aria-pressed="false" title="Polígono o círculo sombreado rojo/violeta (Zona de Presión / Cobertura)">
+                    <span class="draw-swatch zone-fill" aria-hidden="true"></span>
+                    <span>Zona Presión / Cobertura</span>
+                  </button>
+                </div>
+              </div>
+              <div class="freehand-toolbar-actions">
+                <button type="button" id="undo-draw-btn" class="ghost-mini-btn freehand-undo-btn" title="Deshacer último trazo (Ctrl+Z)" disabled>
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 14 4 9l5-5" />
+                    <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
+                  </svg>
+                  <span>Deshacer último trazo</span>
                 </button>
-                <button type="button" class="freehand-color-btn" data-draw-color="amber" aria-pressed="false">
-                  <span class="draw-swatch amber" aria-hidden="true"></span>
-                  <span>Ámbar</span>
+                <button type="button" id="clear-toolbar-draw-btn" class="ghost-mini-btn freehand-clear-toolbar-btn" title="Borrar todos los trazos de la pizarra" disabled>
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                  <span>Limpiar trazos</span>
                 </button>
-                <button type="button" class="freehand-color-btn" data-draw-color="red" aria-pressed="false">
-                  <span class="draw-swatch red" aria-hidden="true"></span>
-                  <span>Rojo</span>
+                <button type="button" id="analyze-draw-ai-btn" class="play-action-btn freehand-analyze-btn" title="Serializar trazos tácticos y analizar viabilidad y riesgos en el Asistente RAG" disabled>
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3l1.9 4.7L19 9.5l-4 3.4 1.3 5.1-4.3-2.8-4.3 2.8 1.3-5.1-4-3.4 5.1-1.8z" />
+                  </svg>
+                  <span>Analizar Trazo con IA</span>
                 </button>
               </div>
-              <button type="button" id="undo-draw-btn" class="ghost-mini-btn freehand-undo-btn" title="Deshacer último trazo (Ctrl+Z)" disabled>
-                <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9 14 4 9l5-5" />
-                  <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
-                </svg>
-                <span>Deshacer (Ctrl+Z)</span>
-              </button>
             </div>
 
             <div class="tactical-pitch large-pitch" id="tactical-pitch">
@@ -1399,7 +1422,7 @@
                   <marker id="arrow-shot" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
                     <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" />
                   </marker>
-                  <marker id="arrow-kaiser" viewBox="0 0 12 12" refX="8.5" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+                  <marker id="arrow-abyssal" viewBox="0 0 12 12" refX="8.5" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
                     <path d="M 0 1.2 L 11 6 L 0 10.8 L 3.4 6 z" fill="#00f0ff" />
                   </marker>
                 </defs>
@@ -1446,15 +1469,20 @@
               <!-- Freehand Tactical Drawing SVG Layer (Pointer Events enabled when Pencil active) -->
               <svg id="freehand-draw-svg" class="freehand-draw-svg" viewBox="0 0 360 220" preserveAspectRatio="none">
                 <defs>
-                  <marker id="arrow-freehand-cyan" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#38bdf8" />
+                  <marker id="arrow-freehand-cyan" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="5.8" markerHeight="5.8" orient="auto-start-reverse">
+                    <path d="M 0 1.4 L 9.5 5 L 0 8.6 z" fill="#38bdf8" />
                   </marker>
-                  <marker id="arrow-freehand-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#fbbf24" />
+                  <marker id="arrow-freehand-gold" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="5.8" markerHeight="5.8" orient="auto-start-reverse">
+                    <path d="M 0 1.4 L 9.5 5 L 0 8.6 z" fill="#eab308" />
                   </marker>
-                  <marker id="arrow-freehand-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#f43f5e" />
+                  <marker id="arrow-freehand-red" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="5.8" markerHeight="5.8" orient="auto-start-reverse">
+                    <path d="M 0 1.4 L 9.5 5 L 0 8.6 z" fill="#f43f5e" />
                   </marker>
+                  <radialGradient id="zone-press-fill" cx="50%" cy="50%" r="60%">
+                    <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.34" />
+                    <stop offset="65%" stop-color="#8b5cf6" stop-opacity="0.24" />
+                    <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.08" />
+                  </radialGradient>
                 </defs>
                 <g id="freehand-paths-group"></g>
               </svg>
@@ -1468,6 +1496,63 @@
                 <span class="live-step-text" id="live-step-text">Preparando jugada...</span>
               </div>
             </div>
+
+            <!-- Live Gaussian Thermal Telemetry Summary Panel (Visible when Calor is active) -->
+            <section id="heatmap-telemetry-panel" class="heatmap-telemetry-panel hidden" aria-label="Resumen de Telemetría Térmica en Vivo">
+              <div class="heatmap-telemetry-top">
+                <div class="heatmap-telemetry-heading">
+                  <span class="section-kicker">TELEMETRÍA TÉRMICA GAUSSIANA EN VIVO</span>
+                  <div class="heatmap-alert-line">
+                    <span id="heatmap-vulnerability-badge" class="heat-alert-badge balanced">Balance Zonal</span>
+                    <p id="heatmap-vulnerability-text" class="heatmap-vulnerability-text">Distribución equilibrada por carriles y tercios.</p>
+                  </div>
+                </div>
+                <button type="button" id="ask-heatmap-rag-btn" class="play-action-btn heatmap-rag-cta" title="Enviar diagnóstico térmico actual al Asistente RAG para sugerir ajustes posicionales">
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  <span>Consultar Ajuste al RAG</span>
+                </button>
+              </div>
+              <div class="heatmap-telemetry-grids">
+                <div class="heatmap-metric-group">
+                  <span class="heatmap-group-title">% Ocupación por Carriles</span>
+                  <div class="heatmap-bar-row">
+                    <span class="heat-bar-label">Izquierdo</span>
+                    <div class="heat-bar-track"><span id="heat-lane-left-bar" class="heat-bar-fill cyan" style="width: 33%"></span></div>
+                    <strong id="heat-lane-left-pct" class="heat-bar-val">33%</strong>
+                  </div>
+                  <div class="heatmap-bar-row">
+                    <span class="heat-bar-label">Central</span>
+                    <div class="heat-bar-track"><span id="heat-lane-center-bar" class="heat-bar-fill amber" style="width: 34%"></span></div>
+                    <strong id="heat-lane-center-pct" class="heat-bar-val">34%</strong>
+                  </div>
+                  <div class="heatmap-bar-row">
+                    <span class="heat-bar-label">Derecho</span>
+                    <div class="heat-bar-track"><span id="heat-lane-right-bar" class="heat-bar-fill emerald" style="width: 33%"></span></div>
+                    <strong id="heat-lane-right-pct" class="heat-bar-val">33%</strong>
+                  </div>
+                </div>
+                <div class="heatmap-metric-group">
+                  <span class="heatmap-group-title">% Ocupación por Tercios</span>
+                  <div class="heatmap-bar-row">
+                    <span class="heat-bar-label">Salida</span>
+                    <div class="heat-bar-track"><span id="heat-third-exit-bar" class="heat-bar-fill emerald" style="width: 33%"></span></div>
+                    <strong id="heat-third-exit-pct" class="heat-bar-val">33%</strong>
+                  </div>
+                  <div class="heatmap-bar-row">
+                    <span class="heat-bar-label">Creación</span>
+                    <div class="heat-bar-track"><span id="heat-third-build-bar" class="heat-bar-fill cyan" style="width: 34%"></span></div>
+                    <strong id="heat-third-build-pct" class="heat-bar-val">34%</strong>
+                  </div>
+                  <div class="heatmap-bar-row">
+                    <span class="heat-bar-label">Finalización</span>
+                    <div class="heat-bar-track"><span id="heat-third-finish-bar" class="heat-bar-fill crimson" style="width: 33%"></span></div>
+                    <strong id="heat-third-finish-pct" class="heat-bar-val">33%</strong>
+                  </div>
+                </div>
+              </div>
+            </section>
 
             <div class="pitch-footer">
               <span id="formation-full-text" class="formation-caption">
@@ -1628,17 +1713,43 @@
     <!-- ========================================================================
          TAB 3: GESTIÓN DE PLANTILLA (Registro + Sinergia Posicional + Top 100)
          ======================================================================== -->
-    <section id="view-squad" class="tab-view hidden-view" role="tabpanel" aria-labelledby="tab-btn-squad">
-      <div class="squad-layout squad-workspace-grid">
+    <section id="view-squad" class="tab-view hidden-view" role="tabpanel" aria-labelledby="tab-btn-squad" hidden>
+      <!-- Exclusive VIP Gate for Demo Users -->
+      <div id="squad-exclusive-gate" class="squad-exclusive-gate glass-card" hidden>
+        <div class="squad-gate-crest" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 16L8 7L17 13L24 5L31 13L40 7L37 16Z" fill="#eab308" fill-opacity="0.35" stroke="#fde047" stroke-width="1.8" stroke-linejoin="round" />
+            <rect x="13" y="21" width="22" height="19" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8" />
+            <path d="M19 21V17a5 5 0 0 1 10 0v4" stroke="#38bdf8" stroke-width="1.8" />
+            <circle cx="24" cy="30.5" r="2.6" fill="#00f0ff" />
+          </svg>
+        </div>
+        <span class="section-kicker">MÓDULO EXCLUSIVO · USUARIOS REGISTRADOS</span>
+        <h2 class="squad-gate-title">Gestor de Plantilla &amp; Comparativa Top 100</h2>
+        <p class="squad-gate-desc">
+          El diseño de plantilla personalizada, cálculo de química del XI Ideal y duelo holográfico contra referentes Top 100 está reservado para entrenadores con cuenta registrada.
+        </p>
+        <ul class="squad-gate-perks">
+          <li>Registro y gestión de tu propia plantilla en PostgreSQL aislado</li>
+          <li>Radar comparado frente a estrellas Top 100 y cálculo de sinergias</li>
+          <li>Asistente RAG sin límites + Pizarra con <strong>Mapa de Calor</strong> y <strong>Estadio 3D</strong></li>
+        </ul>
+        <div class="squad-gate-actions">
+          <button type="button" id="squad-gate-register-btn" class="btn-primary shimmer-btn">Crear Cuenta Gratis y Desbloquear</button>
+          <button type="button" id="squad-gate-login-btn" class="btn-secondary">Ya tengo cuenta · Iniciar Sesión</button>
+        </div>
+      </div>
+
+      <div id="squad-workspace-grid" class="squad-layout squad-workspace-grid">
         <!-- Left Panel: Player Registration Form & Roster List -->
         <aside class="squad-left-panel">
           <article class="glass-card">
             <div class="card-header">
               <div>
-                <span class="section-kicker">BASE DE DATOS POSTGRESQL</span>
+                <span class="section-kicker">Base de Datos PostgreSQL</span>
                 <h2 class="card-title">Registro de Jugador</h2>
               </div>
-              <div style="display: flex; align-items: center; gap: 6px;">
+              <div class="roster-card-actions">
                 <button
                   type="button"
                   id="load-demo-squad-btn"
@@ -1650,7 +1761,7 @@
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
-                  <span>Cargar Demo</span>
+                  <span>Demo</span>
                 </button>
                 <button
                   type="button"
@@ -1667,15 +1778,15 @@
               </div>
             </div>
 
-            <form id="add-player-form" class="player-form">
+            <form id="add-player-form" class="player-form" aria-label="Formulario de registro de jugador">
               <div class="form-row-2">
                 <div class="form-field">
                   <label for="player-name-input">Nombre del Jugador</label>
-                  <input type="text" id="player-name-input" placeholder="Ej. Mateo Gómez" required />
+                  <input type="text" id="player-name-input" name="playerName" placeholder="Ej. Mateo Gómez" autocomplete="off" required />
                 </div>
                 <div class="form-field small-field">
                   <label for="player-number-input">Dorsal</label>
-                  <input type="number" id="player-number-input" min="1" max="99" value="10" required />
+                  <input type="number" id="player-number-input" name="playerNumber" inputmode="numeric" min="1" max="99" value="10" required />
                 </div>
               </div>
 
@@ -1712,31 +1823,31 @@
                 </div>
               </div>
 
-              <!-- Attribute Sliders (1-99) -->
+              <!-- Attribute Sliders (40-99) -->
               <div class="stats-sliders-grid">
                 <div class="slider-item">
-                  <div class="slider-header"><span>RIT · Ritmo</span><strong id="val-pace">84</strong></div>
-                  <input type="range" id="stat-pace" min="40" max="99" value="84" aria-label="Ritmo" />
+                  <div class="slider-header"><label for="stat-pace">RIT · Ritmo</label><strong id="val-pace">84</strong></div>
+                  <input type="range" id="stat-pace" name="pace" min="40" max="99" value="84" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>PAS · Pase</span><strong id="val-passing">86</strong></div>
-                  <input type="range" id="stat-passing" min="40" max="99" value="86" aria-label="Pase" />
+                  <div class="slider-header"><label for="stat-passing">PAS · Pase</label><strong id="val-passing">86</strong></div>
+                  <input type="range" id="stat-passing" name="passing" min="40" max="99" value="86" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>REG · Regate</span><strong id="val-dribbling">85</strong></div>
-                  <input type="range" id="stat-dribbling" min="40" max="99" value="85" aria-label="Regate" />
+                  <div class="slider-header"><label for="stat-dribbling">REG · Regate</label><strong id="val-dribbling">85</strong></div>
+                  <input type="range" id="stat-dribbling" name="dribbling" min="40" max="99" value="85" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>DEF · Defensa</span><strong id="val-defending">70</strong></div>
-                  <input type="range" id="stat-defending" min="40" max="99" value="70" aria-label="Defensa" />
+                  <div class="slider-header"><label for="stat-defending">DEF · Defensa</label><strong id="val-defending">70</strong></div>
+                  <input type="range" id="stat-defending" name="defending" min="40" max="99" value="70" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>TIR · Tiro</span><strong id="val-shooting">82</strong></div>
-                  <input type="range" id="stat-shooting" min="40" max="99" value="82" aria-label="Tiro" />
+                  <div class="slider-header"><label for="stat-shooting">TIR · Tiro</label><strong id="val-shooting">82</strong></div>
+                  <input type="range" id="stat-shooting" name="shooting" min="40" max="99" value="82" />
                 </div>
                 <div class="slider-item">
-                  <div class="slider-header"><span>VIS · Visión</span><strong id="val-vision">86</strong></div>
-                  <input type="range" id="stat-vision" min="40" max="99" value="86" aria-label="Visión" />
+                  <div class="slider-header"><label for="stat-vision">VIS · Visión</label><strong id="val-vision">86</strong></div>
+                  <input type="range" id="stat-vision" name="vision" min="40" max="99" value="86" />
                 </div>
               </div>
 
@@ -1754,7 +1865,7 @@
             <!-- Registered Players Roster -->
             <div class="squad-roster-section">
               <div class="indexed-header">
-                <span>Nómina Registrada (Seleccionar para análisis)</span>
+                <span>Nómina Registrada</span>
                 <span id="squad-count-badge" class="count-pill">0</span>
               </div>
               <ul id="squad-roster-list" class="squad-roster-list">
@@ -1801,7 +1912,7 @@
                   class="btn-primary shimmer-btn ideal-squad-btn"
                   title="Calcular alineación óptima por sinergia de roles, perfil hábil y modelo de juego"
                 >
-                  <span class="kaiser-cta-ring" aria-hidden="true"></span>
+                  <span class="abyssal-cta-ring" aria-hidden="true"></span>
                   <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                   </svg>
@@ -1809,8 +1920,8 @@
                 </button>
                 <div class="synergy-meter-box">
                   <span class="selector-label">Sinergia Global</span>
-                  <div class="synergy-pill-wrap has-imperial-crown">
-                    <span class="synergy-kaiser-emblem" title="Emblema Rosa Azul · Corona Imperial (> 85%)" aria-hidden="true">
+                  <div class="synergy-pill-wrap has-elite-crown">
+                    <span class="synergy-abyssal-emblem" title="Emblema Rosa Azul · Corona Táctica (> 85%)" aria-hidden="true">
                       <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
                         <path d="M12 3C15.5 4.2 18 7.4 17 11.2C15.8 14.3 12.6 15.4 12 15.4C11.4 15.4 8.2 14.3 7 11.2C6 7.4 8.5 4.2 12 3Z" fill="#1d4ed8" stroke="#38bdf8" stroke-width="1.5" />
                         <path d="M12 6.5C13.6 7.4 14 9.5 12 11C10 9.5 10.4 7.4 12 6.5Z" fill="#00f0ff" />
@@ -1821,7 +1932,7 @@
                       </svg>
                     </span>
                     <div class="synergy-score-pill synergy-elite" id="squad-global-synergy">92%</div>
-                    <span class="synergy-tier-badge synergy-elite" id="squad-synergy-tier" aria-live="polite">Élite Imperial</span>
+                    <span class="synergy-tier-badge synergy-elite" id="squad-synergy-tier" aria-live="polite">Élite Táctica</span>
                   </div>
                 </div>
               </div>
@@ -1960,7 +2071,7 @@
                   </svg>
                   <span>Enviar XI a Pizarra</span>
                 </button>
-                <button type="button" id="ask-bot-about-squad-btn" class="btn-primary shimmer-btn" style="flex: 0 0 auto; padding: 8px 16px;">
+                <button type="button" id="ask-bot-about-squad-btn" class="btn-primary shimmer-btn ask-squad-btn">
                   <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                   </svg>
@@ -1976,8 +2087,15 @@
           <article class="glass-card crack-comparison-card">
             <div class="card-header">
               <div>
-                <span class="section-kicker">BENCHMARK TOP 100 MUNDIAL &amp; HISTÓRICO</span>
-                <h2 class="card-title">Perfil Comparativo &amp; Sinergia</h2>
+                <span class="section-kicker">Benchmark Top 100</span>
+                <div class="abyssal-title-with-crown">
+                  <h2 class="card-title">Perfil Comparativo &amp; Sinergia</h2>
+                  <svg class="abyssal-section-crown" viewBox="0 0 28 22" width="17" height="14" fill="none" aria-hidden="true">
+                    <path d="M3 16 L1 4 L9 10 L14 2 L19 10 L27 4 L25 16 Z" fill="#eab308" fill-opacity="0.88" stroke="#fde047" stroke-width="1.5" stroke-linejoin="round" />
+                    <rect x="4" y="17.5" width="20" height="2.6" rx="1.1" fill="#eab308" stroke="#fef08a" stroke-width="0.9" />
+                    <polygon points="14,7.5 16.2,11 14,14.5 11.8,11" fill="#00f0ff" />
+                  </svg>
+                </div>
               </div>
               <span class="coach-origin-badge crown-badge-gold" id="comp-mirror-badge">
                 <svg class="ui-icon crown-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2031,7 +2149,7 @@
                     <span class="badge-tag duel-similarity-pill" id="comp-similarity-badge">94% Similitud</span>
                   </div>
 
-                  <!-- Right Column: Homologous Top 100 Crack (Imperial Crown Shield Edition) -->
+                  <!-- Right Column: Homologous Top 100 Crack (Táctica Crown Shield Edition) -->
                   <div class="duel-shield-frame crack-shield" data-duel-tilt="crack">
                     <div class="duel-fighter-col crack-fighter">
                       <div class="duel-glare-layer duel-glare-crack" aria-hidden="true"></div>
@@ -2041,7 +2159,7 @@
                         <path d="M208 214 C164 178 132 124 72 88 C44 70 16 54 -8 40" stroke="#ca8a04" stroke-width="2" stroke-opacity="0.46" />
                         <path d="M180 162 L196 148 L172 152 Z M144 112 L156 94 L135 104 Z M96 68 L102 48 L85 61 Z M46 36 L44 16 L34 32 Z M116 134 L98 142 L109 124 Z" fill="#facc15" fill-opacity="0.45" />
                       </svg>
-                      <!-- Imperial Crown SVG Watermark -->
+                      <!-- Táctica Crown SVG Watermark -->
                       <svg class="duel-watermark crown-watermark" viewBox="0 0 120 120" fill="none" aria-hidden="true">
                         <path d="M18 82 L12 36 L40 58 L60 22 L80 58 L108 36 L102 82 Z" fill="#eab308" fill-opacity="0.3" stroke="#facc15" stroke-width="2.2" stroke-linejoin="round" />
                         <rect x="20" y="87" width="80" height="9" rx="3" fill="#eab308" fill-opacity="0.48" stroke="#fde047" stroke-width="1.4" />
@@ -2058,7 +2176,7 @@
                         <svg class="ui-icon crown-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                           <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
                         </svg>
-                        <span>REFERENTE TOP 100</span>
+                        <span>TOP 100</span>
                       </span>
                       <div class="duel-avatar-crack" id="comp-crack-avatar">
                         <span id="comp-crack-initials" class="duel-crack-initials">AB</span>
@@ -2093,8 +2211,8 @@
                       <stop offset="100%" stop-color="#04070f" stop-opacity="0" />
                     </radialGradient>
                   </defs>
-                  <!-- Metavision Eye Concentric Luminous Optical Reticle Rings -->
-                  <g class="radar-metavision-eye" aria-hidden="true">
+                  <!-- Telemetría Eye Concentric Luminous Optical Reticle Rings -->
+                  <g class="radar-telemetry-eye" aria-hidden="true">
                     <circle class="radar-mv-iris-halo" cx="140" cy="108" r="76" fill="url(#mvRadarIrisGrad)" />
                     <circle class="radar-mv-ring-outer" cx="140" cy="108" r="78" />
                     <circle class="radar-mv-ring-mid" cx="140" cy="108" r="61" />
@@ -2173,6 +2291,388 @@
         </form>
       </div>
     </dialog>
+
+    <!-- Native Top-Layer Táctico Modal for Demo Quota Exhausted / Account Unlock -->
+    <dialog id="demo-limit-dialog" class="tactical-dialog auth-dialog" closedby="any" aria-labelledby="demo-limit-dialog-title">
+      <div class="tactical-dialog-card abyssal-auth-card demo-limit-modal-card">
+        <div class="tactical-dialog-header">
+          <div class="tactical-dialog-icon auth-icon abyssal-auth-crest" aria-hidden="true">
+            <svg viewBox="0 0 36 36" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 12L6 6L13 10L18 4L23 10L30 6L28 12Z" fill="#eab308" fill-opacity="0.4" stroke="#fde047" stroke-width="1.5" stroke-linejoin="round" />
+              <path d="M18 13L25 17L23 26L18 30L13 26L11 17Z" fill="#1d4ed8" fill-opacity="0.65" stroke="#38bdf8" stroke-width="1.6" stroke-linejoin="round" />
+              <circle cx="18" cy="20" r="3" fill="#00f0ff" />
+            </svg>
+          </div>
+          <div>
+            <span class="section-kicker" id="demo-limit-kicker">MODO DEMO AGOTADO · 0 / 15 CONSULTAS</span>
+            <h2 id="demo-limit-dialog-title" class="card-title">Has agotado tus 15 consultas gratuitas en Modo Demo</h2>
+          </div>
+        </div>
+        <p id="demo-limit-dialog-desc" class="tactical-dialog-body">
+          Inicia sesión o crea tu cuenta gratuita para obtener consultas ilimitadas al Asistente RAG, guardar tu historial de conversaciones, subir expedientes PDF privados y desbloquear Mapa de Calor, Trazar Rutas, Estadio 3D y Gestión de Plantilla.
+        </p>
+        <ul id="demo-limit-perks-list" class="demo-modal-perks">
+          <li><strong>Asistente RAG ilimitado</strong> con historial persistente de conversaciones</li>
+          <li><strong>Expedientes PDF privados</strong> con análisis OCR aislado por cuenta</li>
+          <li><strong>Mapa de Calor</strong>, <strong>Trazar Rutas</strong>, <strong>Estadio 3D</strong> y <strong>Gestión de Plantilla</strong></li>
+        </ul>
+        <div class="demo-limit-modal-actions">
+          <button type="button" id="demo-limit-modal-register-btn" class="btn-primary shimmer-btn">Crear Cuenta Gratis / Iniciar Sesión</button>
+          <form method="dialog">
+            <button type="submit" id="demo-limit-cancel-btn" value="cancel" class="btn-secondary">Seguir explorando Pizarra 2D</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Standalone Full-Page Azul Abisal Authentication Gate -->
+    <section id="auth-gate-view" class="auth-gate-page" aria-labelledby="auth-dialog-title">
+      <div id="login-screen" class="login-screen">
+        <!-- Non-interactive High-DPI Faceted Blue Roses, Cyan Light Domes & Double-Line Thorny Vines -->
+        <div class="login-rose-backdrop" aria-hidden="true">
+          <div class="login-telemetry-flare flare-tl"></div>
+          <div class="login-telemetry-flare flare-br"></div>
+          <div class="abyssal-light-dome dome-tl"></div>
+          <div class="abyssal-light-dome dome-tr"></div>
+          <div class="abyssal-light-dome dome-bl"></div>
+          <div class="abyssal-light-dome dome-br"></div>
+          <canvas id="abyssal-login-backdrop" class="abyssal-login-backdrop"></canvas>
+        </div>
+
+        <div class="auth-gate-shell">
+          <aside class="auth-showcase-card glass-card">
+            <svg class="card-corner-filigree top-left" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M2 80 C4 36 32 10 86 3" stroke="#38bdf8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M12 42 C24 38 28 32 32 24 C23 30 16 32 12 42 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+              <path d="M40 16 C48 11 54 6 60 2 C52 10 47 13 40 16 Z" fill="#00f0ff" />
+            </svg>
+            <svg class="card-corner-filigree top-right" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M10 3 C64 10 92 36 94 80" stroke="#38bdf8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M84 42 C72 38 68 32 64 24 C73 30 80 32 84 42 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+            </svg>
+            <svg class="card-corner-filigree bottom-left" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M2 16 C4 60 32 86 86 93" stroke="#1d4ed8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M12 54 C24 58 28 64 32 72 C23 66 16 64 12 54 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+            </svg>
+            <svg class="card-corner-filigree bottom-right" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M94 16 C92 60 64 86 10 93" stroke="#38bdf8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M84 54 C72 58 68 64 64 72 C73 66 80 64 84 54 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+              <path d="M56 80 C48 85 42 90 36 94 C44 86 49 83 56 80 Z" fill="#00f0ff" />
+            </svg>
+
+            <div class="auth-showcase-hero">
+              <div class="auth-showcase-brand">
+                <div class="tactical-dialog-icon auth-icon abyssal-auth-crest" aria-hidden="true">
+                  <svg viewBox="0 0 36 36" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 12L6 6L13 10L18 4L23 10L30 6L28 12Z" fill="#eab308" fill-opacity="0.45" stroke="#fde047" stroke-width="1.5" stroke-linejoin="round" />
+                    <path d="M18 13L25 17L23 26L18 30L13 26L11 17Z" fill="#1d4ed8" fill-opacity="0.68" stroke="#38bdf8" stroke-width="1.6" stroke-linejoin="round" />
+                    <circle cx="18" cy="20" r="3" fill="#00f0ff" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="abyssal-telemetry-kicker">
+                    <svg class="abyssal-inline-crown" viewBox="0 0 24 20" width="14" height="12" fill="none" aria-hidden="true">
+                      <path d="M2.5 14 L1 3.5 L8 9 L12 1.5 L16 9 L23 3.5 L21.5 14 Z" fill="#eab308" fill-opacity="0.88" stroke="#fde047" stroke-width="1.4" stroke-linejoin="round" />
+                      <rect x="3" y="15.5" width="18" height="2.4" rx="1" fill="#eab308" />
+                    </svg>
+                    <span class="section-kicker">ESTÉTICA AZUL ABISAL • TELEMETRÍA</span>
+                  </div>
+                  <h1 class="brand-title auth-showcase-title">TacticalPlay <span class="accent-gradient">RAG</span></h1>
+                </div>
+              </div>
+
+              <p class="auth-showcase-lead">
+                Estudio táctico inteligente con búsqueda híbrida en PostgreSQL + pgvector, pizarra animada 2D/3D y optimización de plantilla.
+              </p>
+
+              <!-- Emblema Luminoso de Rosa Azul Geométrica Coronada con Anillos de Telemetría Telemetría -->
+              <div class="showcase-center-watermark" aria-hidden="true">
+                <svg viewBox="0 0 240 198" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="centerSealFacetOuter" x1="0%" y1="100%" x2="85%" y2="0%">
+                      <stop offset="0%" stop-color="#040b1a" />
+                      <stop offset="45%" stop-color="#0f296e" />
+                      <stop offset="82%" stop-color="#1d4ed8" />
+                      <stop offset="100%" stop-color="#38bdf8" />
+                    </linearGradient>
+                    <linearGradient id="centerSealFacetMid" x1="0%" y1="100%" x2="25%" y2="0%">
+                      <stop offset="0%" stop-color="#0f296e" />
+                      <stop offset="50%" stop-color="#1d4ed8" />
+                      <stop offset="85%" stop-color="#38bdf8" />
+                      <stop offset="100%" stop-color="#bae6fd" />
+                    </linearGradient>
+                    <linearGradient id="centerSealFacetCore" x1="50%" y1="100%" x2="50%" y2="0%">
+                      <stop offset="0%" stop-color="#020617" />
+                      <stop offset="45%" stop-color="#1d4ed8" />
+                      <stop offset="84%" stop-color="#38bdf8" />
+                      <stop offset="100%" stop-color="#e0f2fe" />
+                    </linearGradient>
+                  </defs>
+                  <!-- Anillos de Telemetría Telemetría -->
+                  <circle cx="120" cy="108" r="84" stroke="#38bdf8" stroke-opacity="0.48" stroke-width="1" stroke-dasharray="10 6 3 6" />
+                  <circle cx="120" cy="108" r="68" stroke="#00f0ff" stroke-opacity="0.42" stroke-width="0.9" stroke-dasharray="3 5" />
+                  <path d="M36 108 H52 M188 108 H204 M120 184 V194" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.6" />
+                  <path d="M56 54 A82 82 0 0 1 82 36 M184 54 A82 82 0 0 0 158 36 M56 162 A82 82 0 0 0 82 180 M184 162 A82 82 0 0 1 158 180" stroke="#7dd3fc" stroke-width="1.35" stroke-opacity="0.72" />
+                  <!-- Corona Táctica Dorada -->
+                  <g transform="translate(120, 32)">
+                    <path d="M-24 12 L-30 -12 L-13 2 L0 -18 L13 2 L30 -12 L24 12 Z" fill="#eab308" fill-opacity="0.72" stroke="#fde047" stroke-width="1.6" stroke-linejoin="round" />
+                    <rect x="-22" y="14.5" width="44" height="4.5" rx="2" fill="#eab308" fill-opacity="0.86" stroke="#fef08a" stroke-width="0.8" />
+                    <polygon points="0,-5 4.2,2.5 0,10 -4.2,2.5" fill="#00f0ff" />
+                  </g>
+                  <!-- Rosa Azul Geométrica Facetada + 3 Hojas Puntiagudas -->
+                  <g transform="translate(120, 114)">
+                    <path d="M-10 34 L-34 54 L-16 28 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" stroke-linejoin="round" />
+                    <path d="M10 34 L34 54 L16 28 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="1.2" stroke-linejoin="round" />
+                    <path d="M0 36 L-12 58 L12 58 Z" fill="#040b1a" stroke="#7dd3fc" stroke-width="1.2" stroke-linejoin="round" />
+                    <!-- Capa Exterior Facetada -->
+                    <path d="M0 -48 L18 -38 L25 -20 L12 -7 L-12 -7 L-25 -20 L-18 -38 Z" fill="url(#centerSealFacetOuter)" stroke="#7dd3fc" stroke-width="1.35" stroke-linejoin="round" />
+                    <path d="M-20 -35 L-41 -29 L-49 -8 L-39 14 L-18 16 L-11 -9 Z" fill="url(#centerSealFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+                    <path d="M20 -35 L41 -29 L49 -8 L39 14 L18 16 L11 -9 Z" fill="url(#centerSealFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+                    <path d="M-40 11 L-30 33 L-11 40 L-3 21 L-21 7 Z" fill="url(#centerSealFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+                    <path d="M40 11 L30 33 L11 40 L3 21 L21 7 Z" fill="url(#centerSealFacetOuter)" stroke="#38bdf8" stroke-width="1.35" stroke-linejoin="round" />
+                    <!-- Capa Media Facetada -->
+                    <path d="M-4 -32 L-23 -24 L-30 -6 L-18 11 L-1 2 Z" fill="url(#centerSealFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+                    <path d="M4 -32 L23 -24 L30 -6 L18 11 L1 2 Z" fill="url(#centerSealFacetMid)" stroke="#7dd3fc" stroke-width="1.3" stroke-linejoin="round" />
+                    <path d="M-26 4 L-19 26 L1 32 L5 13 L-13 5 Z" fill="url(#centerSealFacetMid)" stroke="#bae6fd" stroke-width="1.3" stroke-linejoin="round" />
+                    <path d="M26 4 L19 26 L-1 32 L-5 13 L13 5 Z" fill="url(#centerSealFacetMid)" stroke="#bae6fd" stroke-width="1.3" stroke-linejoin="round" />
+                    <!-- Núcleo Cristalino + Retícula -->
+                    <path d="M0 -23 L16 -14 L18 3 L0 15 L-18 3 L-16 -14 Z" fill="url(#centerSealFacetCore)" stroke="#e0f2fe" stroke-width="1.45" stroke-linejoin="round" />
+                    <polygon points="0,-13 9,-4 5,8 -5,8 -9,-4" fill="#03060f" stroke="#00f0ff" stroke-width="1.35" />
+                    <polygon points="0,-6 4,0 0,6 -4,0" fill="#00f0ff" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <div class="auth-tier-comparison">
+              <div class="auth-tier-box registered">
+                <div class="auth-tier-header">
+                  <span class="auth-tier-badge">Recomendado · Gratis</span>
+                  <strong>Cuenta Registrada</strong>
+                </div>
+                <ul class="auth-tier-list">
+                  <li>Asistente Táctico RAG <strong>ilimitado</strong> y memoria de sesiones</li>
+                  <li>Pizarra 2D, TV 2.5D, <strong>Trazar Rutas</strong>, <strong>Mapa de Calor</strong> y <strong>Estadio 3D</strong></li>
+                  <li><strong>Gestor de Plantilla exclusivo</strong> + Duelo Top 100</li>
+                  <li>Expedientes PDF privados con OCR aislado</li>
+                </ul>
+              </div>
+
+              <div class="auth-tier-box demo">
+                <div class="auth-tier-header">
+                  <span class="auth-tier-badge muted">Acceso Limitado</span>
+                  <strong>Modo Demo</strong>
+                </div>
+                <ul class="auth-tier-list">
+                  <li>Asistente Táctico RAG con límite de <strong>15 consultas</strong></li>
+                  <li>Pizarra Táctica 2D/2.5D y <strong>Jugadas Preparadas</strong></li>
+                  <li><em>Sin Mapa de Calor, Trazar Rutas, Estadio 3D ni Gestor de Plantilla</em></li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+
+          <div class="tactical-dialog-card abyssal-auth-card auth-gate-card">
+            <svg class="card-corner-filigree top-left" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M2 80 C4 36 32 10 86 3" stroke="#38bdf8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M12 42 C24 38 28 32 32 24 C23 30 16 32 12 42 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+              <path d="M40 16 C48 11 54 6 60 2 C52 10 47 13 40 16 Z" fill="#00f0ff" />
+            </svg>
+            <svg class="card-corner-filigree top-right" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M10 3 C64 10 92 36 94 80" stroke="#38bdf8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M84 42 C72 38 68 32 64 24 C73 30 80 32 84 42 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+            </svg>
+            <svg class="card-corner-filigree bottom-left" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M2 16 C4 60 32 86 86 93" stroke="#1d4ed8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M12 54 C24 58 28 64 32 72 C23 66 16 64 12 54 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+            </svg>
+            <svg class="card-corner-filigree bottom-right" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+              <path d="M94 16 C92 60 64 86 10 93" stroke="#38bdf8" stroke-width="1.35" stroke-opacity="0.72" />
+              <path d="M84 54 C72 58 68 64 64 72 C73 66 80 64 84 54 Z" fill="#0f296e" stroke="#38bdf8" stroke-width="0.9" />
+              <path d="M56 80 C48 85 42 90 36 94 C44 86 49 83 56 80 Z" fill="#00f0ff" />
+            </svg>
+          <div class="tactical-dialog-header">
+            <div class="tactical-dialog-icon auth-icon abyssal-auth-crest" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <div>
+              <span class="section-kicker">ACCESO OBLIGATORIO · JWT</span>
+              <h2 id="auth-dialog-title" class="card-title">Inicia Sesión o Regístrate</h2>
+            </div>
+          </div>
+
+          <p id="auth-current-summary" class="auth-current-summary">
+            Inicia sesión o crea tu perfil táctico aislado para entrar a TacticalPlay RAG.
+          </p>
+
+          <div class="auth-mode-tabs" role="tablist" aria-label="Modo de acceso">
+            <button type="button" id="auth-mode-login-btn" class="auth-mode-btn active" role="tab" aria-selected="true">Iniciar Sesión</button>
+            <button type="button" id="auth-mode-register-btn" class="auth-mode-btn" role="tab" aria-selected="false">Registrarse</button>
+          </div>
+
+          <form id="login-form" class="auth-form" method="POST" novalidate>
+            <div class="auth-field">
+              <label for="login-username">Usuario o correo electrónico <span aria-hidden="true">*</span></label>
+              <input
+                type="text"
+                id="login-username"
+                name="username"
+                autocomplete="username"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+                enterkeyhint="next"
+                minlength="3"
+                required
+                data-error="login-username-error"
+                aria-invalid="false"
+              />
+              <div id="login-username-error" class="field-error-msg">
+                <span role="img" aria-label="Error">❌</span> Ingresa tu usuario o correo (mínimo 3 caracteres).
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <div class="auth-label-row">
+                <label for="login-password">Contraseña <span aria-hidden="true">*</span></label>
+                <button
+                  type="button"
+                  id="toggle-login-password"
+                  class="password-toggle-btn"
+                  aria-pressed="false"
+                  aria-label="Mostrar contraseña"
+                >Mostrar</button>
+              </div>
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                autocomplete="current-password"
+                enterkeyhint="done"
+                minlength="8"
+                required
+                data-error="login-password-error"
+                aria-invalid="false"
+              />
+              <div id="login-password-error" class="field-error-msg">
+                <span role="img" aria-label="Error">❌</span> La contraseña debe tener al menos 8 caracteres.
+              </div>
+            </div>
+
+            <p id="login-server-error" class="auth-server-error" role="status" aria-live="polite" hidden></p>
+
+            <div class="auth-actions-stack">
+              <button type="submit" id="login-submit-btn" class="btn-primary shimmer-btn">Entrar al Módulo Táctico</button>
+              <button type="button" id="switch-demo-session-btn" class="btn-secondary auth-demo-discrete-btn">
+                <span class="demo-btn-main">Entrar en Modo Demo</span>
+                <span id="demo-gate-status-note" class="auth-demo-status-note">15/15 consultas disponibles · Pizarra 2D/2.5D libre</span>
+              </button>
+            </div>
+          </form>
+
+          <form id="register-form" class="auth-form" method="POST" hidden novalidate>
+            <div class="auth-field">
+              <label for="reg-display">Nombre completo <span aria-hidden="true">*</span></label>
+              <input
+                type="text"
+                id="reg-display"
+                name="fullName"
+                autocomplete="name"
+                minlength="2"
+                maxlength="80"
+                enterkeyhint="next"
+                data-error="reg-display-error"
+                aria-invalid="false"
+                required
+              />
+              <div id="reg-display-error" class="field-error-msg">
+                <span role="img" aria-label="Error">❌</span> Ingresa tu nombre completo (mínimo 2 caracteres).
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="reg-username">Usuario <span aria-hidden="true">*</span></label>
+              <span id="reg-user-hint" class="field-hint">3–40 caracteres: minúsculas, números, punto o guion.</span>
+              <input
+                type="text"
+                id="reg-username"
+                name="username"
+                autocomplete="username"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+                pattern="[A-Za-z0-9._-]{3,40}"
+                minlength="3"
+                maxlength="40"
+                enterkeyhint="next"
+                aria-describedby="reg-user-hint"
+                data-error="reg-username-error"
+                aria-invalid="false"
+                required
+              />
+              <div id="reg-username-error" class="field-error-msg">
+                <span role="img" aria-label="Error">❌</span> Usa 3–40 caracteres válidos sin espacios.
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="reg-email">Correo electrónico <span aria-hidden="true">*</span></label>
+              <input
+                type="email"
+                id="reg-email"
+                name="email"
+                autocomplete="email"
+                spellcheck="false"
+                enterkeyhint="next"
+                data-error="reg-email-error"
+                aria-invalid="false"
+                required
+              />
+              <div id="reg-email-error" class="field-error-msg">
+                <span role="img" aria-label="Error">❌</span> Ingresa un correo electrónico válido.
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <div class="auth-label-row">
+                <label for="reg-password">Contraseña <span aria-hidden="true">*</span></label>
+                <button
+                  type="button"
+                  id="toggle-reg-password"
+                  class="password-toggle-btn"
+                  aria-pressed="false"
+                  aria-label="Mostrar contraseña de registro"
+                >Mostrar</button>
+              </div>
+              <span id="reg-password-rules" class="field-hint">Mínimo 8 caracteres para desbloquear tu perfil completo.</span>
+              <input
+                type="password"
+                id="reg-password"
+                name="password"
+                autocomplete="new-password"
+                minlength="8"
+                enterkeyhint="done"
+                aria-describedby="reg-password-rules"
+                data-error="reg-password-error"
+                aria-invalid="false"
+                required
+              />
+              <div id="reg-password-error" class="field-error-msg">
+                <span role="img" aria-label="Error">❌</span> La contraseña debe tener al menos 8 caracteres.
+              </div>
+            </div>
+
+            <p id="register-server-error" class="auth-server-error" role="status" aria-live="polite" hidden></p>
+
+            <button type="submit" id="register-submit-btn" class="btn-primary shimmer-btn">Crear Cuenta &amp; Desbloquear Todo</button>
+          </form>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- ========================================================================
          PRINTABLE MATCH PLAN SHEET (Visible on @media print for PDF / Vestuario)

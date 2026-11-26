@@ -20,11 +20,17 @@ export const state = {
   isHeatmapActive: false,
   isDrawModeActive: false,
   drawColor: 'cyan',
+  drawMode: 'pass',
+  lastThermalTelemetry: null,
   isBoardExpanded: false,
   playbackTimers: [],
   motionBlurTimers: [],
   selectedFile: null,
   indexedDocs: [],
+  authSession: null,
+  demoQuota: null,
+  activeChatSessionId: null,
+  chatSessions: [],
   isSendingChat: false,
   isUploadingPdf: false,
   // Tab 3: Tu Propia Plantilla
@@ -80,13 +86,10 @@ export const dom = {
   modalitySelector: document.getElementById('modality-selector'),
   sidebarFormationLabel: document.getElementById('sidebar-formation-label'),
   sidebarStyleLabel: document.getElementById('sidebar-style-label'),
-  sidebarSquadLabel: document.getElementById('sidebar-squad-label'),
   sidebarSynergyValue: document.getElementById('sidebar-synergy-value'),
   sidebarSetpieceValue: document.getElementById('sidebar-setpiece-value'),
-  sidebarCameraValue: document.getElementById('sidebar-camera-value'),
   goToBoardBtn: document.getElementById('go-to-board-btn'),
   goToSquadBtn: document.getElementById('go-to-squad-btn'),
-  syncWikiBtn: document.getElementById('sync-wiki-btn'),
   boardModalityPills: document.getElementById('board-modality-pills'),
   formationSelect: document.getElementById('formation-select'),
   styleSelect: document.getElementById('style-select'),
@@ -105,8 +108,26 @@ export const dom = {
   clearDrawBtn: document.getElementById('clear-draw-btn'),
   freehandToolbar: document.getElementById('freehand-toolbar'),
   undoDrawBtn: document.getElementById('undo-draw-btn'),
+  clearToolbarDrawBtn: document.getElementById('clear-toolbar-draw-btn'),
+  analyzeDrawAiBtn: document.getElementById('analyze-draw-ai-btn'),
   freehandDrawSvg: document.getElementById('freehand-draw-svg'),
   freehandPathsGroup: document.getElementById('freehand-paths-group'),
+  heatmapTelemetryPanel: document.getElementById('heatmap-telemetry-panel'),
+  heatmapVulnerabilityBadge: document.getElementById('heatmap-vulnerability-badge'),
+  heatmapVulnerabilityText: document.getElementById('heatmap-vulnerability-text'),
+  askHeatmapRagBtn: document.getElementById('ask-heatmap-rag-btn'),
+  heatLaneLeftPct: document.getElementById('heat-lane-left-pct'),
+  heatLaneCenterPct: document.getElementById('heat-lane-center-pct'),
+  heatLaneRightPct: document.getElementById('heat-lane-right-pct'),
+  heatLaneLeftBar: document.getElementById('heat-lane-left-bar'),
+  heatLaneCenterBar: document.getElementById('heat-lane-center-bar'),
+  heatLaneRightBar: document.getElementById('heat-lane-right-bar'),
+  heatThirdExitPct: document.getElementById('heat-third-exit-pct'),
+  heatThirdBuildPct: document.getElementById('heat-third-build-pct'),
+  heatThirdFinishPct: document.getElementById('heat-third-finish-pct'),
+  heatThirdExitBar: document.getElementById('heat-third-exit-bar'),
+  heatThirdBuildBar: document.getElementById('heat-third-build-bar'),
+  heatThirdFinishBar: document.getElementById('heat-third-finish-bar'),
   squadSynergyTier: document.getElementById('squad-synergy-tier'),
   benchSwapHint: document.getElementById('bench-swap-hint'),
   stadium3dContainer: document.getElementById('stadium-3d-container'),
@@ -228,6 +249,36 @@ export const dom = {
   inputModalityTag: document.getElementById('input-modality-tag'),
   sendChatBtn: document.getElementById('send-chat-btn'),
   clearChatBtn: document.getElementById('clear-chat-btn'),
+  newChatSessionBtn: document.getElementById('new-chat-session-btn'),
+  chatSessionsList: document.getElementById('chat-sessions-list'),
+  chatSessionsCountBadge: document.getElementById('chat-sessions-count-badge'),
+  authSessionBtn: document.getElementById('auth-session-btn'),
+  authSessionLabel: document.getElementById('auth-session-label'),
+  demoUpgradeBtn: document.getElementById('demo-upgrade-btn'),
+  logoutSessionBtn: document.getElementById('logout-session-btn'),
+  authGateView: document.getElementById('auth-gate-view'),
+  topbarHeader: document.querySelector('.topbar'),
+  appMainContent: document.getElementById('app-main-content'),
+  demoQuotaPill: document.getElementById('demo-quota-pill'),
+  demoLimitBanner: document.getElementById('demo-limit-banner'),
+  demoLimitRegisterBtn: document.getElementById('demo-limit-register-btn'),
+  demoLimitDialog: document.getElementById('demo-limit-dialog'),
+  demoLimitModalRegisterBtn: document.getElementById('demo-limit-modal-register-btn'),
+  demoLimitModalLoginBtn: document.getElementById('demo-limit-modal-login-btn'),
+  squadLockBadge: document.getElementById('squad-lock-badge'),
+  squadExclusiveGate: document.getElementById('squad-exclusive-gate'),
+  squadWorkspaceGrid: document.getElementById('squad-workspace-grid'),
+  squadGateRegisterBtn: document.getElementById('squad-gate-register-btn'),
+  squadGateLoginBtn: document.getElementById('squad-gate-login-btn'),
+  pdfUploadForm: document.getElementById('pdf-upload-form'),
+  pdfFileInput: document.getElementById('pdf-file-input'),
+  pdfFileLabel: document.getElementById('pdf-file-name'),
+  pdfTitleInput: document.getElementById('pdf-title-input'),
+  uploadPdfBtn: document.getElementById('upload-pdf-btn'),
+  pdfUploadProgress: document.getElementById('pdf-upload-progress'),
+  pdfUploadStatusText: document.getElementById('pdf-upload-status-text'),
+  expedientesCountBadge: document.getElementById('expedientes-count-badge'),
+  expedientesList: document.getElementById('expedientes-list'),
   toastContainer: document.getElementById('toast-container')
 };
 
@@ -314,15 +365,18 @@ export function switchTab(tabName) {
 
   dom.viewAssistant.classList.toggle('active-view', isAssistant);
   dom.viewAssistant.classList.toggle('hidden-view', !isAssistant);
+  dom.viewAssistant.hidden = !isAssistant;
   dom.viewBoard.classList.toggle('active-view', isBoard);
   dom.viewBoard.classList.toggle('hidden-view', !isBoard);
+  dom.viewBoard.hidden = !isBoard;
   if (dom.viewSquad) {
     dom.viewSquad.classList.toggle('active-view', isSquad);
     dom.viewSquad.classList.toggle('hidden-view', !isSquad);
+    dom.viewSquad.hidden = !isSquad;
   }
 
   const activeViewEl = isAssistant ? dom.viewAssistant : isBoard ? dom.viewBoard : dom.viewSquad;
-  if (activeViewEl) {
+  if (activeViewEl && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     const cards = activeViewEl.querySelectorAll('.glass-card');
     gsap.fromTo(
       cards,
@@ -1422,12 +1476,20 @@ export function resolveReferenceCoach(modality, formationCode, playStyle) {
   };
 }
 
+export function formatFormationLabel(systemKey) {
+  const raw = String(systemKey ?? '').trim();
+  if (!raw) return '';
+  return raw.replace(/^1-(?=\d)/, '');
+}
+
 export function updateContextBadges() {
   const setup = getActiveFormationSetup();
+  const displayFormation = formatFormationLabel(setup.code);
+  const shortFormation = displayFormation.split(' ')[0];
   const shortStyle = state.playStyle.split('(')[0].split('&')[0].trim();
   const synergyPct = state.squadOptimization?.globalSynergy;
   const synergyClause = synergyPct ? ` · Sinergia ${synergyPct}%` : '';
-  const nextHudText = `${state.modality} · ${setup.code} · ${shortStyle}${synergyClause}`;
+  const nextHudText = `${state.modality} · ${displayFormation} · ${shortStyle}${synergyClause}`;
 
   if (dom.headerModalityBadge) {
     dom.headerModalityBadge.textContent = nextHudText;
@@ -1442,15 +1504,9 @@ export function updateContextBadges() {
     lastHudText = nextHudText;
   }
 
-  dom.inputModalityTag.textContent = `${state.modality} · ${setup.code.split(' ')[0]}`;
-  dom.sidebarFormationLabel.textContent = setup.code;
+  dom.inputModalityTag.textContent = `${state.modality} · ${shortFormation}`;
+  dom.sidebarFormationLabel.textContent = displayFormation;
   dom.sidebarStyleLabel.textContent = state.playStyle;
-  if (dom.sidebarSquadLabel) {
-    const count = state.squadPlayers.length;
-    dom.sidebarSquadLabel.textContent = count > 0
-      ? `${count} jugadores en PostgreSQL`
-      : 'PostgreSQL + Top 100 Activa';
-  }
   if (dom.sidebarSynergyValue) {
     dom.sidebarSynergyValue.textContent = synergyPct ? `${synergyPct}%` : 'Sin nómina';
   }
@@ -1460,19 +1516,12 @@ export function updateContextBadges() {
       ? activePlay.name.split('—')[0].trim()
       : 'Juego libre';
   }
-  if (dom.sidebarCameraValue) {
-    dom.sidebarCameraValue.textContent = state.isStadium3DView
-      ? 'Estadio 3D'
-      : state.isTv25DView
-        ? 'TV 2.5D'
-        : '2D Cenital';
-  }
   if (synergyPct && (dom.squadGlobalSynergy || dom.squadSynergyTier)) {
     let tierClass = 'synergy-low';
     let tierText = 'Baja';
     if (synergyPct >= 90) {
       tierClass = 'synergy-elite';
-      tierText = 'Élite Imperial';
+      tierText = 'Élite Táctica';
     } else if (synergyPct >= 80) {
       tierClass = 'synergy-high';
       tierText = 'Óptima';
@@ -1490,7 +1539,7 @@ export function updateContextBadges() {
     }
     const pillWrap = dom.squadGlobalSynergy?.closest('.synergy-pill-wrap');
     if (pillWrap) {
-      pillWrap.classList.toggle('has-imperial-crown', synergyPct > 85);
+      pillWrap.classList.toggle('has-elite-crown', synergyPct > 85);
     }
   }
 }
@@ -1533,15 +1582,15 @@ export function isStrictNaturalPositionMatch(playerPos, slotRole) {
 }
 
 /**
- * Dispara una onda de choque lineal cian eléctrico ("Kaiser Impact") sobre el botón
+ * Dispara una onda de choque lineal cian eléctrico ("Impacto Táctico") sobre el botón
  * accionado y, opcionalmente, sobre el lienzo/etapa principal (respeta reduced-motion).
  */
-export function triggerKaiserImpactShockwave(anchorEl, stageEl = null) {
+export function triggerTacticalShockwave(anchorEl, stageEl = null) {
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
 
   if (anchorEl) {
     const btnWave = document.createElement('span');
-    btnWave.className = 'kaiser-btn-linear-shockwave';
+    btnWave.className = 'abyssal-btn-linear-shockwave';
     btnWave.setAttribute('aria-hidden', 'true');
     anchorEl.appendChild(btnWave);
     gsap.fromTo(
@@ -1559,7 +1608,7 @@ export function triggerKaiserImpactShockwave(anchorEl, stageEl = null) {
 
   if (stageEl) {
     const stageWave = document.createElement('div');
-    stageWave.className = 'kaiser-stage-linear-shockwave';
+    stageWave.className = 'abyssal-stage-linear-shockwave';
     stageWave.setAttribute('aria-hidden', 'true');
     stageEl.appendChild(stageWave);
     gsap.fromTo(

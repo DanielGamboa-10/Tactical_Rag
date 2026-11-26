@@ -11,9 +11,10 @@ import {
   showToast,
   switchTab,
   animateNumericCounter,
-  triggerKaiserImpactShockwave,
+  triggerTacticalShockwave,
   getPersonInitials,
   updateContextBadges,
+  formatFormationLabel,
   PLAY_STYLE_MODIFIERS,
   FORMATIONS_BY_MODALITY,
   NATURAL_POSITIONS_FUTSAL,
@@ -79,7 +80,7 @@ export function populateSquadFormationDropdown() {
   if (!dom.squadFormationSelect) return;
   const list = FORMATIONS_BY_MODALITY[state.squadModality] || FORMATIONS_BY_MODALITY['Fútbol 11'];
   dom.squadFormationSelect.innerHTML = list
-    .map((item, idx) => `<option value="${idx}" ${idx === state.squadFormationIndex ? 'selected' : ''}>${escapeHtml(item.code)}</option>`)
+    .map((item, idx) => `<option value="${idx}" ${idx === state.squadFormationIndex ? 'selected' : ''}>${escapeHtml(formatFormationLabel(item.code))}</option>`)
     .join('');
   syncSquadSelectTitle(dom.squadFormationSelect);
 }
@@ -92,6 +93,9 @@ function computePlayerOverall(p) {
 
 export async function refreshSquadAndOptimize(idealChemistryMode = false) {
   if (!dom.squadRosterList) return;
+  if (!state.authSession?.token || state.authSession?.isDemo || state.authSession?.username === 'demo') {
+    return;
+  }
   const setup = getActiveSquadFormationSetup();
   const targetSlots = setup.players.map((p) => p.role);
   const selectedPlayStyle = dom.squadStyleSelect ? dom.squadStyleSelect.value : 'Posesión & Juego de Posición';
@@ -150,7 +154,7 @@ export function renderIdealSquadBanner(showBanner = false) {
   const setup = getActiveSquadFormationSetup();
   const activeStyle = opt.playStyle || (dom.squadStyleSelect ? dom.squadStyleSelect.value : 'Posesión & Juego de Posición');
   if (dom.idealBannerTitle) {
-    dom.idealBannerTitle.textContent = `XI Óptimo por Sinergia Colectiva · ${setup.code} (${activeStyle})`;
+    dom.idealBannerTitle.textContent = `XI Óptimo por Sinergia Colectiva · ${formatFormationLabel(setup.code)} (${activeStyle})`;
   }
   if (dom.idealBannerText) {
     dom.idealBannerText.textContent =
@@ -171,7 +175,7 @@ async function handleGenerateIdealSquad() {
   dom.generateIdealSquadBtn.disabled = true;
   const activeStyle = dom.squadStyleSelect ? dom.squadStyleSelect.value : 'Posesión & Juego de Posición';
 
-  triggerKaiserImpactShockwave(dom.generateIdealSquadBtn, dom.squadPitch);
+  triggerTacticalShockwave(dom.generateIdealSquadBtn, dom.squadPitch);
 
   if (dom.squadPitch) {
     dom.squadPitch.classList.remove('shimmer-sweep-active');
@@ -251,12 +255,15 @@ function handleExportSquadToBoard() {
   dom.modalitySelector.querySelectorAll('.modality-btn').forEach((btn) => {
     const isMatch = btn.dataset.modality === state.modality;
     btn.classList.toggle('active', isMatch);
+    btn.setAttribute('aria-checked', String(isMatch));
     if (isMatch && dom.playersCountTag) {
       dom.playersCountTag.textContent = btn.dataset.players;
     }
   });
   dom.boardModalityPills.querySelectorAll('.board-mod-pill').forEach((pill) => {
-    pill.classList.toggle('active', pill.dataset.modality === state.modality);
+    const isPillMatch = pill.dataset.modality === state.modality;
+    pill.classList.toggle('active', isPillMatch);
+    pill.setAttribute('aria-pressed', String(isPillMatch));
   });
 
   populateFormationDropdown();
@@ -274,7 +281,7 @@ function handleExportSquadToBoard() {
   const startersCount = lineup.filter((s) => s.assigned && s.playerId).length;
   showToast(
     'XI Exportado a Pizarra Táctica',
-    `${startersCount} titulares (${state.modality} · ${setup.code} · ${state.playStyle}) listos en cancha para ejecutar acciones tácticas.`,
+    `${startersCount} titulares (${state.modality} · ${formatFormationLabel(setup.code)} · ${state.playStyle}) listos en cancha para ejecutar acciones tácticas.`,
     'success'
   );
 }
@@ -323,7 +330,7 @@ function syncSynergyBadgeVisuals(scorePct) {
   let tierText = 'Baja';
   if (score >= 90) {
     tierClass = 'synergy-elite';
-    tierText = 'Élite Imperial';
+    tierText = 'Élite Táctica';
   } else if (score >= 85) {
     tierClass = 'synergy-high';
     tierText = 'Óptima';
@@ -344,7 +351,7 @@ function syncSynergyBadgeVisuals(scorePct) {
 
   const pillWrap = dom.squadGlobalSynergy?.closest('.synergy-pill-wrap');
   if (pillWrap) {
-    pillWrap.classList.toggle('has-imperial-crown', score > 85);
+    pillWrap.classList.toggle('has-elite-crown', score > 85);
   }
 }
 
@@ -798,6 +805,9 @@ export function renderSelectedPlayerComparison() {
 
 async function handleCreateCustomPlayer(e) {
   e.preventDefault();
+  const submitBtn = e.submitter || e.currentTarget?.querySelector('button[type="submit"]');
+  if (submitBtn?.disabled) return;
+
   const payload = {
     name: dom.playerNameInput.value.trim(),
     jerseyNumber: Number(dom.playerNumberInput.value) || 10,
@@ -813,6 +823,11 @@ async function handleCreateCustomPlayer(e) {
 
   if (!payload.name) return;
 
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-busy', 'true');
+  }
+
   try {
     const created = await api.createSquadPlayer(payload);
     state.selectedSquadPlayerId = created.id;
@@ -821,6 +836,11 @@ async function handleCreateCustomPlayer(e) {
     await refreshSquadAndOptimize();
   } catch (err) {
     showToast('Error al guardar jugador', err.message, 'error');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
+    }
   }
 }
 
@@ -1208,7 +1228,7 @@ export function initSquadViewEvents() {
 
       setModality(state.squadModality);
       switchTab('assistant');
-      const prompt = `Míster, analiza mi alineación personalizada en ${state.squadModality} con formación ${setup.code}. Titulares en cancha: ${startersSummary || 'por definir'}. Suplentes en la banca: ${benchSummary || 'ninguno'}. ¿Qué ajustes, cambios desde la banca o sociedades tácticas me recomiendas?`;
+      const prompt = `Míster, analiza mi alineación personalizada en ${state.squadModality} con formación ${formatFormationLabel(setup.code)}. Titulares en cancha: ${startersSummary || 'por definir'}. Suplentes en la banca: ${benchSummary || 'ninguno'}. ¿Qué ajustes, cambios desde la banca o sociedades tácticas me recomiendas?`;
       sendChatMessage(prompt);
     });
   }
