@@ -336,6 +336,11 @@ function syncSynergyBadgeVisuals(scorePct) {
   if (dom.squadSynergyTier) {
     dom.squadSynergyTier.textContent = tierText;
   }
+
+  const pillWrap = dom.squadGlobalSynergy?.closest('.synergy-pill-wrap');
+  if (pillWrap) {
+    pillWrap.classList.toggle('has-imperial-crown', score > 85);
+  }
 }
 
 export function renderSquadBench() {
@@ -1205,18 +1210,19 @@ export function initSquadViewEvents() {
 
   // Inclinación 3D interactiva al cursor + reflejo especular holográfico (Espejo Top 100)
   if (dom.holographicPlayerCard) {
-    dom.holographicPlayerCard.addEventListener('mousemove', (e) => {
+    dom.holographicPlayerCard.addEventListener('pointermove', (e) => {
+      if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
       const rect = dom.holographicPlayerCard.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
       const relX = (e.clientX - rect.left) / rect.width;
       const relY = (e.clientY - rect.top) / rect.height;
-      const rotateY = (relX - 0.5) * 18;
-      const rotateX = (0.5 - relY) * 14;
+      const rotateY = (relX - 0.5) * 11;
+      const rotateX = (0.5 - relY) * 8;
 
       gsap.to(dom.holographicPlayerCard, {
         rotateX,
         rotateY,
-        scale: 1.015,
+        scale: 1.012,
         transformPerspective: 1000,
         duration: 0.25,
         ease: 'power2.out',
@@ -1226,15 +1232,15 @@ export function initSquadViewEvents() {
       if (dom.holoGlareLayer) {
         const glareX = Math.round(relX * 100);
         const glareY = Math.round(relY * 100);
-        const angleDeg = Math.round(112 + relX * 36);
-        dom.holoGlareLayer.style.opacity = '1';
+        const angleDeg = Math.round(115 + relX * 32);
+        dom.holoGlareLayer.style.opacity = '0.9';
         dom.holoGlareLayer.style.background =
-          `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(0, 240, 255, 0.34) 0%, rgba(234, 179, 8, 0.24) 36%, transparent 68%), ` +
-          `linear-gradient(${angleDeg}deg, rgba(29, 78, 216, 0.16) 0%, rgba(56, 189, 248, 0.26) 35%, rgba(234, 179, 8, 0.3) 54%, rgba(0, 240, 255, 0.18) 74%, transparent 90%)`;
+          `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(0, 240, 255, 0.26) 0%, rgba(234, 179, 8, 0.2) 36%, transparent 68%), ` +
+          `linear-gradient(${angleDeg}deg, rgba(29, 78, 216, 0.14) 0%, rgba(56, 189, 248, 0.22) 35%, rgba(234, 179, 8, 0.24) 55%, rgba(0, 240, 255, 0.15) 75%, transparent 90%)`;
       }
     });
 
-    dom.holographicPlayerCard.addEventListener('mouseleave', () => {
+    dom.holographicPlayerCard.addEventListener('pointerleave', () => {
       gsap.to(dom.holographicPlayerCard, {
         rotateX: 0,
         rotateY: 0,
@@ -1247,6 +1253,63 @@ export function initSquadViewEvents() {
       if (dom.holoGlareLayer) {
         dom.holoGlareLayer.style.opacity = '0';
       }
+    });
+
+    // Inclinación 3D individual y reflejo holográfico diagonal azul/dorado en cada tarjeta duel-fighter-col
+    const fighterCols = dom.holographicPlayerCard.querySelectorAll('.duel-fighter-col[data-duel-tilt]');
+    fighterCols.forEach((colEl) => {
+      const tiltKind = colEl.dataset.duelTilt;
+      const glareEl = colEl.querySelector('.duel-glare-layer');
+      colEl.addEventListener('pointermove', (e) => {
+        if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+        const rect = colEl.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const relX = (e.clientX - rect.left) / rect.width;
+        const relY = (e.clientY - rect.top) / rect.height;
+        const rotateY = (relX - 0.5) * 20;
+        const rotateX = (0.5 - relY) * 16;
+
+        gsap.to(colEl, {
+          rotateX,
+          rotateY,
+          scale: 1.032,
+          transformPerspective: 860,
+          duration: 0.22,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+
+        if (glareEl) {
+          const gx = Math.round(relX * 100);
+          const gy = Math.round(relY * 100);
+          const diagAngle = Math.round(118 + relX * 34);
+          glareEl.style.opacity = '1';
+          if (tiltKind === 'crack') {
+            glareEl.style.background =
+              `radial-gradient(circle at ${gx}% ${gy}%, rgba(254, 240, 138, 0.44) 0%, rgba(234, 179, 8, 0.26) 42%, transparent 72%), ` +
+              `linear-gradient(${diagAngle}deg, transparent 15%, rgba(234, 179, 8, 0.34) 44%, rgba(56, 189, 248, 0.22) 60%, transparent 84%)`;
+          } else {
+            glareEl.style.background =
+              `radial-gradient(circle at ${gx}% ${gy}%, rgba(0, 240, 255, 0.42) 0%, rgba(29, 78, 216, 0.28) 44%, transparent 74%), ` +
+              `linear-gradient(${diagAngle}deg, transparent 15%, rgba(0, 240, 255, 0.32) 45%, rgba(234, 179, 8, 0.16) 62%, transparent 85%)`;
+          }
+        }
+      });
+
+      colEl.addEventListener('pointerleave', () => {
+        gsap.to(colEl, {
+          rotateX: 0,
+          rotateY: 0,
+          scale: 1,
+          transformPerspective: 860,
+          duration: 0.52,
+          ease: 'elastic.out(1, 0.65)',
+          overwrite: 'auto'
+        });
+        if (glareEl) {
+          glareEl.style.opacity = '0';
+        }
+      });
     });
   }
 }

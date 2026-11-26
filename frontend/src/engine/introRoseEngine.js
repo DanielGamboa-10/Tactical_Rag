@@ -685,14 +685,16 @@ export function initBlueRoseIntroEvents() {
 }
 
 /* ==========================================================================
-   Ambient Background Canvas: 20 Floating Kaiser Blue Rose Petals
+   Ambient Background Canvas: 22 Floating Kaiser Blue Rose Petals (3D Tumble + DoF)
    Auto-pauses on reduced-motion, hidden tab, opening intro, or print.
    ========================================================================== */
 let ambientRafId = null;
 let ambientPausedByContentVis = false;
 
 export function initAmbientBluePetalsCanvas() {
-  const canvas = document.getElementById('ambient-petals-canvas');
+  const canvas =
+    document.getElementById('kaiser-ambient-petals') ||
+    document.getElementById('ambient-petals-canvas');
   const ambientBgEl = canvas?.parentElement;
   if (!canvas) return;
 
@@ -700,7 +702,7 @@ export function initAmbientBluePetalsCanvas() {
   if (!ctx) return;
 
   const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const PETAL_COUNT = 20;
+  const PETAL_COUNT = 22;
   let width = window.innerWidth || 1280;
   let height = window.innerHeight || 720;
 
@@ -712,19 +714,25 @@ export function initAmbientBluePetalsCanvas() {
   };
   resizeCanvas();
 
+  // 3 depth-of-field tiers: 0 = far/soft, 1 = mid-field, 2 = crisp foreground cobalt/cyan
   const petals = Array.from({ length: PETAL_COUNT }, (_, i) => {
-    const depthScale = 0.55 + (i % 4) * 0.22;
+    const depthTier = i % 3;
+    const depthScale = depthTier === 0 ? 0.56 : depthTier === 1 ? 0.86 : 1.18;
     return {
       x: Math.random() * width,
       y: Math.random() * height,
-      size: (8 + Math.random() * 7) * depthScale,
+      depthTier,
+      depthScale,
+      size: (8.5 + Math.random() * 6.5) * depthScale,
       vx: -0.14 - depthScale * 0.16,
-      vy: 0.24 + depthScale * 0.34,
+      vy: 0.22 + depthScale * 0.34,
       angle: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.012,
+      spin: (Math.random() - 0.5) * 0.014,
+      tumble: Math.random() * Math.PI * 2,
+      tumbleSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.014 + depthScale * 0.012),
       swayPhase: Math.random() * Math.PI * 2,
-      swayAmp: 0.25 + depthScale * 0.35,
-      alpha: 0.14 + depthScale * 0.14,
+      swayAmp: 0.24 + depthScale * 0.32,
+      alpha: depthTier === 0 ? 0.14 : depthTier === 1 ? 0.23 : 0.34,
       palette: PETAL_COLORS[i % PETAL_COLORS.length]
     };
   });
@@ -752,9 +760,10 @@ export function initAmbientBluePetalsCanvas() {
     ctx.clearRect(0, 0, width, height);
 
     for (const p of petals) {
-      p.x += p.vx + Math.sin(tSec * 0.7 + p.swayPhase) * p.swayAmp;
+      p.x += p.vx + Math.sin(tSec * 0.72 + p.swayPhase) * p.swayAmp;
       p.y += p.vy;
       p.angle += p.spin;
+      p.tumble += p.tumbleSpeed;
 
       if (p.y > height + 36) {
         p.y = -28;
@@ -763,7 +772,21 @@ export function initAmbientBluePetalsCanvas() {
       if (p.x < -36) p.x = width + 24;
       if (p.x > width + 36) p.x = -24;
 
-      drawPetalWithVein(ctx, p.x, p.y, p.size, p.angle, p.palette, p.alpha);
+      // Simulated 3D perspective flip across horizontal axis + DoF glow hierarchy
+      const rawCos = Math.cos(p.tumble);
+      const scale3dX = (rawCos >= 0 ? 1 : -1) * (0.24 + Math.abs(rawCos) * 0.76);
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.scale(scale3dX, 1);
+      if (p.depthTier === 2) {
+        ctx.shadowColor = 'rgba(0, 240, 255, 0.38)';
+        ctx.shadowBlur = 7;
+      } else if (p.depthTier === 0) {
+        ctx.shadowColor = 'rgba(29, 78, 216, 0.28)';
+        ctx.shadowBlur = 10;
+      }
+      drawSculptedRosePetalOnCanvas(ctx, 0, 0, p.size, p.angle, p.palette, p.alpha);
+      ctx.restore();
     }
 
     ambientRafId = requestAnimationFrame(tick);

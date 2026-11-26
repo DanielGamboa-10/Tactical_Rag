@@ -141,6 +141,28 @@ function buildQuadraticBezierD(x1, y1, x2, y2, curveIntensity = 0.2) {
   return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
 }
 
+function spawnKaiserImpactFlash2D(tx, ty) {
+  if (!dom.tacticalPitch) return;
+  const flashEl = document.createElement('div');
+  flashEl.className = 'kaiser-impact-shockwave';
+  flashEl.setAttribute('aria-hidden', 'true');
+  dom.tacticalPitch.appendChild(flashEl);
+
+  gsap.fromTo(
+    flashEl,
+    { x: tx, y: ty, scale: 0.25, opacity: 0.96 },
+    {
+      x: tx,
+      y: ty,
+      scale: 2.25,
+      opacity: 0,
+      duration: 0.54,
+      ease: 'power2.out',
+      onComplete: () => flashEl.remove()
+    }
+  );
+}
+
 export function positionBallToken(x, y, visible = true, animateBlur = false) {
   if (!dom.ballToken) return;
   if (!visible) {
@@ -177,6 +199,7 @@ export function positionBallToken(x, y, visible = true, animateBlur = false) {
     onComplete: () => {
       dom.ballToken?.classList.remove('kaiser-impact-active');
       if (animateBlur && !reducedMotion) {
+        spawnKaiserImpactFlash2D(tx, ty);
         gsap.to(dom.ballToken, {
           scale: 1,
           rotateX: state.isTv25DView ? -28 : 0,
@@ -604,20 +627,37 @@ export function renderSetPieceOverlay(setPiece, totalPlayers) {
     );
     dom.setpieceOverlay.appendChild(kaiserTrail);
 
+    const kaiserCore = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    kaiserCore.setAttribute('d', d);
+    kaiserCore.setAttribute('class', 'bezier-motion-trail kaiser-impact-core');
+    dom.setpieceOverlay.appendChild(kaiserCore);
+
     if (!prefersReducedMotion) {
       gsap.fromTo(
         kaiserTrail,
         { strokeDasharray: '42 260', strokeDashoffset: 220, opacity: 1 },
         {
           strokeDashoffset: 0,
-          opacity: 0.28,
+          opacity: 0.34,
           duration: 1.25,
           delay: i * 0.14,
           ease: 'power2.out'
         }
       );
+      gsap.fromTo(
+        kaiserCore,
+        { strokeDasharray: '28 280', strokeDashoffset: 220, opacity: 0.96 },
+        {
+          strokeDashoffset: 0,
+          opacity: 0.42,
+          duration: 1.18,
+          delay: i * 0.14,
+          ease: 'power2.out'
+        }
+      );
     } else {
-      kaiserTrail.style.opacity = '0.65';
+      kaiserTrail.style.opacity = '0.72';
+      kaiserCore.style.opacity = '0.88';
     }
   }
 }
@@ -889,6 +929,23 @@ export function renderTacticalPitch(animateMotionBlur = false) {
       tokenEl.addEventListener('mouseleave', () => {
         clearHoverInfluenceOnPitch(dom.hoverInfluenceLayer, dom.pitchTokens);
       });
+      // Clic en ficha dentro de #tactical-pitch para fijar el aura Metavision giratoria en Juego Libre
+      tokenEl.addEventListener('click', () => {
+        if (getActiveSetPiece()) return;
+        const clickedIdx = Number(tokenEl.dataset.slotIndex || 0);
+        dom.pitchTokens.dataset.focusedSlot = String(clickedIdx);
+        const tokens = dom.pitchTokens.querySelectorAll('.player-token');
+        tokens.forEach((el, i) => {
+          const isMatch = i === clickedIdx;
+          el.classList.toggle('active-actor', isMatch);
+          if (currentBoardCoords[i]) {
+            currentBoardCoords[i].isActor = isMatch;
+          }
+        });
+        if (state.isStadium3DView) {
+          syncStadium3DScene(currentBoardCoords, null);
+        }
+      });
     }
 
     const exportedSlot = hasExportedLineup ? state.exportedBoardLineup.starters[idx] : null;
@@ -903,7 +960,21 @@ export function renderTacticalPitch(animateMotionBlur = false) {
       : null;
     const visionStat = matchedCustomPlayer?.vision || (p.gk ? 84 : 88);
 
-    tokenEl.className = `player-token ${p.gk ? 'gk' : ''} ${p.isActor ? 'active-actor' : ''}`.trim();
+    let isMetavisionFocused = Boolean(p.isActor);
+    if (!activeSetPiece) {
+      let focusedSlot = Number.parseInt(dom.pitchTokens.dataset.focusedSlot || '', 10);
+      if (Number.isNaN(focusedSlot) || focusedSlot >= adjustedCoords.length) {
+        const defaultIdx = adjustedCoords.findIndex(
+          (c) => Number(c.num) === 10 || /ENG|MCO|PIV|ALA/i.test(String(c.role || ''))
+        );
+        focusedSlot = defaultIdx >= 0 ? defaultIdx : Math.max(0, Math.floor(adjustedCoords.length / 2));
+        dom.pitchTokens.dataset.focusedSlot = String(focusedSlot);
+      }
+      isMetavisionFocused = idx === focusedSlot;
+      adjustedCoords[idx].isActor = isMetavisionFocused;
+    }
+
+    tokenEl.className = `player-token ${p.gk ? 'gk' : ''} ${isMetavisionFocused ? 'active-actor' : ''}`.trim();
     tokenEl.textContent = tokenNum;
     tokenEl.setAttribute('data-role', tokenRoleLabel);
     tokenEl.dataset.slotIndex = String(idx);

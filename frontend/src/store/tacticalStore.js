@@ -1467,15 +1467,29 @@ export function updateContextBadges() {
         : '2D Cenital';
   }
   if (synergyPct && (dom.squadGlobalSynergy || dom.squadSynergyTier)) {
-    const tierClass = synergyPct >= 85 ? 'synergy-high' : synergyPct >= 70 ? 'synergy-mid' : 'synergy-low';
-    const tierText = synergyPct >= 85 ? 'Óptima' : synergyPct >= 70 ? 'Media' : 'Baja';
+    let tierClass = 'synergy-low';
+    let tierText = 'Baja';
+    if (synergyPct >= 90) {
+      tierClass = 'synergy-elite';
+      tierText = 'Élite Imperial';
+    } else if (synergyPct >= 80) {
+      tierClass = 'synergy-high';
+      tierText = 'Óptima';
+    } else if (synergyPct >= 65) {
+      tierClass = 'synergy-mid';
+      tierText = 'Media';
+    }
     [dom.squadGlobalSynergy, dom.squadSynergyTier].forEach((el) => {
       if (!el) return;
-      el.classList.remove('synergy-high', 'synergy-mid', 'synergy-low');
+      el.classList.remove('synergy-elite', 'synergy-high', 'synergy-mid', 'synergy-low');
       el.classList.add(tierClass);
     });
     if (dom.squadSynergyTier) {
       dom.squadSynergyTier.textContent = tierText;
+    }
+    const pillWrap = dom.squadGlobalSynergy?.closest('.synergy-pill-wrap');
+    if (pillWrap) {
+      pillWrap.classList.toggle('has-imperial-crown', synergyPct > 85);
     }
   }
 }

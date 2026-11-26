@@ -30,7 +30,12 @@ let lastRenderedModality = null;
 let pawnsGroup = null;
 let linksGroup = null;
 let ghostMarkersGroup = null;
-let trailLine = null;
+let trailGroup = null;
+let impactShockwavesGroup = null;
+let ambientEnergyPoints = null;
+let ambientEnergyVelocities = null;
+let ambientEnergyTexture = null;
+let ballAuraRing = null;
 let ballMesh = null;
 let ballShadowMesh = null;
 let activeStepTimeline = null;
@@ -415,21 +420,79 @@ function createPlayerLabelSprite(dorsal, roleText, isGk) {
   return sprite;
 }
 
+function buildHoloFootAura3D(isFeatured = false) {
+  const auraGroup = new THREE.Group();
+  auraGroup.position.y = 0.06;
+
+  // Anillo interior fino de Metavision
+  const innerGeo = new THREE.RingGeometry(1.36, 1.44, 40);
+  innerGeo.rotateX(-Math.PI / 2);
+  const innerMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.72,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  auraGroup.add(new THREE.Mesh(innerGeo, innerMat));
+
+  // 4 arcos segmentados exteriores cian eléctrico (rotan en tiempo real)
+  const segMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.94,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  for (let i = 0; i < 4; i++) {
+    const startAngle = i * (Math.PI / 2) + 0.14;
+    const arcGeo = new THREE.RingGeometry(1.56, 1.76, 14, 1, startAngle, Math.PI * 0.34);
+    arcGeo.rotateX(-Math.PI / 2);
+    auraGroup.add(new THREE.Mesh(arcGeo, segMat));
+  }
+
+  // 4 marcas cardinales luminosas de mira óptica
+  const tickMat = new THREE.MeshBasicMaterial({
+    color: 0xe0f2fe,
+    transparent: true,
+    opacity: 0.92,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  const tickGeo = new THREE.BoxGeometry(0.42, 0.03, 0.08);
+  [0, Math.PI / 2, Math.PI, (Math.PI * 3) / 2].forEach((angle) => {
+    const tick = new THREE.Mesh(tickGeo, tickMat);
+    const radius = 1.92;
+    tick.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+    tick.rotation.y = -angle;
+    auraGroup.add(tick);
+  });
+
+  auraGroup.visible = Boolean(isFeatured);
+  return auraGroup;
+}
+
 function createPlayerPawn3D(dorsal, roleText, isGk, isActor) {
   const group = new THREE.Group();
 
   // Anillo neón en la base sobre el césped
   const ringGeo = new THREE.RingGeometry(0.95, 1.34, 32);
   const ringMat = new THREE.MeshBasicMaterial({
-    color: isActor ? 0x00d2ff : isGk ? 0x10b981 : 0x38bdf8,
+    color: isActor ? 0x00f0ff : isGk ? 0x10b981 : 0x38bdf8,
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: 0.88
+    opacity: 0.9
   });
   const ringMesh = new THREE.Mesh(ringGeo, ringMat);
   ringMesh.rotation.x = -Math.PI / 2;
   ringMesh.position.y = 0.04;
   group.add(ringMesh);
+
+  // Anillo holográfico Metavision giratorio bajo los pies del jugador destacado
+  const holoAuraGroup = buildHoloFootAura3D(isActor);
+  group.add(holoAuraGroup);
 
   // Sub-grupo del cuerpo físico que se inclina dinámicamente en la dirección de carrera
   const tiltBodyGroup = new THREE.Group();
@@ -437,8 +500,8 @@ function createPlayerPawn3D(dorsal, roleText, isGk, isActor) {
   const bodyGeo = new THREE.CylinderGeometry(0.62, 0.9, 1.75, 24);
   const bodyMat = new THREE.MeshStandardMaterial({
     color: isGk ? 0x10b981 : isActor ? 0x0284c7 : 0x1d4ed8,
-    emissive: isGk ? 0x059669 : isActor ? 0x38bdf8 : 0x1e40af,
-    emissiveIntensity: 0.48,
+    emissive: isGk ? 0x059669 : isActor ? 0x00f0ff : 0x1e40af,
+    emissiveIntensity: isActor ? 0.62 : 0.48,
     metalness: 0.35,
     roughness: 0.24
   });
@@ -467,6 +530,7 @@ function createPlayerPawn3D(dorsal, roleText, isGk, isActor) {
     isGk,
     isActor,
     ringMat,
+    holoAuraGroup,
     bodyMat,
     tiltBodyGroup,
     labelSprite
@@ -540,6 +604,65 @@ function createGhostOriginAndRunArrow(startX, startZ, endX, endZ) {
   return markerGroup;
 }
 
+function buildAmbientEnergyParticles3D() {
+  const particleCanvas = document.createElement('canvas');
+  particleCanvas.width = 64;
+  particleCanvas.height = 64;
+  const pCtx = particleCanvas.getContext('2d');
+  const grad = pCtx.createRadialGradient(32, 32, 2, 32, 32, 30);
+  grad.addColorStop(0, 'rgba(224, 242, 254, 1)');
+  grad.addColorStop(0.32, 'rgba(0, 240, 255, 0.85)');
+  grad.addColorStop(0.68, 'rgba(29, 78, 216, 0.35)');
+  grad.addColorStop(1, 'rgba(29, 78, 216, 0)');
+  pCtx.fillStyle = grad;
+  pCtx.fillRect(0, 0, 64, 64);
+
+  ambientEnergyTexture = new THREE.CanvasTexture(particleCanvas);
+  ambientEnergyTexture.needsUpdate = true;
+
+  const count = 96;
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  const meta = [];
+  const cyanCol = new THREE.Color(0x00f0ff);
+  const cobaltCol = new THREE.Color(0x38bdf8);
+  const deepBlueCol = new THREE.Color(0x2563eb);
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 76;
+    positions[i * 3 + 1] = 0.4 + Math.random() * 9.5;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 48;
+
+    const paletteCol = i % 3 === 0 ? cyanCol : i % 3 === 1 ? cobaltCol : deepBlueCol;
+    colors[i * 3] = paletteCol.r;
+    colors[i * 3 + 1] = paletteCol.g;
+    colors[i * 3 + 2] = paletteCol.b;
+
+    meta.push({
+      vy: 0.008 + Math.random() * 0.016,
+      phase: Math.random() * Math.PI * 2,
+      sway: 0.005 + Math.random() * 0.007
+    });
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.65,
+    map: ambientEnergyTexture,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.72,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+
+  ambientEnergyVelocities = meta;
+  return new THREE.Points(geo, mat);
+}
+
 function initStadium3DScene() {
   const container = dom.stadium3dContainer;
   if (!container) return;
@@ -565,8 +688,7 @@ function initStadium3DScene() {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.14;
 
-  container.innerHTML = '';
-  container.appendChild(renderer.domElement);
+  container.replaceChildren(renderer.domElement);
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -647,26 +769,45 @@ function initStadium3DScene() {
   scene.add(buildPerimeterLedBoards());
   scene.add(buildCornerFloodlightTowers());
 
-  // Grupos dinámicos de peones, marcadores fantasma de desmarque y líneas tácticas
+  // Partículas azules flotantes de energía Metavision sobre el césped nocturno
+  ambientEnergyPoints = buildAmbientEnergyParticles3D();
+  scene.add(ambientEnergyPoints);
+
+  // Grupos dinámicos de peones, marcadores fantasma, estelas Kaiser Impact y ondas de impacto
   pawnsGroup = new THREE.Group();
   linksGroup = new THREE.Group();
   ghostMarkersGroup = new THREE.Group();
-  scene.add(linksGroup, ghostMarkersGroup, pawnsGroup);
+  trailGroup = new THREE.Group();
+  impactShockwavesGroup = new THREE.Group();
+  scene.add(linksGroup, ghostMarkersGroup, trailGroup, impactShockwavesGroup, pawnsGroup);
 
-  // Balón 3D + Sombra proyectada en el suelo
+  // Balón 3D + Anillo de aura Kaiser Impact + Sombra proyectada en el suelo
   const ballGeo = new THREE.SphereGeometry(0.56, 24, 24);
   const ballMat = new THREE.MeshStandardMaterial({
     color: 0xfacc15,
-    emissive: 0xf59e0b,
-    emissiveIntensity: 0.58,
-    roughness: 0.22,
-    metalness: 0.22
+    emissive: 0x00f0ff,
+    emissiveIntensity: 0.38,
+    roughness: 0.2,
+    metalness: 0.26
   });
   ballMesh = new THREE.Mesh(ballGeo, ballMat);
   ballMesh.position.set(0, 0.56, 0);
   ballMesh.castShadow = true;
   ballMesh.visible = false;
   scene.add(ballMesh);
+
+  const auraRingGeo = new THREE.RingGeometry(0.74, 1.04, 24);
+  const auraRingMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  ballAuraRing = new THREE.Mesh(auraRingGeo, auraRingMat);
+  ballAuraRing.visible = false;
+  scene.add(ballAuraRing);
 
   const shadowGeo = new THREE.CircleGeometry(0.68, 24);
   const shadowMat = new THREE.MeshBasicMaterial({
@@ -691,8 +832,46 @@ function initStadium3DScene() {
   });
   resizeObserver.observe(container);
 
+  const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let frameTick = 0;
+
   const renderLoop = () => {
     animationFrameId = requestAnimationFrame(renderLoop);
+    if (document.hidden) return;
+
+    if (!reducedMotionMq.matches) {
+      frameTick += 0.016;
+      // Girar anillos holográficos bajo los pies del jugador destacado
+      pawnMap.forEach((pawn) => {
+        const aura = pawn.userData?.holoAuraGroup;
+        if (aura && aura.visible) {
+          aura.rotation.y += 0.018;
+        }
+      });
+
+      // Flotación suave de partículas azules sobre el estadio nocturno
+      if (ambientEnergyPoints && ambientEnergyVelocities) {
+        const posAttr = ambientEnergyPoints.geometry.getAttribute('position');
+        const arr = posAttr.array;
+        for (let i = 0; i < ambientEnergyVelocities.length; i++) {
+          const m = ambientEnergyVelocities[i];
+          const pyIdx = i * 3 + 1;
+          const pxIdx = i * 3;
+          arr[pyIdx] += m.vy;
+          arr[pxIdx] += Math.sin(frameTick + m.phase) * m.sway;
+          if (arr[pyIdx] > 10.2) {
+            arr[pyIdx] = 0.35;
+          }
+        }
+        posAttr.needsUpdate = true;
+      }
+
+      if (ballAuraRing && ballAuraRing.visible && camera) {
+        ballAuraRing.lookAt(camera.position);
+        ballAuraRing.rotation.z += 0.08;
+      }
+    }
+
     if (controls) controls.update();
     if (renderer && scene && camera) {
       renderer.render(scene, camera);
@@ -796,6 +975,20 @@ export function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
     });
   }
 
+  // Jugador destacado para el anillo holográfico cian en Juego Libre si no hay actor activo de jugada
+  const hasAnyActor = coords.some((c) => Boolean(c.isActor));
+  let fallbackFeaturedIdx = -1;
+  if (!hasAnyActor && coords.length > 0) {
+    fallbackFeaturedIdx = coords.findIndex(
+      (c) =>
+        Number(c.num) === 10 ||
+        /ENG|MCO|PIV|ALA|DEL/i.test(String(c.role || ''))
+    );
+    if (fallbackFeaturedIdx < 0) {
+      fallbackFeaturedIdx = Math.max(0, Math.floor(coords.length / 2));
+    }
+  }
+
   coords.forEach((p, idx) => {
     const exportedSlot = hasExportedLineup ? state.exportedBoardLineup.starters[idx] : null;
     const hasExportedPlayer = Boolean(exportedSlot && exportedSlot.assigned && exportedSlot.playerId);
@@ -803,6 +996,7 @@ export function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
     const roleLabel = hasExportedPlayer
       ? `${exportedSlot.name.split(' ')[0]} (${p.role})`
       : p.role;
+    const isHighlighted = Boolean(p.isActor) || idx === fallbackFeaturedIdx;
 
     const wx = toWorldX(p.adjX ?? p.x);
     const wz = toWorldZ(p.adjY ?? p.y);
@@ -810,7 +1004,7 @@ export function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
 
     let pawn = pawnMap.get(idx);
     if (!pawn) {
-      pawn = createPlayerPawn3D(dorsal, roleLabel, Boolean(p.gk), Boolean(p.isActor));
+      pawn = createPlayerPawn3D(dorsal, roleLabel, Boolean(p.gk), isHighlighted);
       pawn.position.set(wx, 0, wz);
       pawnsGroup.add(pawn);
       pawnMap.set(idx, pawn);
@@ -821,10 +1015,26 @@ export function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
     ) {
       const prevPos = pawn.position.clone();
       pawnsGroup.remove(pawn);
-      pawn = createPlayerPawn3D(dorsal, roleLabel, Boolean(p.gk), Boolean(p.isActor));
+      pawn = createPlayerPawn3D(dorsal, roleLabel, Boolean(p.gk), isHighlighted);
       pawn.position.copy(prevPos);
       pawnsGroup.add(pawn);
       pawnMap.set(idx, pawn);
+    } else {
+      pawn.userData.isActor = isHighlighted;
+      if (pawn.userData.holoAuraGroup) {
+        pawn.userData.holoAuraGroup.visible = isHighlighted;
+      }
+      if (pawn.userData.ringMat) {
+        pawn.userData.ringMat.color.setHex(
+          isHighlighted ? 0x00f0ff : Boolean(p.gk) ? 0x10b981 : 0x38bdf8
+        );
+      }
+      if (pawn.userData.bodyMat) {
+        pawn.userData.bodyMat.emissive.setHex(
+          Boolean(p.gk) ? 0x059669 : isHighlighted ? 0x00f0ff : 0x1e40af
+        );
+        pawn.userData.bodyMat.emissiveIntensity = isHighlighted ? 0.64 : 0.48;
+      }
     }
 
     // Si es un actor de jugada preparada en desmarque (Paso >= 2), mostrar anillo fantasma en su origen y flecha
@@ -848,7 +1058,9 @@ export function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
   linksGroup.clear();
   if (!activeSetPiece) {
     if (ballMesh) ballMesh.visible = false;
+    if (ballAuraRing) ballAuraRing.visible = false;
     if (ballShadowMesh) ballShadowMesh.visible = false;
+    if (trailGroup) trailGroup.clear();
 
     const lineMat = new THREE.LineBasicMaterial({
       color: 0x38bdf8,
@@ -871,9 +1083,78 @@ export function syncStadium3DScene(adjustedCoords = [], activeSetPiece = null) {
 }
 
 /**
+ * Destello radial cian eléctrico en el punto de llegada del balón (Kaiser Impact 3D)
+ */
+function spawnImpactFlash3D(x, z, isShot = false) {
+  if (!impactShockwavesGroup) return;
+
+  const flashContainer = new THREE.Group();
+  flashContainer.position.set(x, 0.1, z);
+
+  const ringGeo = new THREE.RingGeometry(0.45, 0.98, 32);
+  ringGeo.rotateX(-Math.PI / 2);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.96,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+  flashContainer.add(ringMesh);
+
+  const coreGeo = new THREE.SphereGeometry(isShot ? 0.82 : 0.56, 16, 16);
+  const coreMat = new THREE.MeshBasicMaterial({
+    color: 0xe0f2fe,
+    transparent: true,
+    opacity: 0.92,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+  coreMesh.position.y = 0.42;
+  flashContainer.add(coreMesh);
+
+  impactShockwavesGroup.add(flashContainer);
+
+  gsap.to(ringMesh.scale, {
+    x: isShot ? 5.2 : 3.9,
+    y: 1,
+    z: isShot ? 5.2 : 3.9,
+    duration: 0.56,
+    ease: 'power2.out'
+  });
+  gsap.to(ringMat, {
+    opacity: 0,
+    duration: 0.56,
+    ease: 'power2.out'
+  });
+  gsap.to(coreMesh.scale, {
+    x: 2.4,
+    y: 2.4,
+    z: 2.4,
+    duration: 0.36,
+    ease: 'power2.out'
+  });
+  gsap.to(coreMat, {
+    opacity: 0,
+    duration: 0.38,
+    ease: 'power2.out',
+    onComplete: () => {
+      impactShockwavesGroup?.remove(flashContainer);
+      ringGeo.dispose();
+      ringMat.dispose();
+      coreGeo.dispose();
+      coreMat.dispose();
+    }
+  });
+}
+
+/**
  * Secuencia coreografiada en 3 tiempos con GSAP Timeline por cada paso de jugada preparada:
  * 1) Desmarque previo del receptor con anillo fantasma en origen (0.0s -> 0.24s)
- * 2) Salida del pase/remate con arco parabólico 3D suave, rotación y estela persistente (0.22s -> 1.32s)
+ * 2) Salida del pase/remate Kaiser Impact (estela cian eléctrico 3D + núcleo blanco + destello radial al llegar)
  * 3) Encuadre Follow-Cam suave y continuo sin tirones bruscos
  */
 export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, isShot = false) {
@@ -892,6 +1173,7 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
 
   ballMesh.visible = true;
   ballShadowMesh.visible = true;
+  if (ballAuraRing) ballAuraRing.visible = false;
 
   // Paso 1: Cobrador perfilado junto al balón antes del envío
   if (dist < 0.5) {
@@ -919,9 +1201,9 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
       ? Math.min(6.6, 2.3 + dist * 0.18)
       : 1.15;
 
-  // Estela parabólica 3D luminosa persistente durante el paso
-  if (trailLine && linksGroup) {
-    linksGroup.remove(trailLine);
+  // Estela parabólica 3D luminosa "Kaiser Impact" (#00f0ff + núcleo blanco plasma)
+  if (trailGroup) {
+    trailGroup.clear();
   }
   const midX = (x1 + x2) / 2;
   const midZ = (z1 + z2) / 2;
@@ -930,15 +1212,26 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
     new THREE.Vector3(midX, peakY + 0.85, midZ),
     new THREE.Vector3(x2, 0.56, z2)
   );
-  const curvePoints = curve3D.getPoints(42);
-  const trailGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
-  const trailMat = new THREE.LineBasicMaterial({
-    color: isShot ? 0xf43f5e : 0xfbbf24,
+
+  const outerGeo = new THREE.TubeGeometry(curve3D, 44, isShot ? 0.19 : 0.13, 8, false);
+  const outerMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
     transparent: true,
-    opacity: 0.0
+    opacity: 0,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
   });
-  trailLine = new THREE.Line(trailGeo, trailMat);
-  linksGroup.add(trailLine);
+  const coreGeo = new THREE.TubeGeometry(curve3D, 44, isShot ? 0.068 : 0.045, 6, false);
+  const coreMat = new THREE.MeshBasicMaterial({
+    color: 0xe0f2fe,
+    transparent: true,
+    opacity: 0,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  if (trailGroup) {
+    trailGroup.add(new THREE.Mesh(outerGeo, outerMat), new THREE.Mesh(coreGeo, coreMat));
+  }
 
   // Posicionar balón en el punto de salida mientras el receptor inicia su desmarque (Tiempo 1)
   ballMesh.position.set(x1, 0.56, z1);
@@ -947,12 +1240,12 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
   const flightProxy = { t: 0 };
   activeStepTimeline = gsap.timeline();
 
-  // Tiempo 2 (t = 0.22s): El balón sale tras iniciar el desmarque y describe el arco parabólico
+  // Tiempo 2 (t = 0.22s): El balón sale con rastro Kaiser Impact y destello radial en recepción
   activeStepTimeline.to(
-    trailMat,
+    [outerMat, coreMat],
     {
-      opacity: 0.9,
-      duration: 0.28,
+      opacity: (i) => (i === 0 ? 0.78 : 0.96),
+      duration: 0.24,
       ease: 'sine.out'
     },
     0.2
@@ -962,8 +1255,11 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
     flightProxy,
     {
       t: 1,
-      duration: 1.12,
+      duration: 1.05,
       ease: 'power2.inOut',
+      onStart: () => {
+        if (ballAuraRing) ballAuraRing.visible = true;
+      },
       onUpdate: () => {
         const t = flightProxy.t;
         const bx = x1 + (x2 - x1) * t;
@@ -971,12 +1267,20 @@ export function animateBall3DParabolic(fromPt2D, toPt2D, isElevatedPass = true, 
         const by = 0.56 + 4 * peakY * t * (1 - t);
 
         ballMesh.position.set(bx, by, bz);
-        ballMesh.rotation.x += 0.16;
-        ballMesh.rotation.z -= 0.14;
+        ballMesh.rotation.x += 0.2;
+        ballMesh.rotation.z -= 0.16;
+
+        if (ballAuraRing) {
+          ballAuraRing.position.set(bx, by, bz);
+        }
 
         ballShadowMesh.position.set(bx, 0.03, bz);
         const shadowScale = Math.max(0.42, 1 - (by - 0.56) / (peakY * 2.1));
         ballShadowMesh.scale.set(shadowScale, shadowScale, 1);
+      },
+      onComplete: () => {
+        if (ballAuraRing) ballAuraRing.visible = false;
+        spawnImpactFlash3D(x2, z2, isShot);
       }
     },
     0.22
@@ -1026,6 +1330,23 @@ export function disposeStadium3D() {
     resizeObserver = null;
   }
   pawnMap.clear();
+  if (ambientEnergyPoints) {
+    ambientEnergyPoints.geometry.dispose();
+    ambientEnergyPoints.material.dispose();
+    ambientEnergyPoints = null;
+  }
+  ambientEnergyVelocities = null;
+  if (ambientEnergyTexture) {
+    ambientEnergyTexture.dispose();
+    ambientEnergyTexture = null;
+  }
+  if (ballAuraRing) {
+    ballAuraRing.geometry.dispose();
+    ballAuraRing.material.dispose();
+    ballAuraRing = null;
+  }
+  if (trailGroup) trailGroup.clear();
+  if (impactShockwavesGroup) impactShockwavesGroup.clear();
   if (turfTexture) {
     turfTexture.dispose();
     turfTexture = null;
@@ -1038,7 +1359,7 @@ export function disposeStadium3D() {
   camera = null;
   controls = null;
   if (dom.stadium3dContainer) {
-    dom.stadium3dContainer.innerHTML = '';
+    dom.stadium3dContainer.replaceChildren();
   }
 }
 
