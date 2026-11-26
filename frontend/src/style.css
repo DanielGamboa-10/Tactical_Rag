@@ -3933,13 +3933,61 @@ body {
 
 .intro-rose-bg-pattern {
   position: absolute;
-  inset: -5%;
+  inset: -4%;
   z-index: 1;
   opacity: 0;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%231d4ed8' stroke-width='0.9' stroke-opacity='0.38'%3E%3Ccircle cx='60' cy='60' r='26'/%3E%3Cpath d='M60 34 C75 34 86 46 84 60 C82 74 71 85 60 86 C49 85 38 74 36 60 C34 46 45 34 60 34 Z'/%3E%3Cpath d='M60 44 C70 44 76 52 74 61 C72 70 64 74 56 72 C48 70 46 61 50 54 C54 48 61 48 66 53 C70 57 68 64 62 66 C56 68 52 63 54 58'/%3E%3Cpath d='M0 60 Q30 30 60 0 Q90 30 120 60 Q90 90 60 120 Q30 90 0 60 Z' stroke='%2338bdf8' stroke-opacity='0.16'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 120px 120px;
-  mask-image: radial-gradient(circle at 50% 48%, black 25%, transparent 85%);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='bgRoseGrad' x1='0%25' y1='100%25' x2='15%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%2303060f'/%3E%3Cstop offset='48%25' stop-color='%231d4ed8'/%3E%3Cstop offset='100%25' stop-color='%23bae6fd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg opacity='0.9'%3E%3Cpath d='M0 110 C42 90 68 58 110 0 M110 220 C152 162 178 130 220 110 M0 20 C56 38 148 168 220 200' stroke='%231e3a8a' stroke-width='1.5' stroke-opacity='0.6'/%3E%3Cpath d='M42 74 L35 66 L48 69 Z M148 156 L156 164 L142 161 Z M74 176 L83 181 L78 168 Z' fill='%237dd3fc' fill-opacity='0.55'/%3E%3C/g%3E%3Cg transform='translate(110 110) scale(0.74)'%3E%3Ccircle r='64' stroke='%2338bdf8' stroke-width='1.1' stroke-opacity='0.42'/%3E%3Cpath d='M0 -56 L18 -44 L24 -22 L0 -12 L-24 -22 L-18 -44 Z' fill='url(%23bgRoseGrad)' stroke='%237dd3fc' stroke-width='1.4'/%3E%3Cpath d='M-22 -42 L-44 -38 L-56 -18 L-48 6 L-24 10 L-14 -16 Z' fill='url(%23bgRoseGrad)' stroke='%237dd3fc' stroke-width='1.4'/%3E%3Cpath d='M22 -42 L44 -38 L56 -18 L48 6 L24 10 L14 -16 Z' fill='url(%23bgRoseGrad)' stroke='%237dd3fc' stroke-width='1.4'/%3E%3Cpath d='M-48 8 L-50 28 L-32 46 L-10 48 L-6 24 L-26 6 Z' fill='url(%23bgRoseGrad)' stroke='%237dd3fc' stroke-width='1.4'/%3E%3Cpath d='M48 8 L50 28 L32 46 L10 48 L6 24 L26 6 Z' fill='url(%23bgRoseGrad)' stroke='%237dd3fc' stroke-width='1.4'/%3E%3Cpath d='M0 -34 L18 -24 L20 -4 L6 12 L-6 12 L-20 -4 L-18 -24 Z' fill='url(%23bgRoseGrad)' stroke='%23bae6fd' stroke-width='1.5'/%3E%3Cpath d='M0 -48 L0 -14 M-44 -18 L-16 -2 M44 -18 L16 -2 M-34 26 L-10 10 M34 26 L10 10' stroke='%23e0f2fe' stroke-width='1.1' stroke-opacity='0.78'/%3E%3Cpath d='M-11 -8 L0 -16 L11 -8 L7 5 L0 9 L-7 5 Z' fill='%2303060f' stroke='%23e0f2fe' stroke-width='1.4'/%3E%3C/g%3E%3Cg transform='translate(20 20) scale(0.38) rotate(22)'%3E%3Cpath d='M0 -50 L18 -36 L14 -10 L-14 -10 L-18 -36 Z M-46 -12 L-22 -34 L-10 6 L-34 24 Z M46 -12 L22 -34 L10 6 L34 24 Z M-24 22 L0 48 L24 22 L0 2 Z' fill='url(%23bgRoseGrad)' stroke='%23bae6fd' stroke-width='1.6'/%3E%3Ccircle r='9' fill='%2303060f' stroke='%23e0f2fe' stroke-width='1.4'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  mask-image: radial-gradient(circle at 50% 48%, rgba(0, 0, 0, 0.25) 14%, black 58%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+/* Lateral Kaiser Intertwined Thorny Briar Vines & Sculpted Blooms */
+.intro-lateral-vines-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.intro-vine-side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(200px, 31vw, 460px);
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  filter: drop-shadow(0 0 14px rgba(29, 78, 216, 0.42));
+}
+
+.intro-vine-left {
+  left: 0;
+}
+
+.intro-vine-right {
+  right: 0;
+}
+
+.intro-vine-trace {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.intro-vine-body,
+.intro-vine-thorn,
+.intro-mini-crown,
+.intro-side-bloom {
+  opacity: 0;
+}
+
+@media (max-width: 640px) {
+  .intro-vine-side {
+    width: clamp(130px, 36vw, 210px);
+    opacity: 0.78;
+  }
 }
 
 .intro-rose-canvas {

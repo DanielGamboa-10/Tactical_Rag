@@ -250,15 +250,33 @@ export function playBlueRoseIntroCinematic() {
   gsap.set(quoteEl, { opacity: 0, y: 14 });
   gsap.set(flashLayer, { opacity: 0 });
 
+  // Preparar trazos laterales Kaiser (enredaderas espinosas, espinas, mini-coronas y brotes)
+  const vineTraces = Array.from(overlay.querySelectorAll('.intro-vine-trace'));
+  const vineBodies = Array.from(overlay.querySelectorAll('.intro-vine-body'));
+  const vineThorns = Array.from(overlay.querySelectorAll('.intro-vine-thorn'));
+  const miniCrowns = Array.from(overlay.querySelectorAll('.intro-mini-crown'));
+  const sideBlooms = Array.from(overlay.querySelectorAll('.intro-side-bloom'));
+
+  gsap.set(vineBodies, { opacity: 0 });
+  gsap.set(vineThorns, { opacity: 0, scale: 0.7, transformOrigin: '50% 50%' });
+  gsap.set(miniCrowns, { opacity: 0, scale: 0.72, transformOrigin: '50% 50%' });
+  gsap.set(sideBlooms, { opacity: 0, scale: 0.6, transformOrigin: '50% 50%' });
+
   // Respetar preferencia del SO prefers-reduced-motion mostrando emblema estático breve
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    [stemPath, domePath].forEach((pathEl) => {
+    [stemPath, domePath, ...vineTraces].forEach((pathEl) => {
       if (!pathEl) return;
       pathEl.style.strokeDasharray = 'none';
       pathEl.style.strokeDashoffset = '0';
       pathEl.style.opacity = '1';
     });
-    gsap.set(bgPattern, { opacity: 0.28, scale: 1 });
+    gsap.set(bgPattern, { opacity: 0.14, scale: 1 });
+    gsap.set(vineBodies, { opacity: 0.88 });
+    gsap.set(vineThorns, { opacity: 0.9, scale: 1 });
+    gsap.set(miniCrowns, { opacity: 0.85, scale: 1 });
+    sideBlooms.forEach((bloomEl) => {
+      gsap.set(bloomEl, { opacity: Number(bloomEl.dataset.targetOpacity) || 0.38, scale: 1 });
+    });
     gsap.set([roseLayerCore, roseLayerMid, roseLayerOuter, leafLeft, leafRight], {
       opacity: 1,
       scale: 1
@@ -271,7 +289,7 @@ export function playBlueRoseIntroCinematic() {
   }
 
   // Preparar trazos SVG usando pathLength="100" (+2u para cerrar 100% sin forzar getTotalLength reflow)
-  [stemPath, domePath].forEach((pathEl) => {
+  [stemPath, domePath, ...vineTraces].forEach((pathEl) => {
     if (!pathEl) return;
     pathEl.style.strokeDasharray = '102';
     pathEl.style.strokeDashoffset = '102';
@@ -487,11 +505,82 @@ export function playBlueRoseIntroCinematic() {
     2.35
   );
 
-  // FASE 3 (2.8s – 4.3s): Fuego Azul ascendente, grabado floral y lema legible durante 1.5s
+  // Trazado progresivo de enredaderas espinosas, espinas, mini-coronas y brotes laterales (1.5s – 3.2s)
+  if (vineTraces.length > 0) {
+    introTimeline.to(
+      vineTraces,
+      {
+        strokeDashoffset: 0,
+        duration: 1.55,
+        stagger: 0.08,
+        ease: 'power2.inOut'
+      },
+      1.5
+    );
+  }
+
+  if (vineBodies.length > 0) {
+    introTimeline.to(
+      vineBodies,
+      {
+        opacity: 0.9,
+        duration: 1.2,
+        stagger: 0.09,
+        ease: 'power2.out'
+      },
+      1.68
+    );
+  }
+
+  if (vineThorns.length > 0) {
+    introTimeline.to(
+      vineThorns,
+      {
+        opacity: 0.92,
+        scale: 1,
+        duration: 0.42,
+        stagger: 0.035,
+        ease: 'back.out(1.8)'
+      },
+      1.85
+    );
+  }
+
+  if (miniCrowns.length > 0) {
+    introTimeline.to(
+      miniCrowns,
+      {
+        opacity: 0.86,
+        scale: 1,
+        duration: 0.52,
+        stagger: 0.14,
+        ease: 'back.out(1.7)'
+      },
+      2.25
+    );
+  }
+
+  if (sideBlooms.length > 0) {
+    sideBlooms.forEach((bloomEl, idx) => {
+      const targetOpacity = Number(bloomEl.dataset.targetOpacity) || 0.36;
+      introTimeline.to(
+        bloomEl,
+        {
+          opacity: targetOpacity,
+          scale: 1,
+          duration: 0.72,
+          ease: 'back.out(1.5)'
+        },
+        2.15 + idx * 0.14
+      );
+    });
+  }
+
+  // FASE 3 (2.8s – 4.3s): Fuego Azul ascendente, entramado floral de alta definición y lema legible durante 1.5s
   introTimeline.to(
     bgPattern,
     {
-      opacity: 0.34,
+      opacity: 0.14,
       scale: 1,
       duration: 0.9,
       ease: 'power2.out'
