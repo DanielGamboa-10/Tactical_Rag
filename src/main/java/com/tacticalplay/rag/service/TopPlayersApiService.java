@@ -164,7 +164,7 @@ public class TopPlayersApiService {
             new SeedCrack("Luis Díaz", "Fútbol 11", "EI", "Crack Actual", "Presión Intensa, Gambeta en Velocidad & Diagonal", 93, 82, 92, 65, 85, 83),
 
             // Delanteros Centros (9)
-            new SeedCrack("Cristiano Ronaldo", "Fútbol 11", "DC", "Leyenda & Crack", "Depredador Total, Salto Imperial & Remate con Ambas Piernas", 93, 85, 91, 55, 99, 88),
+            new SeedCrack("Cristiano Ronaldo", "Fútbol 11", "DC", "Leyenda & Crack", "Depredador Total, Salto Dominante & Remate con Ambas Piernas", 93, 85, 91, 55, 99, 88),
             new SeedCrack("Pelé", "Fútbol 11", "DC", "Leyenda Histórica", "O Rei · Delantero Total, Cabezazo, Pared y Definición", 94, 93, 97, 64, 98, 96),
             new SeedCrack("Ronaldo Nazário", "Fútbol 11", "DC", "Leyenda Histórica", "El Fenómeno · Explosividad, Bicicleta y Regate al Arquero", 97, 84, 97, 50, 98, 88),
             new SeedCrack("Kylian Mbappé", "Fútbol 11", "DC", "Crack Actual", "Desmarque al Espacio a 37 km/h & Definición al Primer Palo", 99, 85, 94, 52, 94, 87),
@@ -303,31 +303,43 @@ public class TopPlayersApiService {
     // =========================================================================
 
     public List<CustomPlayerEntity> getAllCustomPlayers() {
+        return getAllCustomPlayers("demo-club");
+    }
+
+    public List<CustomPlayerEntity> getAllCustomPlayers(String tenantId) {
+        String effectiveTenant = (tenantId != null && !tenantId.isBlank()) ? tenantId : "demo-club";
         return jdbcTemplate.query(
-                "SELECT * FROM custom_players ORDER BY jersey_number ASC, id ASC",
-                CUSTOM_PLAYER_MAPPER
+                "SELECT * FROM custom_players WHERE tenant_id = ? ORDER BY jersey_number ASC, id ASC",
+                CUSTOM_PLAYER_MAPPER,
+                effectiveTenant
         );
     }
 
     public CustomPlayerEntity createCustomPlayer(CustomPlayerEntity player) {
+        return createCustomPlayer(player, "demo-club");
+    }
+
+    public CustomPlayerEntity createCustomPlayer(CustomPlayerEntity player, String tenantId) {
+        String effectiveTenant = (tenantId != null && !tenantId.isBlank()) ? tenantId : "demo-club";
         String sql = """
                 INSERT INTO custom_players
-                (name, jersey_number, position, preferred_foot, pace, passing, dribbling, defending, shooting, vision)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (tenant_id, name, jersey_number, position, preferred_foot, pace, passing, dribbling, defending, shooting, vision)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setString(1, player.name());
-            ps.setInt(2, player.jerseyNumber());
-            ps.setString(3, player.position().toUpperCase());
-            ps.setString(4, player.preferredFoot() != null ? player.preferredFoot() : "Derecho");
-            ps.setInt(5, clampStat(player.pace()));
-            ps.setInt(6, clampStat(player.passing()));
-            ps.setInt(7, clampStat(player.dribbling()));
-            ps.setInt(8, clampStat(player.defending()));
-            ps.setInt(9, clampStat(player.shooting()));
-            ps.setInt(10, clampStat(player.vision()));
+            ps.setString(1, effectiveTenant);
+            ps.setString(2, player.name());
+            ps.setInt(3, player.jerseyNumber());
+            ps.setString(4, player.position().toUpperCase());
+            ps.setString(5, player.preferredFoot() != null ? player.preferredFoot() : "Derecho");
+            ps.setInt(6, clampStat(player.pace()));
+            ps.setInt(7, clampStat(player.passing()));
+            ps.setInt(8, clampStat(player.dribbling()));
+            ps.setInt(9, clampStat(player.defending()));
+            ps.setInt(10, clampStat(player.shooting()));
+            ps.setInt(11, clampStat(player.vision()));
             return ps;
         }, keyHolder);
 
@@ -348,19 +360,34 @@ public class TopPlayersApiService {
     }
 
     public void deleteCustomPlayer(Long id) {
-        jdbcTemplate.update("DELETE FROM custom_players WHERE id = ?", id);
+        deleteCustomPlayer(id, "demo-club");
+    }
+
+    public void deleteCustomPlayer(Long id, String tenantId) {
+        String effectiveTenant = (tenantId != null && !tenantId.isBlank()) ? tenantId : "demo-club";
+        jdbcTemplate.update("DELETE FROM custom_players WHERE id = ? AND tenant_id = ?", id, effectiveTenant);
     }
 
     public void clearAllCustomPlayers() {
-        jdbcTemplate.update("DELETE FROM custom_players");
+        clearAllCustomPlayers("demo-club");
+    }
+
+    public void clearAllCustomPlayers(String tenantId) {
+        String effectiveTenant = (tenantId != null && !tenantId.isBlank()) ? tenantId : "demo-club";
+        jdbcTemplate.update("DELETE FROM custom_players WHERE tenant_id = ?", effectiveTenant);
     }
 
     public List<CustomPlayerEntity> seedDemoSquad() {
-        return seedDemoSquad("Fútbol 11");
+        return seedDemoSquad("Fútbol 11", "demo-club");
     }
 
     public List<CustomPlayerEntity> seedDemoSquad(String modality) {
-        jdbcTemplate.update("DELETE FROM custom_players");
+        return seedDemoSquad(modality, "demo-club");
+    }
+
+    public List<CustomPlayerEntity> seedDemoSquad(String modality, String tenantId) {
+        String effectiveTenant = (tenantId != null && !tenantId.isBlank()) ? tenantId : "demo-club";
+        jdbcTemplate.update("DELETE FROM custom_players WHERE tenant_id = ?", effectiveTenant);
         // Sembramos tanto la plantilla completa de Fútbol 11/9/7 como la de Futsal para que al cambiar
         // de modalidad o formación todos los puestos tengan jugadores compatibles y suplentes en la banca.
         List<CustomPlayerEntity> demoPlayers = List.of(
@@ -404,7 +431,7 @@ public class TopPlayersApiService {
 
         List<CustomPlayerEntity> saved = new ArrayList<>();
         for (CustomPlayerEntity p : demoPlayers) {
-            saved.add(createCustomPlayer(p));
+            saved.add(createCustomPlayer(p, effectiveTenant));
         }
         boolean isFutsal = "Futsal".equalsIgnoreCase(modality);
         return saved.stream()
@@ -425,7 +452,7 @@ public class TopPlayersApiService {
             String formation,
             List<String> targetSlots
     ) {
-        return optimizeSquadAndCompare(modality, formation, targetSlots, "Posesión", false);
+        return optimizeSquadAndCompare(modality, formation, targetSlots, "Posesión", false, "demo-club");
     }
 
     public Map<String, Object> optimizeSquadAndCompare(
@@ -435,7 +462,18 @@ public class TopPlayersApiService {
             String playStyle,
             boolean idealChemistryMode
     ) {
-        List<CustomPlayerEntity> userPlayers = getAllCustomPlayers();
+        return optimizeSquadAndCompare(modality, formation, targetSlots, playStyle, idealChemistryMode, "demo-club");
+    }
+
+    public Map<String, Object> optimizeSquadAndCompare(
+            String modality,
+            String formation,
+            List<String> targetSlots,
+            String playStyle,
+            boolean idealChemistryMode,
+            String tenantId
+    ) {
+        List<CustomPlayerEntity> userPlayers = getAllCustomPlayers(tenantId);
         List<TopReferencePlayer> top100 = getAllTopReferencePlayers();
         String activeStyle = (playStyle != null && !playStyle.isBlank()) ? playStyle : "Posesión";
 
@@ -991,7 +1029,11 @@ public class TopPlayersApiService {
     }
 
     public String buildSquadContextForChatbot(String modality) {
-        List<CustomPlayerEntity> players = getAllCustomPlayers();
+        return buildSquadContextForChatbot(modality, "demo-club");
+    }
+
+    public String buildSquadContextForChatbot(String modality, String tenantId) {
+        List<CustomPlayerEntity> players = getAllCustomPlayers(tenantId);
         if (players.isEmpty()) {
             return "";
         }
