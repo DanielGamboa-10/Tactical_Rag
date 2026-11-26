@@ -1,14 +1,9 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:03060f,50:0f296e,100:38bdf8&height=230&section=header&text=TACTICALPLAY%20RAG&fontSize=54&fontColor=ffffff&fontAlignY=38&desc=Estudio%20T%C3%A1ctico%20IA%20%7C%20B%C3%BAsqueda%20H%C3%ADbrida%20pgvector%20%7C%20Pizarra%202D%2F2.5D%2F3D&descAlignY=60&descSize=16" alt="TacticalPlay RAG Banner" width="100%" />
+<img src="docs/banner-tacticalplay.svg" alt="TacticalPlay RAG Banner" width="100%" />
 
-<p>
-  <img src="https://img.shields.io/badge/Java-21-0f296e?style=for-the-badge&logo=openjdk&logoColor=38bdf8" alt="Java 21" />
-  <img src="https://img.shields.io/badge/Spring_Boot-3.3-0f296e?style=for-the-badge&logo=springboot&logoColor=38bdf8" alt="Spring Boot 3" />
-  <img src="https://img.shields.io/badge/PostgreSQL_16-pgvector_768d-0f296e?style=for-the-badge&logo=postgresql&logoColor=38bdf8" alt="PostgreSQL + pgvector" />
-  <img src="https://img.shields.io/badge/JavaScript-Vite_5-0f296e?style=for-the-badge&logo=vite&logoColor=38bdf8" alt="JavaScript + Vite" />
-  <img src="https://img.shields.io/badge/Three.js-Estadio_3D-0f296e?style=for-the-badge&logo=threedotjs&logoColor=38bdf8" alt="Three.js Estadio 3D" />
-  <img src="https://img.shields.io/badge/Spring_Security-JWT-0f296e?style=for-the-badge&logo=springsecurity&logoColor=38bdf8" alt="Spring Security JWT" />
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=java,spring,postgres,js,vite,threejs,docker,git&theme=dark" alt="Stack Tecnológico de TacticalPlay RAG" />
 </p>
 
 <p>

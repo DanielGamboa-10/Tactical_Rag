@@ -1,0 +1,272 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-labelledby="bannerTitle bannerDesc">
+  <title id="bannerTitle">TacticalPlay RAG</title>
+  <desc id="bannerDesc">Estudio Táctico IA, búsqueda híbrida pgvector y pizarra 2D / 2.5D / 3D, con rosas azules luminosas y enredaderas con espinas sobre una cancha táctica en azul abisal.</desc>
+
+  <defs>
+    <!-- Fondo -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#02050e"/>
+      <stop offset="0.5" stop-color="#0a193d"/>
+      <stop offset="1" stop-color="#030816"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.75">
+      <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.55"/>
+    </radialGradient>
+    <pattern id="fineGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#38bdf8" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <clipPath id="bannerClip">
+      <rect width="1200" height="300" rx="18"/>
+    </clipPath>
+
+    <!-- Brillos -->
+    <radialGradient id="titleGlowGrad" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#2563eb" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="haloGrad" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.65"/>
+      <stop offset="0.55" stop-color="#2563eb" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="scanGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#7dd3fc" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="textGlow" x="-10%" y="-40%" width="120%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Texto -->
+    <linearGradient id="titleFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#bae6fd"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <!-- Pétalos de rosa (base en 0,0 / punta en 0,-40) -->
+    <linearGradient id="petalOuter" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#0b2566"/>
+      <stop offset="1" stop-color="#2f7df0"/>
+    </linearGradient>
+    <linearGradient id="petalMid" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#1b43b8"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+    <linearGradient id="petalCore" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <path id="petal" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z"/>
+
+    <g id="rose">
+      <g fill="url(#petalOuter)" stroke="#7dd3fc" stroke-opacity="0.55" stroke-width="0.9" stroke-linejoin="round">
+        <use xlink:href="#petal" href="#petal" transform="rotate(0)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(72)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(144)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(216)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(288)"/>
+      </g>
+      <g fill="url(#petalMid)" stroke="#bae6fd" stroke-opacity="0.6" stroke-width="1" stroke-linejoin="round">
+        <use xlink:href="#petal" href="#petal" transform="rotate(36) scale(0.7)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(108) scale(0.7)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(180) scale(0.7)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(252) scale(0.7)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(324) scale(0.7)"/>
+      </g>
+      <g fill="url(#petalCore)" stroke="#ffffff" stroke-opacity="0.65" stroke-width="1.1" stroke-linejoin="round">
+        <use xlink:href="#petal" href="#petal" transform="rotate(10) scale(0.4)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(100) scale(0.4)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(190) scale(0.4)"/>
+        <use xlink:href="#petal" href="#petal" transform="rotate(280) scale(0.4)"/>
+      </g>
+      <circle r="3.2" fill="#e0f2fe"/>
+      <circle r="1.4" fill="#ffffff"/>
+    </g>
+
+    <!-- Decoración de esquina izquierda: enredaderas, espinas y rosas -->
+    <g id="cornerDecor">
+      <!-- Enredaderas -->
+      <g fill="none" stroke="#38bdf8" stroke-linecap="round" stroke-linejoin="round">
+        <g stroke-width="2.2" stroke-opacity="0.8" filter="url(#softGlow)">
+          <path d="M-10 110 C 50 100 95 150 70 205 C 50 250 100 290 190 288"/>
+          <path d="M120 -8 C 150 30 110 60 150 95 C 170 112 185 118 200 140"/>
+          <path d="M-10 290 C 40 262 20 235 55 215"/>
+        </g>
+        <!-- Zarcillos -->
+        <g stroke-width="1.4" stroke-opacity="0.65">
+          <path d="M70 205 C 92 200 104 214 94 226 C 86 234 76 228 82 220"/>
+          <path d="M150 95 C 160 80 178 82 180 94 C 181 102 172 104 170 98"/>
+          <path d="M190 288 C 205 284 212 292 206 298"/>
+        </g>
+        <!-- Flujo de energía por la enredadera -->
+        <g class="flow" stroke="#bae6fd" stroke-width="2" stroke-opacity="0.9" stroke-dasharray="6 54">
+          <path d="M-10 110 C 50 100 95 150 70 205 C 50 250 100 290 190 288"/>
+          <path d="M120 -8 C 150 30 110 60 150 95 C 170 112 185 118 200 140"/>
+        </g>
+      </g>
+      <!-- Espinas -->
+      <g fill="#7dd3fc" fill-opacity="0.85" stroke="#38bdf8" stroke-opacity="0.6" stroke-width="0.6" stroke-linejoin="round">
+        <polygon points="28,114 35,111 30,101"/>
+        <polygon points="59,135 66,131 73,123"/>
+        <polygon points="76,162 77,170 88,167"/>
+        <polygon points="69,233 68,241 57,238"/>
+        <polygon points="85,264 93,264 90,274"/>
+        <polygon points="126,283 134,282 132,292"/>
+        <polygon points="132,41 133,49 144,45"/>
+        <polygon points="130,16 129,23 118,19"/>
+        <polygon points="175,116 181,115 179,105"/>
+      </g>
+      <!-- Brotes -->
+      <g fill="#38bdf8" fill-opacity="0.9">
+        <circle cx="94" cy="226" r="3"/>
+        <circle cx="170" cy="98" r="2.6"/>
+        <circle cx="206" cy="298" r="2.4"/>
+        <circle cx="55" cy="215" r="2.6"/>
+      </g>
+      <!-- Halos de rosa -->
+      <circle class="halo" cx="88" cy="62" r="78" fill="url(#haloGrad)"/>
+      <circle class="halo h2" cx="46" cy="232" r="52" fill="url(#haloGrad)"/>
+      <circle class="halo h3" cx="160" cy="268" r="38" fill="url(#haloGrad)"/>
+      <!-- Rosas azules -->
+      <g transform="translate(88 62)"><use class="sway" xlink:href="#rose" href="#rose" transform="scale(1.15)"/></g>
+      <g transform="translate(46 232)"><use class="sway s2" xlink:href="#rose" href="#rose" transform="rotate(20) scale(0.8)"/></g>
+      <g transform="translate(160 268)"><use class="sway s3" xlink:href="#rose" href="#rose" transform="rotate(-15) scale(0.55)"/></g>
+    </g>
+  </defs>
+
+  <style>
+    .halo { transform-box: fill-box; transform-origin: center; animation: pulse 4.6s ease-in-out infinite; }
+    .halo.h2 { animation-delay: -1.5s; animation-duration: 5.2s; }
+    .halo.h3 { animation-delay: -3s; animation-duration: 4s; }
+    .sway { transform-box: fill-box; transform-origin: center; animation: sway 7s ease-in-out infinite; }
+    .sway.s2 { animation-duration: 8s; animation-delay: -2s; }
+    .sway.s3 { animation-duration: 6s; animation-delay: -4s; }
+    .title-glow { transform-box: fill-box; transform-origin: center; animation: pulse 5s ease-in-out infinite; }
+    .scan { animation: scan 8s linear infinite; }
+    .flow { animation: flow 5s linear infinite; }
+    .drift { transform-box: fill-box; transform-origin: center; opacity: 0; animation: drift 11s ease-in-out infinite; }
+    .twinkle { animation: twinkle 3.6s ease-in-out infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(0.92); }
+      50% { opacity: 0.95; transform: scale(1.08); }
+    }
+    @keyframes sway {
+      0%, 100% { transform: rotate(-3deg) scale(1); }
+      50% { transform: rotate(3deg) scale(1.04); }
+    }
+    @keyframes scan {
+      0% { transform: translateY(-8px); opacity: 0; }
+      10% { opacity: 0.9; }
+      90% { opacity: 0.9; }
+      100% { transform: translateY(308px); opacity: 0; }
+    }
+    @keyframes flow {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: -240; }
+    }
+    @keyframes drift {
+      0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+      15% { opacity: 0.85; }
+      55% { transform: translate(var(--dx), calc(var(--dy) * 0.55)) rotate(140deg); }
+      85% { opacity: 0.7; }
+      100% { opacity: 0; transform: translate(calc(var(--dx) * -0.6), var(--dy)) rotate(280deg); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.9; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .halo, .sway, .title-glow, .scan, .flow, .drift, .twinkle { animation: none; }
+      .drift { opacity: 0.5; }
+      .scan { opacity: 0; }
+    }
+  </style>
+
+  <g clip-path="url(#bannerClip)">
+    <!-- Fondo y cuadrícula táctica -->
+    <rect width="1200" height="300" fill="url(#bgGrad)"/>
+    <rect width="1200" height="300" fill="url(#fineGrid)"/>
+
+    <!-- Líneas de cancha translúcidas -->
+    <g fill="none" stroke="#38bdf8" stroke-opacity="0.13" stroke-width="1.6">
+      <rect x="28" y="24" width="1144" height="252" rx="8"/>
+      <line x1="600" y1="24" x2="600" y2="276"/>
+      <circle cx="600" cy="150" r="62"/>
+      <rect x="28" y="84" width="140" height="132"/>
+      <rect x="28" y="116" width="52" height="68"/>
+      <rect x="1032" y="84" width="140" height="132"/>
+      <rect x="1120" y="116" width="52" height="68"/>
+      <path d="M168 112 A 44 44 0 0 1 168 188"/>
+      <path d="M1032 112 A 44 44 0 0 0 1032 188"/>
+    </g>
+    <circle cx="600" cy="150" r="3" fill="#38bdf8" fill-opacity="0.35"/>
+
+    <!-- Destellos de fondo -->
+    <g fill="#bae6fd">
+      <circle class="twinkle" cx="300" cy="46" r="1.6"/>
+      <circle class="twinkle" cx="470" cy="262" r="1.4" style="animation-delay:-1s"/>
+      <circle class="twinkle" cx="720" cy="40" r="1.5" style="animation-delay:-2s"/>
+      <circle class="twinkle" cx="905" cy="250" r="1.7" style="animation-delay:-0.5s"/>
+      <circle class="twinkle" cx="1010" cy="58" r="1.3" style="animation-delay:-2.6s"/>
+      <circle class="twinkle" cx="380" cy="238" r="1.2" style="animation-delay:-1.8s"/>
+    </g>
+
+    <!-- Pulso de brillo detrás del título -->
+    <ellipse class="title-glow" cx="600" cy="146" rx="400" ry="84" fill="url(#titleGlowGrad)"/>
+
+    <!-- Pétalos flotantes -->
+    <g>
+      <g transform="translate(250 250) scale(0.3)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#38bdf8" style="--dx:36px;--dy:-190px;animation-duration:12s"/></g>
+      <g transform="translate(330 280) scale(0.24)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#7dd3fc" style="--dx:-30px;--dy:-210px;animation-duration:10s;animation-delay:-3s"/></g>
+      <g transform="translate(430 262) scale(0.28)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#60a5fa" style="--dx:40px;--dy:-180px;animation-duration:13s;animation-delay:-6s"/></g>
+      <g transform="translate(540 285) scale(0.22)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#38bdf8" style="--dx:-24px;--dy:-220px;animation-duration:11s;animation-delay:-8s"/></g>
+      <g transform="translate(680 275) scale(0.26)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#7dd3fc" style="--dx:30px;--dy:-200px;animation-duration:12.5s;animation-delay:-2s"/></g>
+      <g transform="translate(790 258) scale(0.3)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#60a5fa" style="--dx:-38px;--dy:-185px;animation-duration:10.5s;animation-delay:-5s"/></g>
+      <g transform="translate(880 284) scale(0.24)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#38bdf8" style="--dx:28px;--dy:-215px;animation-duration:13.5s;animation-delay:-7s"/></g>
+      <g transform="translate(960 255) scale(0.28)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#7dd3fc" style="--dx:-34px;--dy:-175px;animation-duration:11.5s;animation-delay:-4s"/></g>
+      <g transform="translate(610 296) scale(0.2)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#bae6fd" style="--dx:20px;--dy:-240px;animation-duration:14s;animation-delay:-9s"/></g>
+      <g transform="translate(360 200) scale(0.22)"><path class="drift" d="M0 0 C 15 -9 16 -30 0 -40 C -16 -30 -15 -9 0 0 Z" fill="#60a5fa" style="--dx:-22px;--dy:-150px;animation-duration:9.5s;animation-delay:-1s"/></g>
+    </g>
+
+    <!-- Línea de escaneo táctico -->
+    <rect class="scan" x="0" y="0" width="1200" height="2" fill="url(#scanGrad)"/>
+
+    <!-- Esquinas: enredaderas y rosas azules (izquierda y espejo derecha) -->
+    <use xlink:href="#cornerDecor" href="#cornerDecor"/>
+    <use xlink:href="#cornerDecor" href="#cornerDecor" transform="translate(1200 0) scale(-1 1)"/>
+
+    <!-- Título -->
+    <g text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+      <text x="600" y="152" font-size="64" font-weight="800" letter-spacing="5" fill="url(#titleFill)" filter="url(#textGlow)">TACTICALPLAY <tspan fill="#38bdf8">RAG</tspan></text>
+
+      <!-- Separador -->
+      <g stroke="#38bdf8" stroke-opacity="0.7" stroke-width="1.4">
+        <line x1="380" y1="177" x2="570" y2="177"/>
+        <line x1="630" y1="177" x2="820" y2="177"/>
+      </g>
+      <polygon points="600,171 606,177 600,183 594,177" fill="#7dd3fc"/>
+
+      <text x="600" y="214" font-size="20" font-weight="500" letter-spacing="1.2" fill="#bae6fd" fill-opacity="0.95">Estudio Táctico IA · Búsqueda Híbrida pgvector · Pizarra 2D / 2.5D / 3D</text>
+    </g>
+
+    <!-- Viñeta y marco -->
+    <rect width="1200" height="300" fill="url(#vignette)"/>
+    <rect x="0.75" y="0.75" width="1198.5" height="298.5" rx="17.5" fill="none" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="1.5"/>
+  </g>
+</svg>
